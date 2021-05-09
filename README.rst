@@ -3,13 +3,14 @@ cbsplotlib
 ==========
 
 
-Add a short description here!
+Een library om CBS plaatjes in de huisstijl te maken
 
 
-Description
-===========
+Omschrijving
+============
 
-A longer description of your project goes here...
+Moet nog komen
+
 
 
 .. _pyscaffold-notes:
