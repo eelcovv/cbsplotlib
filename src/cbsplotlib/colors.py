@@ -3,16 +3,8 @@ Definition of CBS rbg colors. Based on the color rgb definitions from the cbs La
 """
 
 import logging
-import math
-from pathlib import Path
 
-import numpy as np
 import matplotlib as mpl
-import matplotlib.patches as mpatches
-from matplotlib.path import Path as mPath
-from matplotlib.image import imread
-import matplotlib.transforms as trn
-from PIL import Image
 from matplotlib import colors as mcolors
 
 logger = logging.getLogger(__name__)
