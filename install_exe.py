@@ -10,7 +10,7 @@ This script runs the following steps
 
 Generates a wheel file in the dest directory
 
-2.: pip install ict_analyser --no-index --find-links <name of the wheel file> --prefix <location> -U
+2.: pip install cbsplotlib --no-index --find-links <name of the wheel file> --prefix <location> -U
 
 Installs the APP as a library
 
@@ -25,11 +25,11 @@ import argparse
 
 TOOLS_DIR = "\\\\cbsp.nl\\Productie\\secundair\\DecentraleTools\\Output\\CBS_Python"
 
-parser = argparse.ArgumentParser("Install the python cbs_utils module")
+parser = argparse.ArgumentParser("Install the python cbsplotlib module")
 parser.add_argument("--debug", help="Give debug info", dest="log_level", default=logging.INFO,
                     const=logging.DEBUG,
                     action="store_const")
-parser.add_argument("--app_name", help="Name of the module", default="cbs_utils")
+parser.add_argument("--app_name", help="Name of the module", default="cbsplotlib")
 parser.add_argument("--system_install", help="If true, install in the system directory",
                     action="store_true")
 parser.add_argument("--destination", help="Destination where the app is installed", default=TOOLS_DIR)
