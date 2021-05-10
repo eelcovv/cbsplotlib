@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 
-import matplotlib as mpl
 import matplotlib.patches as mpatches
 import matplotlib.transforms as trn
 import numpy as np
@@ -418,9 +417,9 @@ def add_axis_label_background(fig, axes, alpha=1,
         Distance from bottom of logo in mm. Default = 2
     logo_margin_y_in_mm=2,
         Distance from left of logo in mm. Default = 2
-   backgroundcolor: str, optional
+    backgroundcolor: str, optional
         Color of the grey square. Default is "cbs:lichtgrijs"
-   logo_edgecolor: str, optional
+    logo_edgecolor: str, optional
         Color of the logo edge. Default "cbs:logogrijs"
     """
 
@@ -468,14 +467,14 @@ def add_axis_label_background(fig, axes, alpha=1,
     else:
         raise AssertionError(f"This should not happen")
 
-    p1 = mpl.patches.Rectangle(rec_p,
-                               width=rec_w,
-                               height=rec_h,
-                               alpha=alpha,
-                               facecolor=backgroundcolor,
-                               edgecolor=backgroundcolor,
-                               zorder=0
-                               )
+    p1 = mpatches.Rectangle(rec_p,
+                            width=rec_w,
+                            height=rec_h,
+                            alpha=alpha,
+                            facecolor=backgroundcolor,
+                            edgecolor=backgroundcolor,
+                            zorder=0
+                            )
     p1.set_transform(axes.transAxes)
     p1.set_clip_on(False)
 
@@ -488,15 +487,15 @@ def add_axis_label_background(fig, axes, alpha=1,
     if aspect is None:
         aspect = bbox_axis_fig.height / bbox_axis_fig.width
     _logger.debug(f"Using aspect ratio {aspect}")
-    p2 = mpl.patches.FancyBboxPatch((x0 + xshift, y0 + yshift),
-                                    width=width - 2 * xshift,
-                                    height=height - 2 * yshift,
-                                    mutation_aspect=1 / aspect,
-                                    alpha=alpha,
-                                    facecolor=backgroundcolor,
-                                    edgecolor=backgroundcolor,
-                                    transform=fig.transFigure,
-                                    zorder=0)
+    p2 = mpatches.FancyBboxPatch((x0 + xshift, y0 + yshift),
+                                 width=width - 2 * xshift,
+                                 height=height - 2 * yshift,
+                                 mutation_aspect=1 / aspect,
+                                 alpha=alpha,
+                                 facecolor=backgroundcolor,
+                                 edgecolor=backgroundcolor,
+                                 transform=fig.transFigure,
+                                 zorder=0)
     p2.set_boxstyle("round", pad=pad)
     p2.set_transform(axes.transAxes)
     p2.set_clip_on(False)
