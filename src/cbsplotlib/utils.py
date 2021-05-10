@@ -187,7 +187,7 @@ def add_cbs_logo_to_plot(fig,
                          width=None,
                          height=None,
                          zorder_start=1,
-                         backgroundcolor="cbs:lichtgrijs",
+                         fillcolor="cbs:lichtgrijs",
                          edgecolor="cbs:logogrijs",
                          ):
     # maak een box met de coordinaten van de linker onderhoek van het grijze vierkant in axis
@@ -231,7 +231,7 @@ def add_cbs_logo_to_plot(fig,
             if ii == 0:
                 color = edgecolor
             else:
-                color = backgroundcolor
+                color = fillcolor
             poly = mpatches.PathPatch(tr_path, fc=color,
                                       linewidth=0,
                                       zorder=zorder,
@@ -391,6 +391,7 @@ def add_axis_label_background(fig, axes, alpha=1,
                               add_logo=True,
                               aspect=None,
                               backgroundcolor="cbs:lichtgrijs",
+                              logo_fillcolor="cbs:lichtgrijs",
                               logo_edgecolor="cbs:logogrijs",
                               ):
     """
@@ -513,7 +514,7 @@ def add_axis_label_background(fig, axes, alpha=1,
                              margin_x_in_mm=logo_margin_x_in_mm,
                              margin_y_in_mm=logo_margin_y_in_mm,
                              edgecolor=logo_edgecolor,
-                             backgroundcolor=backgroundcolor)
+                             fillcolor=logo_fillcolor)
 
 
 def clean_up_artists(axis, artist_list):
