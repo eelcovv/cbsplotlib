@@ -1,0 +1,7 @@
+matplotlib~=3.3.4
+numpy~=1.19.2
+importlib_metadata~=2.0.0
+cbsplotlib~=0.0.post1.dev4+g1ae14e7
+sphinx~=3.5.2
+seaborn~=0.11.1
+setuptools~=52.0.0
