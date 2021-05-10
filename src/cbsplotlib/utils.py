@@ -500,8 +500,11 @@ def add_axis_label_background(fig, axes, alpha=1,
     p2.set_transform(axes.transAxes)
     p2.set_clip_on(False)
 
-    axes.add_artist(p1)
-    axes.add_artist(p2)
+    # add_artist wordt niet door mpld3 herkend. add_patch wel. Wel chechekn of het ong wel goed gaat
+    # axes.add_artist(p1)
+    # axes.add_artist(p2)
+    axes.add_patch(p1)
+    axes.add_patch(p2)
 
     if add_logo:
         add_cbs_logo_to_plot(fig=fig,
