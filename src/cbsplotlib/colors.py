@@ -35,6 +35,26 @@ CBS_COLORS_RBG = {
     "codekleur": (88, 88, 88),
 }
 
+
+def rgb_to_hex(rgb):
+    """
+    Converteer een tuple met rgb waardes in  een hex
+
+    Parameters
+    ----------
+    rgb: tuple
+        tuple met rgb waardes met ints tussen de 0 en 255, bijv (10, 54, 255)
+
+    Returns
+    -------
+    str:
+        een sting met een hex representatie van de kleur
+    """
+    return "#{0:02x}{1:02x}{2:02x}".format(rgb[0], rgb[1], rgb[2]).upper()
+
+
+CBS_COLORS_HEX = {name: rgb_to_hex(rgb_value) for name, rgb_value in CBS_COLORS_RBG.items()}
+
 # prepend 'cbs:' to all color names to prevent collision
 CBS_COLORS = {"cbs:" + name: (value[0] / 255, value[1] / 255, value[2] / 255)
               for name, value in CBS_COLORS_RBG.items()}
