@@ -7,7 +7,7 @@ import matplotlib.transforms as trn
 import numpy as np
 from matplotlib.path import Path as mPath
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
 
@@ -445,7 +445,7 @@ def add_axis_label_background(fig, axes, alpha=1,
     width = x1 - x0
     height = y1 - y0
 
-    logger.debug(f"Adding rectangle with width {width} and height {height}")
+    _logger.debug(f"Adding rectangle with width {width} and height {height}")
 
     # eerste vierkant zorgt voor rechte hoeken aan de rechter kant
     if loc == "east":
@@ -478,7 +478,7 @@ def add_axis_label_background(fig, axes, alpha=1,
     # we moeten corrigeren voor de ronding van de hoeken als we een aspect ratio hebben
     if aspect is None:
         aspect = bbox_axis_fig.height / bbox_axis_fig.width
-    logger.debug(f"Using aspect ratio {aspect}")
+    _logger.debug(f"Using aspect ratio {aspect}")
     p2 = mpl.patches.FancyBboxPatch((x0 + xshift, y0 + yshift),
                                     width=width - 2 * xshift,
                                     height=height - 2 * yshift,

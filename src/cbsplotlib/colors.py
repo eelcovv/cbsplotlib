@@ -7,7 +7,7 @@ import logging
 import matplotlib as mpl
 from matplotlib import colors as mcolors
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 CBS_COLORS_RBG = {
     "corporateblauw": (39, 29, 108),
@@ -117,4 +117,4 @@ def get_color_palette(style="koel"):
 
 def report_colors():
     for name, value in CBS_COLORS.items():
-        logger.info("{:20s}: {}".format(name, value))
+        _logger.info("{:20s}: {}".format(name, value))

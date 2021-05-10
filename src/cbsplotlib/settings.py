@@ -9,7 +9,7 @@ import matplotlib as mpl
 
 from cbsplotlib.colors import get_color_palette
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
 
