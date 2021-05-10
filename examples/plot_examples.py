@@ -2,12 +2,13 @@ import logging
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+from cbsplotlib.settings import CBSPlotSettings
+from cbsplotlib.utils import add_axis_label_background
 
-from cbs_utils.misc import (create_logger, merge_loggers)
-from cbs_utils.plotting import (CBSPlotSettings, add_axis_label_background)
-
-logger = create_logger(console_log_level=logging.DEBUG)
-logger = merge_loggers(logger, "cbs_utils.plotting", logger_level_to_merge=logging.DEBUG)
+logging.basicConfig(level=logging.INFO,
+                    format="[%(levelname)8s] %(message)s"
+                    )
+_logger = logging.getLogger(__name__)
 figure_properties = CBSPlotSettings()
 
 
@@ -36,7 +37,7 @@ def make_bar_plot(data_df, orientation="horizontal"):
         kind = "bar"
 
     # plot data. Cbs stijl wil een ruimte tussen de bar van 0.75 pt. Los dit op door een witte rand
-    data_df.plot(kind=kind, ax=axis, edgecolor="white", linewidth=0.75, rot=0)
+    data_df.plot(kind=kind, ax=axis, edgecolor="white", linewidth=0.75, rot=0, zorder=2)
 
     if orientation == "horizontal":
         # pas marges aan
@@ -48,7 +49,8 @@ def make_bar_plot(data_df, orientation="horizontal"):
         axis.set_xlim((xticks[0], xticks[-1]))
 
         # stel de grid lijnen in en haal de buiten randen behalve de bodem en links weg
-        axis.xaxis.grid(True)
+        # zorder is nodig om te zorgen dat de gridlijnen niet boven de bars komen, maar onder
+        axis.xaxis.grid(True, zorder=0)
         axis.tick_params(which="both", bottom=False, left=False)
         # xlabel aan de rechter zijde
         axis.set_xlabel("Gemiddelde afmeting [mm]", horizontalalignment="right")
@@ -69,14 +71,14 @@ def make_bar_plot(data_df, orientation="horizontal"):
         add_axis_label_background(fig, axes=axis, )
     else:
         fig.subplots_adjust(bottom=0.3)
-        
+
         yticks = axis.get_yticks()
         axis.set_ylim((yticks[0], yticks[-1]))
         axis.yaxis.grid(True)
         axis.tick_params(which="both", right=False, left=False)
 
         # ylabel aan de boven
-        axis.set_ylabel("Gemiddelde afmeting [mm]", rotation="horizontal", 
+        axis.set_ylabel("Gemiddelde afmeting [mm]", rotation="horizontal",
                         horizontalalignment="left")
         axis.yaxis.set_label_coords(-0.05, 1.05)
 
@@ -94,7 +96,6 @@ def make_bar_plot(data_df, orientation="horizontal"):
         axis.spines["bottom"].set_linewidth(1.5)
         axis.spines["bottom"].set_color("cbs:grijs")
 
-
         add_axis_label_background(fig, axes=axis, loc="south")
 
     # de legend aan de onderkant
@@ -106,14 +107,16 @@ def make_bar_plot(data_df, orientation="horizontal"):
                          title="Afmeting bloemdeel")
     legend._legend_box.align = "left"
 
-    im_name = "plot_example_"  + orientation
+    im_name = "plot_example_" + orientation
     # fig.savefig(im_name + ".png")
     fig.savefig(im_name + ".pdf")
 
 
 def main():
+
+    # laad de dataset
     iris = sns.load_dataset('iris')
-    logger.info(iris.head())
+    _logger.info(f"\n{iris.head()}")
 
     # hernoem de kolommen
     iris.rename(columns={
@@ -127,12 +130,12 @@ def main():
     geometry_df = iris.groupby("species").mean()
     geometry_df.index.name = "Soort bloem"
 
-    logger.info(geometry_df)
+    _logger.info(f"\n{geometry_df}")
 
     make_bar_plot(data_df=geometry_df, orientation="horizontal")
 
     make_bar_plot(data_df=geometry_df, orientation="vertical")
-    
+
     plt.show()
 
 
