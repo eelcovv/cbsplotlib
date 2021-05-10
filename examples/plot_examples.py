@@ -46,7 +46,8 @@ def make_bar_plot(data_df, orientation="horizontal"):
         xticks = axis.get_xticks()
         # de ccn standaard schrijft voor dat de hoogste tick waarde hoger is dan de hoogste waarde
         # in de grafiek. Lost dat op door de hoogste  xlimit gelijk aan de hoogste xtick te zetten
-        axis.set_xlim((xticks[0], xticks[-1]))
+        # tel die 0.01 op omdat anders de bovenste gridlijn niet goed zichtbaar is
+        axis.set_xlim((xticks[0], xticks[-1] + 0.01))
 
         # stel de grid lijnen in en haal de buiten randen behalve de bodem en links weg
         # zorder is nodig om te zorgen dat de gridlijnen niet boven de bars komen, maar onder
@@ -113,7 +114,6 @@ def make_bar_plot(data_df, orientation="horizontal"):
 
 
 def main():
-
     # laad de dataset
     iris = sns.load_dataset('iris')
     _logger.info(f"\n{iris.head()}")
