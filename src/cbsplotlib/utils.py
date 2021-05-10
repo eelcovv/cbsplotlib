@@ -187,6 +187,8 @@ def add_cbs_logo_to_plot(fig,
                          width=None,
                          height=None,
                          zorder_start=1,
+                         backgroundcolor="cbs:lichtgrijs",
+                         edgecolor="cbs:logogrijs",
                          ):
     # maak een box met de coordinaten van de linker onderhoek van het grijze vierkant in axis
     # fractie coordinaten
@@ -227,9 +229,9 @@ def add_cbs_logo_to_plot(fig,
             dr = points[:, 2]
             tr_path = mPath(pl, dr).transformed(trans.inverted())
             if ii == 0:
-                color = "cbs:logogrijs"
+                color = edgecolor
             else:
-                color = "cbs:lichtgrijs"
+                color = backgroundcolor
             poly = mpatches.PathPatch(tr_path, fc=color,
                                       linewidth=0,
                                       zorder=zorder,
@@ -387,7 +389,9 @@ def add_axis_label_background(fig, axes, alpha=1,
                               logo_margin_x_in_mm=1,
                               logo_margin_y_in_mm=1,
                               add_logo=True,
-                              aspect=None
+                              aspect=None,
+                              backgroundcolor="cbs:lichtgrijs",
+                              logo_edgecolor="cbs:logogrijs",
                               ):
     """
     Add a background to the axis label
@@ -413,6 +417,10 @@ def add_axis_label_background(fig, axes, alpha=1,
         Distance from bottom of logo in mm. Default = 2
     logo_margin_y_in_mm=2,
         Distance from left of logo in mm. Default = 2
+   backgroundcolor: str, optional
+        Color of the grey square. Default is "cbs:lichtgrijs"
+   logo_edgecolor: str, optional
+        Color of the logo edge. Default "cbs:logogrijs"
     """
 
     # the bounding box with respect to the axis in Figure coordinates
@@ -463,8 +471,8 @@ def add_axis_label_background(fig, axes, alpha=1,
                                width=rec_w,
                                height=rec_h,
                                alpha=alpha,
-                               facecolor='cbs:lichtgrijs',
-                               edgecolor='cbs:lichtgrijs',
+                               facecolor=backgroundcolor,
+                               edgecolor=backgroundcolor,
                                zorder=0
                                )
     p1.set_transform(axes.transAxes)
@@ -484,8 +492,8 @@ def add_axis_label_background(fig, axes, alpha=1,
                                     height=height - 2 * yshift,
                                     mutation_aspect=1 / aspect,
                                     alpha=alpha,
-                                    facecolor='cbs:lichtgrijs',
-                                    edgecolor='cbs:lichtgrijs',
+                                    facecolor=backgroundcolor,
+                                    edgecolor=backgroundcolor,
                                     transform=fig.transFigure,
                                     zorder=0)
     p2.set_boxstyle("round", pad=pad)
@@ -503,7 +511,9 @@ def add_axis_label_background(fig, axes, alpha=1,
                              width=width,
                              height=height,
                              margin_x_in_mm=logo_margin_x_in_mm,
-                             margin_y_in_mm=logo_margin_y_in_mm)
+                             margin_y_in_mm=logo_margin_y_in_mm,
+                             edgecolor=logo_edgecolor,
+                             backgroundcolor=backgroundcolor)
 
 
 def clean_up_artists(axis, artist_list):
