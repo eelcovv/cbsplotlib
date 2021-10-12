@@ -68,6 +68,110 @@ class Chart(HCElement):
         self._prop["animation"] = animation
 
 
+class Categories(HCElement):
+    def __init__(self,
+                 chart_type=None,
+                 values=None
+                 ):
+        super().__init__(chart_type=chart_type)
+
+        categories = values
+        self._prop["categories"] = values
+
+
+class Axis(HCElement):
+    def __init__(self,
+                 chart_type=None,
+                 draw_horizontal_borders=False,
+                 line_color="#666666",
+                 line_width=1,
+                 tick_color="#C6C6C6",
+                 tick_length=0,
+                 title=None,
+                 categories=None,
+                 labels=None,
+                 tickmark_placement="between",
+                 start_on_tick=False,
+                 show_first_label=False,
+                 end_on_tick=False,
+                 show_last_label=False,
+                 ):
+        super().__init__(chart_type=chart_type)
+
+        axis = {
+            "drawHorizontalBorders": draw_horizontal_borders,
+            "lineColor": line_color,
+            "lineWidth": line_width,
+            "tickColor": tick_color,
+            "tickLength": tick_length,
+        }
+        if title is not None:
+            axis["title"] = title
+        if labels is not None:
+            axis["labels"] = labels
+
+        axis["tickmarkPlacement"] = tickmark_placement
+        axis["startOnTick"] = start_on_tick
+        axis["showFirstLabel"] = show_first_label
+        axis["endOnTick"] = end_on_tick
+        axis["showLastLabel"] = show_last_label
+
+        if categories is not None:
+            axis["categories"] = categories
+
+        for key, value in axis.items():
+            self._prop[key] = value
+
+
+class Style(HCElement):
+    def __init__(self,
+                 chart_type=None,
+                 font_family=None,
+                 font_size=None,
+                 color=None,
+                 ):
+
+        super().__init__(chart_type=chart_type)
+
+        style = {}
+        if font_family is not None:
+            style["fontFamily"] = font_family
+        if font_size is not None:
+            style["fontSize"] = font_size
+        if color is not None:
+            style["color"] = color
+
+        for key, value in style.items():
+            self._prop[key] = value
+
+
+class Title(HCElement):
+    def __init__(self,
+                 chart_type=None,
+                 style=None,
+                 align="left",
+                 x_shift=None,
+                 use_html=None,
+                 rotation=None,
+                 ):
+        super().__init__(chart_type=chart_type)
+
+        title = {
+            "align": align,
+        }
+        if style is not None:
+            title["style"] = style
+        if x_shift is not None:
+            title["x"] = x_shift
+        if use_html is not None:
+            title["useHTML"] = use_html
+        if rotation is not None:
+            title["rotation"] = rotation
+
+        for key, value in title.items():
+            self._prop[key] = value
+
+
 class PlotOptions(HCElement):
     def __init__(self,
                  chart_type=None,
@@ -116,6 +220,8 @@ class CBSHighChart:
                  filename: str = None,
                  output_directory: str = None,
                  chart_type: str = None,
+                 chart_title: str = None,
+                 chart_subtitle: str = None,
                  chart_inverted=None,
                  chart_spacing_left=None,
                  chart_margin_right=None,
@@ -124,13 +230,16 @@ class CBSHighChart:
                  chart_polar=False,
                  chart_events={}
                  ):
-        self.chart_type = chart_type
         self.data_df = data
         self.filename = filename
         if output_directory is None:
             self.output_directory = Path(".")
         else:
             self.output_directory = Path(output_directory)
+
+        self.chart_type = chart_type
+        self.chart_title = chart_title
+        self.chart_subtitle = chart_subtitle
         self.chart_inverted = chart_inverted
         self.chart_spacing_left = chart_spacing_left
         self.chart_margin_right = chart_margin_right
@@ -141,14 +250,22 @@ class CBSHighChart:
 
         _logger.debug(f"have data\n{data}")
 
+        self.template = {}
         self.output = {}
 
-        self.add_template()
+        self.add_template_chart()
+        self.add_template_plot_options()
+        self.add_template_title()
+        self.add_template_title(title_key="subtitle")
+        self.add_template_axis()
+
+        self.output["template"] = self.template
+
         self.add_options()
 
         self.write_to_file()
 
-    def add_template(self):
+    def add_template_chart(self):
         chart = Chart(chart_type=self.chart_type,
                       inverted=self.chart_inverted,
                       spacing_left=self.chart_spacing_left,
@@ -158,13 +275,39 @@ class CBSHighChart:
                       polar=self.chart_animation,
                       events=self.chart_events
                       )
-        template = {}
-        template["chart"] = chart.serialize()
+        self.template["chart"] = chart.serialize()
 
+    def add_template_plot_options(self):
         plot_options = PlotOptions(chart_type=self.chart_type)
-        template["plotOptions"] = plot_options.serialize()
+        self.template["plotOptions"] = plot_options.serialize()
 
-        self.output["template"] = template
+    def add_template_title(self, title_key=" title"):
+
+        if self.chart_title is not None:
+            style = Style(font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
+                          font_size="17px",
+                          color="#000")
+            title = Title(style=style.serialize())
+        else:
+            title = Title()
+
+        self.template[title_key] = title.serialize()
+
+    def add_template_axis(self, axis_key="xAxis"):
+
+        categories = Categories(self.data_df.index)
+
+        style = Style()
+        title = Title(align="high", style=style.serialize(), use_html=True, rotation=0)
+
+        label_style = Style(font_size="11px", color="#000000")
+        labels = Title(style=label_style.serialize())
+
+        axis = Axis(categories=categories.serialize(),
+                    title=title.serialize(),
+                    labels=labels.serialize())
+        self.template[axis_key] = axis.serialize()
+        _logger.debug("axis: {axis}")
 
     def add_options(self):
         options = {}

@@ -23,5 +23,5 @@ data_df = pd.read_csv(data_input_directory / Path("cbs_hc_bar.csv"))
 
 logger.info(data_df)
 
-hc = CBSHighChart(data_df, chart_type="bar", output_directory="out")
+hc = CBSHighChart(data_df, chart_type="bar", output_directory=output_directory)
 print("Done")
