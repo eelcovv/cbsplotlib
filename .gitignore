@@ -54,3 +54,4 @@ MANIFEST
 
 *.png
 *.pdf
+/examples/out/

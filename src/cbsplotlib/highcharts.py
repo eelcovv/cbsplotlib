@@ -1,6 +1,7 @@
 import logging
 import json
 import pandas as pd
+from pathlib import Path
 
 _logger = logging.getLogger(__name__)
 
@@ -69,6 +70,7 @@ class Chart(HCElement):
 
 class PlotOptions(HCElement):
     def __init__(self,
+                 chart_type=None,
                  stacking=None,
                  point_placement=None,
                  events={},
@@ -78,7 +80,7 @@ class PlotOptions(HCElement):
                  border_width=None,
                  line_width=None
                  ):
-        super().__init__()
+        super().__init__(chart_type=chart_type)
         series = {
                      "stacking": stacking,
                      "pointPlacement": point_placement,
@@ -112,6 +114,7 @@ class CBSHighChart:
     def __init__(self,
                  data: pd.DataFrame,
                  filename: str = None,
+                 output_directory: str = None,
                  chart_type: str = None,
                  chart_inverted=None,
                  chart_spacing_left=None,
@@ -124,6 +127,10 @@ class CBSHighChart:
         self.chart_type = chart_type
         self.data_df = data
         self.filename = filename
+        if output_directory is None:
+            self.output_directory = Path(".")
+        else:
+            self.output_directory = Path(output_directory)
         self.chart_inverted = chart_inverted
         self.chart_spacing_left = chart_spacing_left
         self.chart_margin_right = chart_margin_right
@@ -154,7 +161,7 @@ class CBSHighChart:
         template = {}
         template["chart"] = chart.serialize()
 
-        plot_options = PlotOptions()
+        plot_options = PlotOptions(chart_type=self.chart_type)
         template["plotOptions"] = plot_options.serialize()
 
         self.output["template"] = template
@@ -164,9 +171,10 @@ class CBSHighChart:
         self.output["options"] = options
 
     def write_to_file(self, json_indent=4):
+        self.output_directory.mkdir(exist_ok=True)
         if self.filename is None:
-            outfile = "_".join(["highchart", self.chart_type, "plot"]) + ".json"
+            outfile = self.output_directory / Path("_".join(["highchart", self.chart_type, "plot"]) + ".json")
         else:
-            outfile = self.filename
-        with open(outfile, "w") as stream:
+            outfile = self.output_directory / Path(self.filename)
+        with open(outfile.as_posix(), "w") as stream:
             stream.write(json.dumps(self.output, indent=json_indent))
