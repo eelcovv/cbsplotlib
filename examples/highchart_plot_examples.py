@@ -1,10 +1,14 @@
 import logging
 import pandas as pd
-import io
+from pathlib import Path
+
 from cbsplotlib.highcharts import CBSHighChart
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+output_directory = "out"
+data_input_directory = Path("../data/highcharts_examples")
 
 csv_data = """
 dim_gk,2016,2017,2018,2019
@@ -13,9 +17,9 @@ dim_gk,2016,2017,2018,2019
 50 tot 250 werkzame personen,82,83,89,89
 250 of meer werkzame personen,94,94,98,98
 """
-#data_df = pd.read_csv(io.StringIO(csv_data))
+# data_df = pd.read_csv(io.StringIO(csv_data))
 
-data_df = pd.read_csv("cbs_hc_bar.csv")
+data_df = pd.read_csv(data_input_directory / Path("cbs_hc_bar.csv"))
 
 logger.info(data_df)
 
