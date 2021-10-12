@@ -13,8 +13,11 @@ dim_gk,2016,2017,2018,2019
 50 tot 250 werkzame personen,82,83,89,89
 250 of meer werkzame personen,94,94,98,98
 """
-data_df = pd.read_csv(io.StringIO(csv_data))
+#data_df = pd.read_csv(io.StringIO(csv_data))
+
+data_df = pd.read_csv("cbs_hc_bar.csv")
 
 logger.info(data_df)
 
-hc = CBSHighChart(data_df, plot_type=None)
+hc = CBSHighChart(data_df, plot_type="bar")
+print("Done")
