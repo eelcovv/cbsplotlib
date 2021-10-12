@@ -19,5 +19,5 @@ data_df = pd.read_csv("cbs_hc_bar.csv")
 
 logger.info(data_df)
 
-hc = CBSHighChart(data_df, plot_type="bar")
+hc = CBSHighChart(data_df, chart_type="bar")
 print("Done")

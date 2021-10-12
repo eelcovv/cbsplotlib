@@ -1,13 +1,11 @@
 {
     "template": {
         "chart": {
-            "type": "bar",
-            "inverted": true,
+            "chart_type": "bar",
             "spacingLeft": 54,
             "marginRight": 45,
-            "animation": false,
             "polar": false,
-            "events": {}
+            "animation": false
         }
     },
     "options": {}
