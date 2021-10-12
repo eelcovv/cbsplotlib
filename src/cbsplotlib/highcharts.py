@@ -71,12 +71,11 @@ class Chart(HCElement):
 class Categories(HCElement):
     def __init__(self,
                  chart_type=None,
-                 values=None
+                 series=None
                  ):
         super().__init__(chart_type=chart_type)
 
-        categories = values
-        self._prop["categories"] = values
+        self._prop["values"] = series.to_list()
 
 
 class Axis(HCElement):
@@ -87,14 +86,18 @@ class Axis(HCElement):
                  line_width=1,
                  tick_color="#C6C6C6",
                  tick_length=0,
+                 grid_line_color=None,
+                 grid_line_width=None,
+                 grid_line_interpolation=None,
                  title=None,
                  categories=None,
                  labels=None,
                  tickmark_placement="between",
                  start_on_tick=False,
-                 show_first_label=False,
+                 show_first_label=True,
                  end_on_tick=False,
-                 show_last_label=False,
+                 show_last_label=True,
+                 reversed_stacks=None,
                  ):
         super().__init__(chart_type=chart_type)
 
@@ -105,10 +108,12 @@ class Axis(HCElement):
             "tickColor": tick_color,
             "tickLength": tick_length,
         }
+
         if title is not None:
-            axis["title"] = title
+            axis["title"] = title.serialize()
+
         if labels is not None:
-            axis["labels"] = labels
+            axis["labels"] = labels.serialize()
 
         axis["tickmarkPlacement"] = tickmark_placement
         axis["startOnTick"] = start_on_tick
@@ -116,8 +121,19 @@ class Axis(HCElement):
         axis["endOnTick"] = end_on_tick
         axis["showLastLabel"] = show_last_label
 
+        if grid_line_color is not None:
+            axis["gridLineColor"] = grid_line_color
+
+        if grid_line_width is not None:
+            axis["gridLineWidth"] = grid_line_width
+
+        if reversed_stacks is not None:
+            axis["reversedStacks"] = reversed_stacks
+
+        axis["gridLineInterpolation"] = grid_line_interpolation
+
         if categories is not None:
-            axis["categories"] = categories
+            axis["categories"] = categories.serialize()['values']
 
         for key, value in axis.items():
             self._prop[key] = value
@@ -145,28 +161,37 @@ class Style(HCElement):
             self._prop[key] = value
 
 
-class Title(HCElement):
+class Text(HCElement):
     def __init__(self,
                  chart_type=None,
+                 text=None,
                  style=None,
-                 align="left",
+                 align=None,
                  x_shift=None,
                  use_html=None,
                  rotation=None,
+                 enabled=None,
+                 auto_rotation=None,
                  ):
         super().__init__(chart_type=chart_type)
 
         title = {
-            "align": align,
+            "text": text,
         }
+        if align is not None:
+            title["align"] = align
         if style is not None:
-            title["style"] = style
+            title["style"] = style.serialize()
         if x_shift is not None:
             title["x"] = x_shift
         if use_html is not None:
             title["useHTML"] = use_html
         if rotation is not None:
             title["rotation"] = rotation
+        if auto_rotation is not None:
+            title["auto_rotation"] = auto_rotation
+        if enabled is not None:
+            title["enabled"] = enabled
 
         for key, value in title.items():
             self._prop[key] = value
@@ -257,13 +282,45 @@ class CBSHighChart:
         self.add_template_plot_options()
         self.add_template_title()
         self.add_template_title(title_key="subtitle")
-        self.add_template_axis()
+
+        self.add_template_both_axis()
 
         self.output["template"] = self.template
 
         self.add_options()
 
         self.write_to_file()
+
+    def add_template_both_axis(self):
+        """ Beide assen worden toegevoegd. Moet waarschijn plot type afhankelijk worden """
+
+        # eerst de x as
+        categories = Categories(series=self.data_df.index)
+
+        style = Style(color="#000000")
+        title = Text(align="high", style=style, use_html=True, rotation=0)
+        label_style = Style(font_size="11px", color="#000000")
+        labels = Text(style=label_style)
+        self.add_template_axes(axis_key="xAxis",
+                               title=title,
+                               labels=labels,
+                               categories=categories,
+                               )
+
+        # nu de y as
+        title = Text(use_html=True)
+        label_style = Style(font_size="11px", color="#000000")
+        labels = Text(style=label_style, enabled=True, auto_rotation=False)
+        self.add_template_axes(axis_key="yAxis",
+                               title=title,
+                               labels=labels,
+                               grid_line_color="#666666",
+                               grid_line_width=0.25,
+                               start_on_tick=True,
+                               end_on_tick=True,
+                               line_width=0,
+                               tick_length=9,
+                               reversed_stacks=False)
 
     def add_template_chart(self):
         chart = Chart(chart_type=self.chart_type,
@@ -287,25 +344,36 @@ class CBSHighChart:
             style = Style(font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
                           font_size="17px",
                           color="#000")
-            title = Title(style=style.serialize())
+            title = Text(style=style.serialize())
         else:
-            title = Title()
+            title = Text()
 
         self.template[title_key] = title.serialize()
 
-    def add_template_axis(self, axis_key="xAxis"):
+    def add_template_axes(self,
+                          axis_key="xAxis",
+                          title=None,
+                          labels=None,
+                          categories=None,
+                          grid_line_color=None,
+                          grid_line_width=None,
+                          start_on_tick=False,
+                          end_on_tick=False,
+                          line_width=1,
+                          tick_length=0,
+                          reversed_stacks=None):
 
-        categories = Categories(self.data_df.index)
-
-        style = Style()
-        title = Title(align="high", style=style.serialize(), use_html=True, rotation=0)
-
-        label_style = Style(font_size="11px", color="#000000")
-        labels = Title(style=label_style.serialize())
-
-        axis = Axis(categories=categories.serialize(),
-                    title=title.serialize(),
-                    labels=labels.serialize())
+        axis = Axis(categories=categories,
+                    title=title,
+                    labels=labels,
+                    grid_line_color=grid_line_color,
+                    grid_line_width=grid_line_width,
+                    start_on_tick=start_on_tick,
+                    end_on_tick=end_on_tick,
+                    line_width=line_width,
+                    tick_length=tick_length,
+                    reversed_stacks=reversed_stacks,
+                    )
         self.template[axis_key] = axis.serialize()
         _logger.debug("axis: {axis}")
 
@@ -320,4 +388,4 @@ class CBSHighChart:
         else:
             outfile = self.output_directory / Path(self.filename)
         with open(outfile.as_posix(), "w") as stream:
-            stream.write(json.dumps(self.output, indent=json_indent))
+            stream.write(json.dumps(self.output, indent=json_indent, ensure_ascii=False))

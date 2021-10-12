@@ -19,7 +19,7 @@ dim_gk,2016,2017,2018,2019
 """
 # data_df = pd.read_csv(io.StringIO(csv_data))
 
-data_df = pd.read_csv(data_input_directory / Path("cbs_hc_bar.csv"))
+data_df = pd.read_csv(data_input_directory / Path("cbs_hc_bar.csv"), sep=';', index_col=0, decimal=",")
 
 logger.info(data_df)
 
