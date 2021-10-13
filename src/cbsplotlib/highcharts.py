@@ -24,37 +24,20 @@ class Chart(HCElement):
                  spacing_left=None,
                  margin_right=None,
                  margin_bottom=None,
+                 height=None,
+                 style=None,
                  animation=False,
                  polar=False,
                  events=None
                  ):
         super().__init__(chart_type=chart_type)
 
-        if events is None:
-            events = {}
         self.name: str = "chart"
 
-        assert chart_type in ("line", "bar", "column")
-
-        self.chart_type = chart_type
-
         # initieer de properties met het type plot
-        self._prop["chart_type"] = chart_type
-
-        # zet nu de waarden die alleen voor bepaalde types gezet worden
-        if chart_type == "line":
-            if margin_bottom is None:
-                margin_bottom = 180
-        elif chart_type == "bar":
-            if margin_right is None:
-                margin_right = 45
-            if spacing_left is None:
-                spacing_left = 54
-            if inverted is not None:
-                inverted = False
-        elif chart_type == "column":
-            if inverted is not None:
-                inverted = False
+        if chart_type is not None:
+            assert chart_type in ("line", "bar", "column")
+            self._prop["type"] = chart_type
 
         if inverted is not None:
             self._prop["inverted"] = inverted
@@ -64,11 +47,18 @@ class Chart(HCElement):
             self._prop["marginRight"] = margin_right
         if margin_bottom is not None:
             self._prop["marginBottom"] = margin_bottom
+        if height is not None:
+            self._prop["height"] = height
+        if style is not None:
+            self._prop["style"] = style.serialize()
 
         # nu de velden die altijd gegeven worden
-        self._prop["polar"] = polar
-        self._prop["animation"] = animation
-        self._prop["events"] = events
+        if polar is not None:
+            self._prop["polar"] = polar
+        if animation is not None:
+            self._prop["animation"] = animation
+        if events is not None:
+            self._prop["events"] = events
 
 
 class Categories(HCElement):
@@ -285,25 +275,25 @@ class Text(HCElement):
                  ):
         super().__init__(chart_type=chart_type)
 
-        title = {
+        text = {
             "text": text,
         }
         if align is not None:
-            title["align"] = align
+            text["align"] = align
         if style is not None:
-            title["style"] = style.serialize()
+            text["style"] = style.serialize()
         if x_shift is not None:
-            title["x"] = x_shift
+            text["x"] = x_shift
         if use_html is not None:
-            title["useHTML"] = use_html
+            text["useHTML"] = use_html
         if rotation is not None:
-            title["rotation"] = rotation
+            text["rotation"] = rotation
         if auto_rotation is not None:
-            title["auto_rotation"] = auto_rotation
+            text["auto_rotation"] = auto_rotation
         if enabled is not None:
-            title["enabled"] = enabled
+            text["enabled"] = enabled
 
-        for key, value in title.items():
+        for key, value in text.items():
             self._prop[key] = value
 
 
@@ -357,6 +347,9 @@ class CBSHighChart:
                  chart_type: str = None,
                  chart_title: str = None,
                  chart_subtitle: str = None,
+                 chart_title_font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
+                 chart_title_font_size="17px",
+                 chart_title_color="#000",
                  chart_inverted=None,
                  chart_spacing_left=None,
                  chart_margin_right=None,
@@ -373,50 +366,50 @@ class CBSHighChart:
             self.output_directory = Path(output_directory)
 
         self.chart_type = chart_type
-        self.chart_title = chart_title
-        self.chart_subtitle = chart_subtitle
-        self.chart_inverted = chart_inverted
-        self.chart_spacing_left = chart_spacing_left
-        self.chart_margin_right = chart_margin_right
-        self.chart_margin_bottom = chart_margin_bottom
-        self.chart_animation = chart_animation
-        self.chart_polar = chart_polar
-        if chart_events is None:
-            self.chart_events = {}
-        else:
-            self.chart_events = chart_events
 
-        _logger.debug(f"have data\n{data}")
+        self.output = {
+            "template": {},
+            "options": {},
+            "selectedTemplate": {}
+        }
 
-        self.template = {}
-        self.output = {}
+        self.add_chart(chart_type=chart_type,
+                       inverted=chart_inverted,
+                       spacing_left=chart_spacing_left,
+                       margin_right=chart_margin_right,
+                       margin_bottom=chart_margin_bottom)
+        self.add_plot_options()
 
-        self.add_template_chart()
-        self.add_template_plot_options()
-        self.add_template_title()
-        self.add_template_title(title_key="subtitle")
+        title_style = Style(font_family=chart_title_font_family,
+                            font_size=chart_title_font_size,
+                            color=chart_title_color)
+        self.add_title(text_key="title", text=chart_title, style=title_style)
+        self.add_title(text_key="subtitle", text=chart_subtitle)
 
-        self.add_template_both_axis()
-        self.add_template_plot_lines()
-        self.add_template_legend()
-        self.add_template_tooltip()
-        self.add_template_credits()
+        self.add_both_axis()
+        self.add_plot_lines()
+        self.add_legend()
+        self.add_tooltip()
+        self.add_credits()
 
-        self.output["template"] = self.template
-
-        self.add_options()
+        chart_style = Style(font_family="\"Akko W01 Regular\", \"Calibri Light\", sans-serif",
+                            font_size="12px",
+                            color="#000")
+        self.add_chart(key="options",
+                       style=chart_style,
+                       height=450)
 
         self.write_to_file()
 
-    def add_template_plot_lines(self, number_of_plot_lines=1):
+    def add_plot_lines(self, key="template", number_of_plot_lines=1):
 
         plot_lines = list()
         for cnt in range(number_of_plot_lines):
             plot_lines.append(PlotLine().serialize())
 
-        self.template["plotLines"] = plot_lines
+        self.output[key]["plotLines"] = plot_lines
 
-    def add_template_both_axis(self):
+    def add_both_axis(self, key="template"):
         """ Beide assen worden toegevoegd. Moet waarschijn plot type afhankelijk worden """
 
         # eerst de x as
@@ -426,80 +419,109 @@ class CBSHighChart:
         title = Text(align="high", style=style, use_html=True, rotation=0)
         label_style = Style(font_size="11px", color="#000000")
         labels = Text(style=label_style)
-        self.add_template_axes(axis_key="xAxis",
-                               title=title,
-                               labels=labels,
-                               categories=categories,
-                               )
+        self.add_axes(key=key,
+                      axis_key="xAxis",
+                      title=title,
+                      labels=labels,
+                      categories=categories,
+                      )
 
         # nu de y as
         title = Text(use_html=True)
         label_style = Style(font_size="11px", color="#000000")
         labels = Text(style=label_style, enabled=True, auto_rotation=False)
-        self.add_template_axes(axis_key="yAxis",
-                               title=title,
-                               labels=labels,
-                               grid_line_color="#666666",
-                               grid_line_width=0.25,
-                               start_on_tick=True,
-                               end_on_tick=True,
-                               line_width=0,
-                               tick_length=9,
-                               reversed_stacks=False)
+        self.add_axes(key=key,
+                      axis_key="yAxis",
+                      title=title,
+                      labels=labels,
+                      grid_line_color="#666666",
+                      grid_line_width=0.25,
+                      start_on_tick=True,
+                      end_on_tick=True,
+                      line_width=0,
+                      tick_length=9,
+                      reversed_stacks=False)
 
-    def add_template_chart(self):
-        chart = Chart(chart_type=self.chart_type,
-                      inverted=self.chart_inverted,
-                      spacing_left=self.chart_spacing_left,
-                      margin_right=self.chart_margin_right,
-                      margin_bottom=self.chart_margin_bottom,
-                      animation=self.chart_animation,
-                      polar=self.chart_animation,
-                      events=self.chart_events
+    def add_chart(self,
+                  key="template",
+                  set_defaults=False,
+                  chart_type=None,
+                  inverted=None,
+                  spacing_left=None,
+                  margin_right=None,
+                  margin_bottom=None,
+                  height=None,
+                  style=None,
+                  animation=None,
+                  polar=None,
+                  events=None,
+                  ):
+
+        if set_defaults:
+            # zet nu de waarden die alleen voor bepaalde types gezet worden
+            if self.chart_type == "line":
+                if margin_bottom is None:
+                    margin_bottom = 180
+            elif self.chart_type == "bar":
+                if margin_right is None:
+                    margin_right = 45
+                if spacing_left is None:
+                    spacing_left = 54
+                if inverted is not None:
+                    inverted = False
+            elif self.chart_type == "column":
+                if inverted is not None:
+                    inverted = False
+
+        chart = Chart(chart_type=chart_type,
+                      inverted=inverted,
+                      spacing_left=spacing_left,
+                      margin_right=margin_right,
+                      margin_bottom=margin_bottom,
+                      height=height,
+                      style=style,
+                      animation=animation,
+                      polar=polar,
+                      events=events
                       )
-        self.template["chart"] = chart.serialize()
+        self.output[key]["chart"] = chart.serialize()
 
-    def add_template_plot_options(self):
+    def add_plot_options(self, key="template"):
         plot_options = PlotOptions(chart_type=self.chart_type)
-        self.template["plotOptions"] = plot_options.serialize()
+        self.output[key]["plotOptions"] = plot_options.serialize()
 
-    def add_template_title(self, title_key=" title"):
+    def add_title(self, key="template", text_key=" title", text=None, style=None):
 
-        if self.chart_title is not None:
-            style = Style(font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
-                          font_size="17px",
-                          color="#000")
-            title = Text(style=style.serialize())
-        else:
-            title = Text()
+        text = Text(text=text, style=style)
 
-        self.template[title_key] = title.serialize()
+        self.output[key][text_key] = text.serialize()
 
-    def add_template_tooltip(self):
+    def add_tooltip(self, key="template"):
 
         tooltip = ToolTip()
-        self.template["tooltip"] = tooltip.serialize()
+        self.output[key]["tooltip"] = tooltip.serialize()
 
-    def add_template_credits(self):
+    def add_credits(self, key="template"):
 
         plot_credits = Credits()
-        self.template["credits"] = plot_credits.serialize()
+        self.output[key]["credits"] = plot_credits.serialize()
 
-    def add_template_legend(self,
-                            align="left",
-                            reversed_legend=False,
-                            vertical_align="bottom",
-                            y_shift=-40,
-                            padding=0,
-                            symbol_radius=0,
-                            symbol_height=10,
-                            symbol_width=25,
-                            square_symbol=False,
-                            symbol_padding=10,
-                            item_distance=25,
-                            item_margin_bottom=6,
-                            use_html=True
-                            ):
+    def add_legend(self,
+                   key="template",
+                   align="left",
+                   reversed_legend=False,
+                   vertical_align="bottom",
+                   y_shift=-40,
+                   padding=0,
+                   symbol_radius=0,
+                   symbol_height=10,
+                   symbol_width=25,
+                   square_symbol=False,
+                   symbol_padding=10,
+                   item_distance=25,
+                   item_margin_bottom=6,
+                   use_html=True
+                   ):
 
         item_style = Style(font_weight="normal",
                            color="#000000",
@@ -520,20 +542,21 @@ class CBSHighChart:
                         use_html=use_html,
                         item_style=item_style,
                         item_hidden_style=item_hidden_style)
-        self.template["legend"] = legend.serialize()
+        self.output[key]["legend"] = legend.serialize()
 
-    def add_template_axes(self,
-                          axis_key="xAxis",
-                          title=None,
-                          labels=None,
-                          categories=None,
-                          grid_line_color=None,
-                          grid_line_width=None,
-                          start_on_tick=False,
-                          end_on_tick=False,
-                          line_width=1,
-                          tick_length=0,
-                          reversed_stacks=None):
+    def add_axes(self,
+                 key="template",
+                 axis_key="xAxis",
+                 title=None,
+                 labels=None,
+                 categories=None,
+                 grid_line_color=None,
+                 grid_line_width=None,
+                 start_on_tick=False,
+                 end_on_tick=False,
+                 line_width=1,
+                 tick_length=0,
+                 reversed_stacks=None):
 
         axis = Axis(categories=categories,
                     title=title,
@@ -546,7 +569,7 @@ class CBSHighChart:
                     tick_length=tick_length,
                     reversed_stacks=reversed_stacks,
                     )
-        self.template[axis_key] = axis.serialize()
+        self.output[key][axis_key] = axis.serialize()
         _logger.debug("axis: {axis}")
 
     def add_options(self):
