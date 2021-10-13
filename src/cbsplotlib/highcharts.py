@@ -381,16 +381,6 @@ class CBSHighChart:
         self.csv_separator = csv_separator
         self.decimal = decimal
         self.index_col = index_col
-        if self.data_df is None:
-            if self.input_file_name is None:
-                raise TypeError("Both input data argument *data_df* and input filename "
-                                "*input_file_name* are None. Please provide at least one.")
-            else:
-                _logger.info(f"Reading {input_file_name}")
-                self.data_df = pd.read_csv(input_file_name,
-                                           sep=self.csv_separator,
-                                           index_col=self.index_col,
-                                           decimal=self.decimal)
 
         self.y_format = y_format
         if chart_type is None:
@@ -416,6 +406,19 @@ class CBSHighChart:
                                                defaults_directory=defaults_directory,
                                                defaults_filename=defaults_filename,
                                                modifications_filename=modifications_filename)
+
+        if self.data_df is None:
+            if self.input_file_name is None:
+                raise TypeError("Both input data argument *data_df* and input filename "
+                                "*input_file_name* are None. Please provide at least one.")
+            else:
+                _logger.info(f"Reading {input_file_name}")
+                self.data_df = pd.read_csv(input_file_name,
+                                           sep=self.csv_separator,
+                                           index_col=self.index_col,
+                                           decimal=self.decimal)
+        else:
+            _logger.debug(f"Using dataframe")
 
         self.add_chart()
         self.add_plot_options()
@@ -473,9 +476,15 @@ class CBSHighChart:
             defaults = json.load(stream)
 
         if modifications_filename is not None:
-            with open(modifications_filename, "r") as stream:
-                modifications = json.load(stream)
-            defaults = modify_the_defaults(defaults, modifications)
+            if modifications_filename.exists():
+                _logger.info(f"Reading modification settings from {modifications_filename} ")
+                with open(modifications_filename, "r") as stream:
+                    modifications = json.load(stream)
+                defaults = modify_the_defaults(defaults, modifications)
+            else:
+                _logger.info(f"Creating new modification settings file {modifications_filename}")
+                with codecs.open(modifications_filename.as_posix(), "w", encoding='utf-8') as fp:
+                    fp.write(json.dumps(defaults, indent=2, ensure_ascii=False))
 
         return defaults
 
