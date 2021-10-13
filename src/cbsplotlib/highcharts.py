@@ -1,3 +1,4 @@
+import codecs
 import logging
 import json
 import pandas as pd
@@ -568,5 +569,5 @@ class CBSHighChart:
         else:
             outfile = self.output_directory / Path(self.output_filename).with_suffix(".json")
         _logger.info(f"Writing to {outfile}")
-        with open(outfile.as_posix(), "w") as stream:
+        with codecs.open(outfile.as_posix(), "w", encoding='utf-8') as stream:
             stream.write(json.dumps(self.output, indent=json_indent, ensure_ascii=False))
