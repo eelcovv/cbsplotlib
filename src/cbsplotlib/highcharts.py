@@ -2,8 +2,16 @@ import logging
 import json
 import pandas as pd
 from pathlib import Path
+import functools
+import cbsplotlib
 
 _logger = logging.getLogger(__name__)
+
+
+@functools.wraps(cbsplotlib.set_loglevel)
+def set_loglevel(*args, **kwargs):
+    return cbsplotlib.set_loglevel(*args, **kwargs)
+
 
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
 
@@ -341,13 +349,17 @@ class PlotOptions(HCElement):
 
 class CBSHighChart:
     def __init__(self,
-                 data: pd.DataFrame,
-                 filename: str = None,
+                 data: pd.DataFrame = None,
+                 input_file_name: str = None,
+                 output_file_name: str = None,
                  output_directory: str = None,
                  defaults_directory: str = None,
                  defaults_filename: str = None,
                  modifications_filename: str = None,
                  chart_type: str = None,
+                 csv_separator: str = ";",
+                 decimal: str = ",",
+                 index_col: int = 0,
                  y_format: str = None,
                  chart_title: str = None,
                  chart_subtitle: str = None,
@@ -363,6 +375,21 @@ class CBSHighChart:
                  chart_events=None
                  ):
         self.data_df = data
+        self.input_file_name = input_file_name
+        self.csv_separator = csv_separator
+        self.decimal = decimal
+        self.index_col = index_col
+        if self.data_df is None:
+            if self.input_file_name is None:
+                raise TypeError("Both input data argument *data_df* and input filename "
+                                "*input_file_name* are None. Please provide at least one.")
+            else:
+                _logger.info(f"Reading {input_file_name}")
+                self.data_df = pd.read_csv(input_file_name,
+                                           sep=self.csv_separator,
+                                           index_col=self.index_col,
+                                           decimal=self.decimal)
+
         self.y_format = y_format
         if chart_type is None:
             # defaults chart type is a bar plot
@@ -370,7 +397,7 @@ class CBSHighChart:
         else:
             self.chart_type = chart_type
 
-        self.filename = filename
+        self.output_filename = output_file_name
         self.output = {
             "template": {},
             "options": {},
@@ -486,7 +513,7 @@ class CBSHighChart:
     def add_options(self):
         self.output["options"] = self.defaults["options"]
 
-        self.output["options"]["settings"]["csvData"] = self.data_df.to_csv()
+        self.output["options"]["settings"]["csvData"] = self.data_df.to_csv(sep=self.csv_separator)
 
         if self.y_format is None:
             self.y_format = "{:.1f}"
@@ -513,11 +540,12 @@ class CBSHighChart:
 
         self.output["options"]["series"] = series
 
-    def write_to_file(self, json_indent=4):
+    def write_to_file(self, json_indent=2):
         self.output_directory.mkdir(exist_ok=True)
-        if self.filename is None:
-            outfile = self.output_directory / Path("_".join(["highchart", self.chart_type, "plot"]) + ".json")
+        if self.output_filename is None:
+            default_file_name = Path("_".join(["highchart", self.chart_type, "plot"]) + ".json")
+            outfile = self.output_directory / default_file_name
         else:
-            outfile = self.output_directory / Path(self.filename)
+            outfile = self.output_directory / Path(self.output_filename)
         with open(outfile.as_posix(), "w") as stream:
             stream.write(json.dumps(self.output, indent=json_indent, ensure_ascii=False))
