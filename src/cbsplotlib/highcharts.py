@@ -26,10 +26,12 @@ class Chart(HCElement):
                  margin_bottom=None,
                  animation=False,
                  polar=False,
-                 events={}
+                 events=None
                  ):
         super().__init__(chart_type=chart_type)
 
+        if events is None:
+            events = {}
         self.name: str = "chart"
 
         assert chart_type in ("line", "bar", "column")
@@ -66,6 +68,7 @@ class Chart(HCElement):
         # nu de velden die altijd gegeven worden
         self._prop["polar"] = polar
         self._prop["animation"] = animation
+        self._prop["events"] = events
 
 
 class Categories(HCElement):
@@ -360,7 +363,7 @@ class CBSHighChart:
                  chart_margin_bottom=None,
                  chart_animation=False,
                  chart_polar=False,
-                 chart_events={}
+                 chart_events=None
                  ):
         self.data_df = data
         self.filename = filename
@@ -378,7 +381,10 @@ class CBSHighChart:
         self.chart_margin_bottom = chart_margin_bottom
         self.chart_animation = chart_animation
         self.chart_polar = chart_polar
-        self.chart_events = chart_events
+        if chart_events is None:
+            self.chart_events = {}
+        else:
+            self.chart_events = chart_events
 
         _logger.debug(f"have data\n{data}")
 
