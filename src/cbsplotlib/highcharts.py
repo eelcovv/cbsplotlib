@@ -426,7 +426,18 @@ class CBSHighChart:
         self.add_title(text_key="title")
         self.add_title(text_key="subtitle")
 
-        self.add_axis(axis_key="xAxis", categories=self.data_df.index.to_list())
+        if self.data_df.index.nlevels == 1:
+            categories = self.data_df.index.to_list()
+        elif self.data_df.index.nlevels == 2:
+            categories = list()
+            for first_level_key, df in self.data_df.groupby(level=0):
+                group_categories = {"name": str(first_level_key),
+                                    "categories": df.index.get_level_values(1).to_list()}
+                categories.append(group_categories)
+        else:
+            raise TypeError("Multilevel with more than 2 levels not implemented")
+
+        self.add_axis(axis_key="xAxis", categories=categories)
         self.add_axis(axis_key="yAxis")
         self.add_legend()
         self.add_tooltip()
@@ -435,7 +446,7 @@ class CBSHighChart:
         self.add_options()
         self.add_csv_data()
         self.add_series()
-        self.add_axis(key="options", axis_key="xAxis", categories=self.data_df.index.to_list())
+        self.add_axis(key="options", axis_key="xAxis", categories=categories)
         self.add_axis(key="options", axis_key="yAxis")
 
         self.add_selected_templated()
@@ -554,8 +565,9 @@ class CBSHighChart:
                 entry = {
                     "y": value,
                     "yString": y_string,
-                    "name": index
                 }
+                if isinstance(index, str):
+                    entry["name"] = index
                 item["data"].append(entry)
 
             series.append(item)
