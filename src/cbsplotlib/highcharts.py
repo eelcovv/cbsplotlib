@@ -142,13 +142,27 @@ class Axis(HCElement):
 class PlotLine(HCElement):
     def __init__(self):
         super().__init__()
-        plotline = {
+        plot_line = {
             "value": "0",
             "width": 2,
             "color": "#666666",
             "zIndex": 4
         }
-        for key, value in plotline.items():
+        for key, value in plot_line.items():
+            self._prop[key] = value
+
+
+class Credits(HCElement):
+
+    def __init__(self,
+                 enabled=False,
+                 ):
+        super().__init__()
+
+        plot_credits = {
+            "enabled": enabled
+        }
+        for key, value in plot_credits.items():
             self._prop[key] = value
 
 
@@ -380,6 +394,7 @@ class CBSHighChart:
         self.add_template_plot_lines()
         self.add_template_legend()
         self.add_template_tooltip()
+        self.add_template_credits()
 
         self.output["template"] = self.template
 
@@ -458,6 +473,11 @@ class CBSHighChart:
 
         tooltip = ToolTip()
         self.template["tooltip"] = tooltip.serialize()
+
+    def add_template_credits(self):
+
+        plot_credits = Credits()
+        self.template["credits"] = plot_credits.serialize()
 
     def add_template_legend(self,
                             align="left",
