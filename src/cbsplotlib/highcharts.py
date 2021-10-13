@@ -45,7 +45,6 @@ class CBSHighChart:
                  chart_polar=False,
                  chart_events=None
                  ):
-        self.data_df = data
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
@@ -76,35 +75,24 @@ class CBSHighChart:
                                                defaults_filename=defaults_filename,
                                                modifications_filename=modifications_filename)
 
-        if self.data_df is None:
-            if self.input_file_name is None:
-                raise TypeError("Both input data argument *data_df* and input filename "
-                                "*input_file_name* are None. Please provide at least one.")
-            else:
-                _logger.info(f"Reading {input_file_name}")
-                self.data_df = pd.read_csv(input_file_name,
-                                           sep=self.csv_separator,
-                                           index_col=self.index_col,
-                                           decimal=self.decimal)
+        # get the data here, if take from the argument
+        if data is None:
+            _logger.debug(f"Reading dataframe from {input_file_name}")
+            self.data_df = self.get_data(input_file_name, index_col=index_col, csv_separator=csv_separator,
+                                    decimal=decimal)
         else:
             _logger.debug(f"Using dataframe")
+            self.data_df = data
 
+        # get the categories from the data
+        categories = self.get_categories()
+
+        # now add all the items of the highcarts
         self.add_chart()
         self.add_plot_options()
 
         self.add_title(text_key="title")
         self.add_title(text_key="subtitle")
-
-        if self.data_df.index.nlevels == 1:
-            categories = self.data_df.index.to_list()
-        elif self.data_df.index.nlevels == 2:
-            categories = list()
-            for first_level_key, df in self.data_df.groupby(level=0):
-                group_categories = {"name": str(first_level_key),
-                                    "categories": df.index.get_level_values(1).to_list()}
-                categories.append(group_categories)
-        else:
-            raise TypeError("Multilevel with more than 2 levels not implemented")
 
         self.add_axis(axis_key="xAxis", categories=categories)
         self.add_axis(axis_key="yAxis")
@@ -120,7 +108,35 @@ class CBSHighChart:
 
         self.add_selected_templated()
 
+        # finally write the result to file
         self.write_to_file()
+
+    @staticmethod
+    def get_data(input_file_name, index_col=0, csv_separator=";", decimal=","):
+        if input_file_name is None:
+            raise TypeError("Both input data argument *data_df* and input filename "
+                            "*input_file_name* are None. Please provide at least one.")
+        else:
+            _logger.info(f"Reading {input_file_name}")
+            data_df = pd.read_csv(input_file_name,
+                                  sep=csv_separator,
+                                  index_col=index_col,
+                                  decimal=decimal)
+        return data_df
+
+    def get_categories(self):
+        if self.data_df.index.nlevels == 1:
+            categories = self.data_df.index.to_list()
+        elif self.data_df.index.nlevels == 2:
+            categories = list()
+            for first_level_key, df in self.data_df.groupby(level=0):
+                group_categories = {"name": str(first_level_key),
+                                    "categories": df.index.get_level_values(1).to_list()}
+                categories.append(group_categories)
+        else:
+            raise TypeError("Multilevel with more than 2 levels not implemented")
+
+        return categories
 
     @staticmethod
     def read_the_defaults(chart_type=None,
