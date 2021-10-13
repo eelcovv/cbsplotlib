@@ -10,7 +10,7 @@ output_directory = "out"
 data_input_directory = Path("../data/highcharts_examples")
 
 # create column plot (met verticale balken)
-input_file_name = data_input_directory / Path("cbs_hc_column.csv")
+input_file_name = data_input_directory / Path("cbs_hc_bar.csv")
 data_df = pd.read_csv(input_file_name, sep=";", index_col=0, decimal=",")
 
 hc = CBSHighChart(data=data_df,
