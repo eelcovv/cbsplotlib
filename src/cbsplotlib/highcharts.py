@@ -1,6 +1,7 @@
 import logging
 import json
 import pandas as pd
+from decimal import Decimal, Rounded
 from pathlib import Path
 import functools
 import cbsplotlib
@@ -428,6 +429,12 @@ class CBSHighChart:
         self.add_credits()
 
         self.add_options()
+        self.add_csv_data()
+        self.add_series()
+        self.add_axis(key="options", axis_key="xAxis", categories=self.data_df.index.to_list())
+        self.add_axis(key="options", axis_key="yAxis")
+
+        self.add_selected_templated()
 
         self.write_to_file()
 
@@ -513,10 +520,15 @@ class CBSHighChart:
     def add_options(self):
         self.output["options"] = self.defaults["options"]
 
-        self.output["options"]["settings"]["csvData"] = self.data_df.to_csv(sep=self.csv_separator)
+    def add_csv_data(self, key="options", settings_keys="settings"):
+
+        csv = self.data_df.to_csv(sep=self.csv_separator, decimal=self.decimal, float_format="%g")
+        self.output[key][settings_keys]["csvData"] = csv.rstrip()
+
+    def add_series(self, key="options", series_key="series"):
 
         if self.y_format is None:
-            self.y_format = "{:.1f}"
+            self.y_format = "{:g}"
 
         series = list()
         for col_name in self.data_df.columns:
@@ -538,14 +550,23 @@ class CBSHighChart:
 
             series.append(item)
 
-        self.output["options"]["series"] = series
+        self.output[key][series_key] = series
+
+    def add_selected_templated(self, key="selectedTemplate"):
+        self.output[key] = self.defaults[key]
 
     def write_to_file(self, json_indent=2):
         self.output_directory.mkdir(exist_ok=True)
         if self.output_filename is None:
-            default_file_name = Path("_".join(["highchart", self.chart_type, "plot"]) + ".json")
+            if self.input_file_name is None:
+                default_file_name = Path("_".join(["highchart", self.chart_type, "plot"]) + ".json")
+            else:
+                file_stem = Path(self.input_file_name).stem
+                default_file_name = Path(file_stem).with_suffix(".json")
+
             outfile = self.output_directory / default_file_name
         else:
-            outfile = self.output_directory / Path(self.output_filename)
+            outfile = self.output_directory / Path(self.output_filename).with_suffix(".json")
+        _logger.info(f"Writing to {outfile}")
         with open(outfile.as_posix(), "w") as stream:
             stream.write(json.dumps(self.output, indent=json_indent, ensure_ascii=False))

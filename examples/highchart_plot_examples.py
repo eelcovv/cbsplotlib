@@ -27,5 +27,7 @@ logger.info(data_df)
 
 hc = CBSHighChart(input_file_name=input_file_name.as_posix(),
                   chart_type="bar",
-                  output_directory=output_directory)
+                  output_directory=output_directory,
+                  output_file_name="cbs_hc_bar_plot",
+                  y_format="{:.1f}")
 print("Done")
