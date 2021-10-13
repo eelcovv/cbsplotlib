@@ -139,9 +139,100 @@ class Axis(HCElement):
             self._prop[key] = value
 
 
+class PlotLine(HCElement):
+    def __init__(self):
+        super().__init__()
+        plotline = {
+            "value": "0",
+            "width": 2,
+            "color": "#666666",
+            "zIndex": 4
+        }
+        for key, value in plotline.items():
+            self._prop[key] = value
+
+
+class ToolTip(HCElement):
+
+    def __init__(self,
+                 shared=True,
+                 follow_pointer=True,
+                 use_html=True
+                 ):
+        super().__init__()
+
+        tooltip = {}
+
+        if shared is not None:
+            tooltip["shared"] = shared
+        if follow_pointer is not None:
+            tooltip["followPointer"] = follow_pointer
+        if use_html is not None:
+            tooltip["useHTML"] = use_html
+
+        for key, value in tooltip.items():
+            self._prop[key] = value
+
+
+class Legend(HCElement):
+    def __init__(self,
+                 align="left",
+                 reversed_legend=False,
+                 vertical_align="bottom",
+                 y_shift=-40,
+                 padding=0,
+                 symbol_radius=0,
+                 symbol_height=10,
+                 symbol_width=25,
+                 square_symbol=False,
+                 symbol_padding=10,
+                 item_distance=25,
+                 item_margin_bottom=6,
+                 use_html=True,
+                 item_style=None,
+                 item_hidden_style=None,
+                 ):
+        super().__init__()
+        legend = {}
+        if align is not None:
+            legend["align"] = align
+        if reversed_legend is not None:
+            legend["reversed"] = reversed_legend
+        if vertical_align is not None:
+            legend["verticalAlign"] = vertical_align
+        if y_shift is not None:
+            legend["y"] = y_shift
+        if padding is not None:
+            legend["padding"] = padding
+        if symbol_radius is not None:
+            legend["symbolRadius"] = symbol_radius
+        if symbol_height is not None:
+            legend["symbolHeight"] = symbol_height
+        if symbol_width is not None:
+            legend["symbolWidth"] = symbol_width
+        if square_symbol is not None:
+            legend["squareSymbol"] = square_symbol
+        if item_style is not None:
+            legend["itemStyle"] = item_style.serialize()
+        if item_hidden_style is not None:
+            legend["itemHiddenStyle"] = item_hidden_style.serialize()
+        if symbol_padding is not None:
+            legend["symbolPadding"] = symbol_padding
+        if item_distance is not None:
+            legend["symbolDistance"] = item_distance
+        if item_margin_bottom is not None:
+            legend["symbolMarginBottom"] = item_margin_bottom
+        if use_html is not None:
+            legend["useHTML"] = use_html
+
+        for key, value in legend.items():
+            self._prop[key] = value
+
+
 class Style(HCElement):
     def __init__(self,
                  chart_type=None,
+                 font_weight=None,
                  font_family=None,
                  font_size=None,
                  color=None,
@@ -150,6 +241,8 @@ class Style(HCElement):
         super().__init__(chart_type=chart_type)
 
         style = {}
+        if font_weight is not None:
+            style["fontWeight"] = font_weight
         if font_family is not None:
             style["fontFamily"] = font_family
         if font_size is not None:
@@ -284,12 +377,23 @@ class CBSHighChart:
         self.add_template_title(title_key="subtitle")
 
         self.add_template_both_axis()
+        self.add_template_plot_lines()
+        self.add_template_legend()
+        self.add_template_tooltip()
 
         self.output["template"] = self.template
 
         self.add_options()
 
         self.write_to_file()
+
+    def add_template_plot_lines(self, number_of_plot_lines=1):
+
+        plot_lines = list()
+        for cnt in range(number_of_plot_lines):
+            plot_lines.append(PlotLine().serialize())
+
+        self.template["plotLines"] = plot_lines
 
     def add_template_both_axis(self):
         """ Beide assen worden toegevoegd. Moet waarschijn plot type afhankelijk worden """
@@ -349,6 +453,48 @@ class CBSHighChart:
             title = Text()
 
         self.template[title_key] = title.serialize()
+
+    def add_template_tooltip(self):
+
+        tooltip = ToolTip()
+        self.template["tooltip"] = tooltip.serialize()
+
+    def add_template_legend(self,
+                            align="left",
+                            reversed_legend=False,
+                            vertical_align="bottom",
+                            y_shift=-40,
+                            padding=0,
+                            symbol_radius=0,
+                            symbol_height=10,
+                            symbol_width=25,
+                            square_symbol=False,
+                            symbol_padding=10,
+                            item_distance=25,
+                            item_margin_bottom=6,
+                            use_html=True
+                            ):
+
+        item_style = Style(font_weight="normal",
+                           color="#000000",
+                           font_size="12px")
+        item_hidden_style = Style(color="#757575")
+        legend = Legend(align=align,
+                        reversed_legend=reversed_legend,
+                        vertical_align=vertical_align,
+                        y_shift=y_shift,
+                        padding=padding,
+                        symbol_radius=symbol_radius,
+                        symbol_height=symbol_height,
+                        symbol_width=symbol_width,
+                        square_symbol=square_symbol,
+                        symbol_padding=symbol_padding,
+                        item_distance=item_distance,
+                        item_margin_bottom=item_margin_bottom,
+                        use_html=use_html,
+                        item_style=item_style,
+                        item_hidden_style=item_hidden_style)
+        self.template["legend"] = legend.serialize()
 
     def add_template_axes(self,
                           axis_key="xAxis",
