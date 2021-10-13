@@ -344,7 +344,11 @@ class CBSHighChart:
                  data: pd.DataFrame,
                  filename: str = None,
                  output_directory: str = None,
+                 defaults_directory: str = None,
+                 defaults_filename: str = None,
+                 modifications_filename: str = None,
                  chart_type: str = None,
+                 y_format: str = None,
                  chart_title: str = None,
                  chart_subtitle: str = None,
                  chart_title_font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
@@ -359,222 +363,155 @@ class CBSHighChart:
                  chart_events=None
                  ):
         self.data_df = data
-        self.filename = filename
-        if output_directory is None:
-            self.output_directory = Path(".")
+        self.y_format = y_format
+        if chart_type is None:
+            # defaults chart type is a bar plot
+            self.chart_type = "bar"
         else:
-            self.output_directory = Path(output_directory)
+            self.chart_type = chart_type
 
-        self.chart_type = chart_type
-
+        self.filename = filename
         self.output = {
             "template": {},
             "options": {},
             "selectedTemplate": {}
         }
 
-        self.add_chart(chart_type=chart_type,
-                       inverted=chart_inverted,
-                       spacing_left=chart_spacing_left,
-                       margin_right=chart_margin_right,
-                       margin_bottom=chart_margin_bottom)
+        if output_directory is None:
+            self.output_directory = Path(".")
+        else:
+            self.output_directory = Path(output_directory)
+
+        # hier worden alle defaults in de self.defaults attribute geladen
+        self.defaults = self.read_the_defaults(chart_type=chart_type,
+                                               defaults_directory=defaults_directory,
+                                               defaults_filename=defaults_filename,
+                                               modifications_filename=modifications_filename)
+
+        self.add_chart()
         self.add_plot_options()
 
-        title_style = Style(font_family=chart_title_font_family,
-                            font_size=chart_title_font_size,
-                            color=chart_title_color)
-        self.add_title(text_key="title", text=chart_title, style=title_style)
-        self.add_title(text_key="subtitle", text=chart_subtitle)
+        self.add_title(text_key="title")
+        self.add_title(text_key="subtitle")
 
-        self.add_both_axis()
-        self.add_plot_lines()
+        self.add_axis(axis_key="xAxis", categories=self.data_df.index.to_list())
+        self.add_axis(axis_key="yAxis")
         self.add_legend()
         self.add_tooltip()
         self.add_credits()
 
-        chart_style = Style(font_family="\"Akko W01 Regular\", \"Calibri Light\", sans-serif",
-                            font_size="12px",
-                            color="#000")
-        self.add_chart(key="options",
-                       style=chart_style,
-                       height=450)
+        self.add_options()
 
         self.write_to_file()
 
-    def add_plot_lines(self, key="template", number_of_plot_lines=1):
+    @staticmethod
+    def read_the_defaults(chart_type=None,
+                          defaults_directory=None,
+                          defaults_filename=None,
+                          modifications_filename=None):
 
-        plot_lines = list()
-        for cnt in range(number_of_plot_lines):
-            plot_lines.append(PlotLine().serialize())
+        def modify_the_defaults(mod_defaults, mods):
 
-        self.output[key]["plotLines"] = plot_lines
+            for chapter_key, chapter_prop in mods:
+                for section_key, section_prop in chapter_prop:
+                    if isinstance(section_prop, dict):
+                        for subsection_key, subsection_prop in section_prop:
+                            mod_defaults[chapter_key][section_key][subsection_key] = subsection_prop
+                    else:
+                        mod_defaults[chapter_key][section_key] = section_prop
+            return mod_defaults
 
-    def add_both_axis(self, key="template"):
-        """ Beide assen worden toegevoegd. Moet waarschijn plot type afhankelijk worden """
+        if defaults_directory is None:
+            defaults_directory = Path(__file__).parent / Path("cbs_hc_defaults")
+        else:
+            defaults_directory = Path(defaults_directory)
 
-        # eerst de x as
-        categories = Categories(series=self.data_df.index)
+        if defaults_filename is None:
+            defaults_filename = defaults_directory / Path(chart_type + ".json")
+        else:
+            defaults_filename = defaults_directory / Path(defaults_filename)
 
-        style = Style(color="#000000")
-        title = Text(align="high", style=style, use_html=True, rotation=0)
-        label_style = Style(font_size="11px", color="#000000")
-        labels = Text(style=label_style)
-        self.add_axes(key=key,
-                      axis_key="xAxis",
-                      title=title,
-                      labels=labels,
-                      categories=categories,
-                      )
+        if modifications_filename is not None:
+            modifications_filename = Path(modifications_filename)
 
-        # nu de y as
-        title = Text(use_html=True)
-        label_style = Style(font_size="11px", color="#000000")
-        labels = Text(style=label_style, enabled=True, auto_rotation=False)
-        self.add_axes(key=key,
-                      axis_key="yAxis",
-                      title=title,
-                      labels=labels,
-                      grid_line_color="#666666",
-                      grid_line_width=0.25,
-                      start_on_tick=True,
-                      end_on_tick=True,
-                      line_width=0,
-                      tick_length=9,
-                      reversed_stacks=False)
+        with open(defaults_filename, "r") as stream:
+            defaults = json.load(stream)
 
-    def add_chart(self,
-                  key="template",
-                  set_defaults=False,
-                  chart_type=None,
-                  inverted=None,
-                  spacing_left=None,
-                  margin_right=None,
-                  margin_bottom=None,
-                  height=None,
-                  style=None,
-                  animation=None,
-                  polar=None,
-                  events=None,
-                  ):
+        if modifications_filename is not None:
+            with open(modifications_filename, "r") as stream:
+                modifications = json.load(stream)
+            defaults = modify_the_defaults(defaults, modifications)
 
-        if set_defaults:
-            # zet nu de waarden die alleen voor bepaalde types gezet worden
-            if self.chart_type == "line":
-                if margin_bottom is None:
-                    margin_bottom = 180
-            elif self.chart_type == "bar":
-                if margin_right is None:
-                    margin_right = 45
-                if spacing_left is None:
-                    spacing_left = 54
-                if inverted is not None:
-                    inverted = False
-            elif self.chart_type == "column":
-                if inverted is not None:
-                    inverted = False
+        return defaults
 
-        chart = Chart(chart_type=chart_type,
-                      inverted=inverted,
-                      spacing_left=spacing_left,
-                      margin_right=margin_right,
-                      margin_bottom=margin_bottom,
-                      height=height,
-                      style=style,
-                      animation=animation,
-                      polar=polar,
-                      events=events
-                      )
-        self.output[key]["chart"] = chart.serialize()
+    def add_plot_lines(self, key="template"):
+
+        self.output[key]["plotLines"] = self.defaults[key]["plotLines"]
+
+    def add_chart(self, key="template"):
+
+        self.output[key]["chart"] = self.defaults[key]["chart"]
 
     def add_plot_options(self, key="template"):
-        plot_options = PlotOptions(chart_type=self.chart_type)
-        self.output[key]["plotOptions"] = plot_options.serialize()
+        self.output[key]["plotOptions"] = self.defaults[key]["plotOptions"]
 
-    def add_title(self, key="template", text_key=" title", text=None, style=None):
+    def add_title(self, key="template", text_key="title"):
 
-        text = Text(text=text, style=style)
-
-        self.output[key][text_key] = text.serialize()
+        self.output[key][text_key] = self.defaults[key][text_key]
 
     def add_tooltip(self, key="template"):
 
-        tooltip = ToolTip()
-        self.output[key]["tooltip"] = tooltip.serialize()
+        self.output[key]["tooltip"] = self.defaults[key]["tooltip"]
 
     def add_credits(self, key="template"):
 
-        plot_credits = Credits()
-        self.output[key]["credits"] = plot_credits.serialize()
+        self.output[key]["credits"] = self.defaults[key]["credits"]
 
-    def add_legend(self,
-                   key="template",
-                   align="left",
-                   reversed_legend=False,
-                   vertical_align="bottom",
-                   y_shift=-40,
-                   padding=0,
-                   symbol_radius=0,
-                   symbol_height=10,
-                   symbol_width=25,
-                   square_symbol=False,
-                   symbol_padding=10,
-                   item_distance=25,
-                   item_margin_bottom=6,
-                   use_html=True
-                   ):
+    def add_legend(self, key="template"):
 
-        item_style = Style(font_weight="normal",
-                           color="#000000",
-                           font_size="12px")
-        item_hidden_style = Style(color="#757575")
-        legend = Legend(align=align,
-                        reversed_legend=reversed_legend,
-                        vertical_align=vertical_align,
-                        y_shift=y_shift,
-                        padding=padding,
-                        symbol_radius=symbol_radius,
-                        symbol_height=symbol_height,
-                        symbol_width=symbol_width,
-                        square_symbol=square_symbol,
-                        symbol_padding=symbol_padding,
-                        item_distance=item_distance,
-                        item_margin_bottom=item_margin_bottom,
-                        use_html=use_html,
-                        item_style=item_style,
-                        item_hidden_style=item_hidden_style)
-        self.output[key]["legend"] = legend.serialize()
+        self.output[key]["legend"] = self.defaults[key]["legend"]
 
-    def add_axes(self,
+    def add_axis(self,
                  key="template",
                  axis_key="xAxis",
-                 title=None,
-                 labels=None,
                  categories=None,
-                 grid_line_color=None,
-                 grid_line_width=None,
-                 start_on_tick=False,
-                 end_on_tick=False,
-                 line_width=1,
-                 tick_length=0,
-                 reversed_stacks=None):
+                 ):
 
-        axis = Axis(categories=categories,
-                    title=title,
-                    labels=labels,
-                    grid_line_color=grid_line_color,
-                    grid_line_width=grid_line_width,
-                    start_on_tick=start_on_tick,
-                    end_on_tick=end_on_tick,
-                    line_width=line_width,
-                    tick_length=tick_length,
-                    reversed_stacks=reversed_stacks,
-                    )
-        self.output[key][axis_key] = axis.serialize()
-        _logger.debug("axis: {axis}")
+        self.output[key][axis_key] = self.defaults[key][axis_key]
+
+        if categories is not None:
+            for ax in self.output[key][axis_key]:
+                ax["categories"] = categories
 
     def add_options(self):
-        options = {}
-        self.output["options"] = options
+        self.output["options"] = self.defaults["options"]
+
+        self.output["options"]["settings"]["csvData"] = self.data_df.to_csv()
+
+        if self.y_format is None:
+            self.y_format = "{:.1f}"
+
+        series = list()
+        for col_name in self.data_df.columns:
+            item = {
+                "name": col_name,
+                "isSerie": True,
+                "borderColor": "#FFFFFF",
+                "data": list()
+            }
+            for index, row in self.data_df[[col_name]].iterrows():
+                value = row.values[0]
+                y_string = self.y_format.format(value)
+                entry = {
+                    "y": value,
+                    "yString": y_string,
+                    "name": index
+                }
+                item["data"].append(entry)
+
+            series.append(item)
+
+        self.output["options"]["series"] = series
 
     def write_to_file(self, json_indent=4):
         self.output_directory.mkdir(exist_ok=True)
