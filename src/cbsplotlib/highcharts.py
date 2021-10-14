@@ -34,25 +34,47 @@ class CBSHighChart:
                  index_col: int = 0,
                  y_format: str = None,
                  start: bool = False,
-                 chart_title: str = None,
-                 chart_subtitle: str = None,
-                 chart_title_font_family="\"Soho W01 Medium\", \"Cambria\", sans-serif",
-                 chart_title_font_size="17px",
-                 chart_title_color="#000",
-                 chart_inverted=None,
-                 chart_spacing_left=None,
-                 chart_margin_right=None,
-                 chart_margin_bottom=None,
-                 chart_animation=False,
-                 chart_polar=False,
-                 chart_events=None
+                 title: str = None,
+                 subtitle: str = None,
+                 xlabel: str = None,
+                 ylabel: str = None,
+                 x_lim: tuple = None,
+                 y_lim: tuple = None,
+                 x_tick_interval: int = None,
+                 y_tick_interval: int = None,
+                 chart_description: str = None,
+                 chart_height: int = None,
+                 color_selection: str = None,
+                 sources_text: str = None,
+                 footnote_text: str = None,
+                 series_description: pd.Series = None,
+                 tooltip_prefix: str = None,
+                 tooltip_suffix: str = None,
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
         self.index_col = index_col
 
+        # plot settings
+        self.title = title
+        self.subtitle = subtitle
+        self.xlabel = xlabel
+        self.ylabel = ylabel
+        self.x_lim = x_lim
+        self.y_lim = y_lim
+        self.x_tick_interval = x_tick_interval
+        self.y_tick_interval = y_tick_interval
+        self.chart_description = chart_description
+        self.chart_height = chart_height
+        self.color_selection = color_selection
+        self.sources_text = sources_text
+        self.footnote_text = footnote_text
+        self.series_description = series_description
+        self.tooltip_prefix = tooltip_prefix
+        self.tooltip_suffix = tooltip_suffix
         self.y_format = y_format
+
         if chart_type is None:
             # defaults chart type is a bar plot
             self.chart_type = "bar"
@@ -85,11 +107,11 @@ class CBSHighChart:
             # deze file
             self.write_to_file(output=self.defaults, output_file_name=defaults_out_file)
             _logger.info(
-            """
-            We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
-            was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee 
-            met het *defaults_file_name* argument. Script stop nu hier.
                 """
+                We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
+                was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee 
+                met het *defaults_file_name* argument. Script stop nu hier.
+                    """
             )
             return
 
@@ -109,13 +131,21 @@ class CBSHighChart:
 
         if start:
             # als de start optie meegeven is dan gaan we de highcharts file bouwen
-            self.make_highcharts()
-            _logger.info("Done with making highcharts")
+            self.make_highchart()
+
+            self.modify_highchart()
+
+            # finally write the result to file
+            self.write_to_file(output=self.output,
+                               output_directory=self.output_directory,
+                               output_file_name=self.output_file_name,
+                               input_file_name=self.input_file_name,
+                               chart_type=self.chart_type)
         else:
-            _logger.info("The data was successfully. To create the highcharts, call the "
+            _logger.info("The data was read successfully. To create the highcharts, call the "
                          "*make_highcharts()* method or pass the start=True argument")
 
-    def make_highcharts(self):
+    def make_highchart(self):
 
         # now add all the items of the highcarts
         self.add_chart()
@@ -138,12 +168,89 @@ class CBSHighChart:
 
         self.add_selected_templated()
 
-        # finally write the result to file
-        self.write_to_file(output=self.output,
-                           output_directory=self.output_directory,
-                           output_file_name=self.output_file_name,
-                           input_file_name=self.input_file_name,
-                           chart_type=self.chart_type)
+    def impose_value(self, value, key_1, key_2=None, key_3=None, output=None):
+        if output is None:
+            output = self.output
+        if key_3 is not None:
+            assert key_2 is not None
+            try:
+                output[key_1][key_2][key_3] = value
+            except KeyError:
+                _logger.warning(f"Failed imposing value '{value}' to [{key_1}][{key_2}][{key_3}]")
+
+        elif key_2 is not None:
+            assert key_1 is not None
+            try:
+                output[key_1][key_2] = value
+            except KeyError:
+                _logger.warning(f"Failed imposing value '{value}' to [{key_1}][{key_2}]")
+        elif key_1 is not None:
+            try:
+                output[key_1] = value
+            except KeyError:
+                _logger.warning(f"Failed imposing value '{value}' to [{key_1}]")
+        else:
+            raise ValueError("at least one key should be given")
+
+        return output
+
+    def modify_highchart(self):
+        """ impose the use settings to the highchart """
+        # plot settings
+        if self.title is not None:
+            self.output = self.impose_value(self.title, "options", "title", "text")
+        if self.subtitle is not None:
+            self.output = self.impose_value(self.title, "options", "subtitle", "text")
+
+        if self.xlabel is not None or self.x_tick_interval is not None or self.x_lim is not None:
+            new_x_axis = list()
+            for x_axis in self.output["template"]["xAxis"]:
+                if self.xlabel is not None:
+                    x_axis = self.impose_value(self.xlabel, "title", "text", output=x_axis)
+                if self.x_tick_interval is not None:
+                    x_axis = self.impose_value(self.x_tick_interval, "tickInterval", output=x_axis)
+                if self.x_lim is not None:
+                    if self.x_lim[0] is not None:
+                        x_axis = self.impose_value(self.x_lim[0], "min", output=x_axis)
+                    if self.x_lim[1] is not None:
+                        x_axis = self.impose_value(self.x_lim[1], "max", output=x_axis)
+                new_x_axis.append(x_axis)
+            self.output["template"]["xAxis"] = new_x_axis
+
+        if self.ylabel is not None or self.y_tick_interval is not None or self.y_lim is not None:
+            new_y_axis = list()
+            for y_axis in self.output["template"]["yAxis"]:
+                if self.ylabel is not None:
+                    y_axis = self.impose_value(self.ylabel, "cbsTitle", output=y_axis)
+                if self.y_tick_interval is not None:
+                    y_axis = self.impose_value(self.y_tick_interval, "tickInterval", output=y_axis)
+                if self.y_lim is not None:
+                    if self.y_lim[0] is not None:
+                        y_axis = self.impose_value(self.y_lim[0], "min", output=y_axis)
+                    if self.y_lim[1] is not None:
+                        y_axis = self.impose_value(self.y_lim[1], "max", output=y_axis)
+                new_y_axis.append(y_axis)
+            self.output["template"]["xAxis"] = new_y_axis
+
+        if self.chart_description is not None:
+            self.output = self.impose_value(self.chart_description, "options", "chart",
+                                            "description")
+        if self.chart_height is not None:
+            self.output = self.impose_value(self.chart_height, "options", "chart", "height")
+        if self.color_selection is not None:
+            pass
+        if self.sources_text is not None:
+            self.output = self.impose_value(self.sources_text, "options", "sources", "text")
+        if self.footnote_text is not None:
+            self.output = self.impose_value(self.footnote_text, "options", "footnote", "text")
+        if self.series_description is not None:
+            pass
+        if self.tooltip_prefix is not None:
+            self.output = self.impose_value(self.tooltip_prefix, "options", "tooltop",
+                                            "valuePrefix")
+        if self.tooltip_suffix is not None:
+            self.output = self.impose_value(self.tooltip_suffix, "options", "tooltop",
+                                            "valueSuffix")
 
     @staticmethod
     def get_data(input_file_name, index_col=0, csv_separator=";", decimal=","):
