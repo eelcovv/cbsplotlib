@@ -270,7 +270,7 @@ class CBSHighChart:
             self.output = self.impose_value(self.title, "options", "title", "text")
         if self.subtitle is not None:
             _logger.debug(f"Imposing {self.subtitle} to [options][title][text]")
-            self.output = self.impose_value(self.title, "options", "subtitle", "text")
+            self.output = self.impose_value(self.subtitle, "options", "subtitle", "text")
 
         if self.xlabel is not None or self.x_tick_interval is not None or self.x_lim is not None:
             for section in ("template", "options"):
