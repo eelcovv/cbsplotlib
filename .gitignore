@@ -55,3 +55,4 @@ MANIFEST
 *.png
 *.pdf
 /examples/out
+/examples/cbs_hc_bar.json
