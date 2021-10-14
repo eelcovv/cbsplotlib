@@ -4,3 +4,5 @@ importlib_metadata
 sphinx
 seaborn
 setuptools
+cbsplotlib
+pandas

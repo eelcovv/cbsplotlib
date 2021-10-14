@@ -1,11 +1,11 @@
-import sys
 import codecs
-import logging
-import json
-import pandas as pd
-from decimal import Decimal, Rounded
-from pathlib import Path
 import functools
+import json
+import logging
+from pathlib import Path
+
+import pandas as pd
+
 import cbsplotlib
 
 _logger = logging.getLogger(__name__)
@@ -81,13 +81,14 @@ class CBSHighChart:
                                                defaults_file_name=defaults_file_name)
 
         if defaults_out_file is not None:
-            # als we een default output file geven dan schrijven we alleen de huidige template naar deze file
+            # als we een default output file geven dan schrijven we alleen de huidige template naar
+            # deze file
             self.write_to_file(output=self.defaults, output_file_name=defaults_out_file)
             _logger.info(
-                """
-                We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
-                was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee met het 
-                *defaults_file_name* argument. Script stop nu hier.
+            """
+            We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
+            was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee 
+            met het *defaults_file_name* argument. Script stop nu hier.
                 """
             )
             return
@@ -95,8 +96,8 @@ class CBSHighChart:
         # get the data here, if take from the argument
         if data is None:
             _logger.info(f"Reading data from {input_file_name}")
-            self.data_df = self.get_data(input_file_name, index_col=index_col, csv_separator=csv_separator,
-                                         decimal=decimal)
+            self.data_df = self.get_data(input_file_name, index_col=index_col,
+                                         csv_separator=csv_separator, decimal=decimal)
         else:
             _logger.debug(f"Using dataframe")
             self.data_df = data
@@ -111,8 +112,8 @@ class CBSHighChart:
             self.make_highcharts()
             _logger.info("Done with making highcharts")
         else:
-            _logger.info("The data was successfully. To create the highcharts, call the *make_highcharts()* method"
-                         "or pass the start=True argument")
+            _logger.info("The data was successfully. To create the highcharts, call the "
+                         "*make_highcharts()* method or pass the start=True argument")
 
     def make_highcharts(self):
 
