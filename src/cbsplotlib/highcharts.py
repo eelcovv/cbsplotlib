@@ -18,6 +18,43 @@ def set_loglevel(*args, **kwargs):
 
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
 
+PALETTES = {
+    "Warm":
+        ["#e94c0a",
+         "#ffcc00",
+         "#af0e80",
+         "#f39200",
+         "#53a31d",
+         "#afcb05",
+         "#0058b8",
+         "#00a1cd",
+         "#b23d02",
+         "#e1b600",
+         "#82045e",
+         "#ce7c00",
+         "#488225",
+         "#899d0c",
+         "#163a72",
+         "#0581a2"],
+    "Cold":
+        ["#00a1cd",
+         "#0058b8",
+         "#afcb05",
+         "#53a31d",
+         "#f39200",
+         "#af0e80",
+         "#ffcc00",
+         "#e94c0a",
+         "#0581a2",
+         "#163a72",
+         "#899d0c",
+         "#488225",
+         "#ce7c00",
+         "#82045e",
+         "#e1b600",
+         "#b23d02"]
+}
+
 
 class CBSHighChart:
     def __init__(self,
@@ -176,14 +213,18 @@ class CBSHighChart:
             try:
                 output[key_1][key_2][key_3] = value
             except KeyError:
-                _logger.warning(f"Failed imposing value '{value}' to [{key_1}][{key_2}][{key_3}]")
-
+                # voor de laatste level kan het zijn dat de entry nog niet bestaat. Maak het gewoon
+                _logger.debug(f"Adding new key [{key_2}][{key_3}]")
+                output[key_1][key_2] = {}
+                output[key_1][key_2][key_3] = value
         elif key_2 is not None:
             assert key_1 is not None
             try:
                 output[key_1][key_2] = value
             except KeyError:
-                _logger.warning(f"Failed imposing value '{value}' to [{key_1}][{key_2}]")
+                _logger.debug(f"Adding new key [{key_2}]")
+                output[key_1] = {}
+                output[key_1][key_2] = value
         elif key_1 is not None:
             try:
                 output[key_1] = value
@@ -194,63 +235,98 @@ class CBSHighChart:
 
         return output
 
+    def impose_axis_prop(self, output, section="template", axis_key="xAxis", label=None,
+                         tick_interval=None, lim=None):
+
+        new_axis = list()
+        for axis in self.output[section][axis_key]:
+            if label is not None:
+                if axis_key == "xAxis":
+                    _logger.debug(f"Imposing {label} to [{section}][{axis_key}][title][text]")
+                    axis = self.impose_value(label, "title", "text", output=axis)
+                else:
+                    _logger.debug(f"Imposing {label} to [{section}][{axis_key}][cbsTitle]")
+                    axis = self.impose_value(label, "cbsTitle", output=axis)
+            if tick_interval is not None:
+                _logger.debug(f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]")
+                axis = self.impose_value(tick_interval, "tickInterval", output=axis)
+            if lim is not None:
+                if lim[0] is not None:
+                    _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
+                    axis = self.impose_value(lim[0], "min", output=axis)
+                if lim[1] is not None:
+                    _logger.debug(f"Imposing {lim[1]} to [{section}][{axis_key}][max]")
+                    axis = self.impose_value(lim[1], "max", output=axis)
+            new_axis.append(axis)
+        output[section][axis_key] = new_axis
+
+        return output
+
     def modify_highchart(self):
         """ impose the use settings to the highchart """
         # plot settings
         if self.title is not None:
+            _logger.debug(f"Imposing {self.title} to [options][title][text]")
             self.output = self.impose_value(self.title, "options", "title", "text")
         if self.subtitle is not None:
+            _logger.debug(f"Imposing {self.subtitle} to [options][title][text]")
             self.output = self.impose_value(self.title, "options", "subtitle", "text")
 
         if self.xlabel is not None or self.x_tick_interval is not None or self.x_lim is not None:
-            new_x_axis = list()
-            for x_axis in self.output["template"]["xAxis"]:
-                if self.xlabel is not None:
-                    x_axis = self.impose_value(self.xlabel, "title", "text", output=x_axis)
-                if self.x_tick_interval is not None:
-                    x_axis = self.impose_value(self.x_tick_interval, "tickInterval", output=x_axis)
-                if self.x_lim is not None:
-                    if self.x_lim[0] is not None:
-                        x_axis = self.impose_value(self.x_lim[0], "min", output=x_axis)
-                    if self.x_lim[1] is not None:
-                        x_axis = self.impose_value(self.x_lim[1], "max", output=x_axis)
-                new_x_axis.append(x_axis)
-            self.output["template"]["xAxis"] = new_x_axis
+            for section in ("template", "options"):
+                _logger.debug(f"Imposing xlabel/xtick/xlim to [{section}][xAxis][text]")
+                self.output = self.impose_axis_prop(output=self.output,
+                                                    section=section,
+                                                    axis_key="xAxis",
+                                                    label=self.xlabel,
+                                                    tick_interval=self.x_tick_interval,
+                                                    lim=self.x_lim)
 
         if self.ylabel is not None or self.y_tick_interval is not None or self.y_lim is not None:
-            new_y_axis = list()
-            for y_axis in self.output["template"]["yAxis"]:
-                if self.ylabel is not None:
-                    y_axis = self.impose_value(self.ylabel, "cbsTitle", output=y_axis)
-                if self.y_tick_interval is not None:
-                    y_axis = self.impose_value(self.y_tick_interval, "tickInterval", output=y_axis)
-                if self.y_lim is not None:
-                    if self.y_lim[0] is not None:
-                        y_axis = self.impose_value(self.y_lim[0], "min", output=y_axis)
-                    if self.y_lim[1] is not None:
-                        y_axis = self.impose_value(self.y_lim[1], "max", output=y_axis)
-                new_y_axis.append(y_axis)
-            self.output["template"]["xAxis"] = new_y_axis
+            for section in ("template", "options"):
+                _logger.debug(f"Imposing ylabel/ytick/ylim to [{section}][yAxis][text]")
+                self.output = self.impose_axis_prop(output=self.output,
+                                                    section=section,
+                                                    axis_key="yAxis",
+                                                    label=self.ylabel,
+                                                    tick_interval=self.y_tick_interval,
+                                                    lim=self.y_lim)
 
         if self.chart_description is not None:
+            _logger.debug(f"Imposing {self.chart_description} to [options][chart][description]")
             self.output = self.impose_value(self.chart_description, "options", "chart",
                                             "description")
         if self.chart_height is not None:
+            _logger.debug(f"Imposing {self.chart_height} to [options][chart][height]")
             self.output = self.impose_value(self.chart_height, "options", "chart", "height")
         if self.color_selection is not None:
             pass
         if self.sources_text is not None:
+            _logger.debug(f"Imposing {self.sources_text} to [options][sources][text]")
             self.output = self.impose_value(self.sources_text, "options", "sources", "text")
         if self.footnote_text is not None:
-            self.output = self.impose_value(self.footnote_text, "options", "footnote", "text")
+            _logger.debug(f"Imposing {self.footnote_text} to [options][footNote][text]")
+            self.output = self.impose_value(self.footnote_text, "options", "footNote", "text")
         if self.series_description is not None:
             pass
         if self.tooltip_prefix is not None:
-            self.output = self.impose_value(self.tooltip_prefix, "options", "tooltop",
+            _logger.debug(f"Imposing {self.tooltip_prefix} to [options][tooltip][valuePrefix]")
+            self.output = self.impose_value(self.tooltip_prefix, "options", "tooltip",
                                             "valuePrefix")
         if self.tooltip_suffix is not None:
-            self.output = self.impose_value(self.tooltip_suffix, "options", "tooltop",
+            _logger.debug(f"Imposing {self.tooltip_suffix} to [options][tooltip][valueSuffix]")
+            self.output = self.impose_value(self.tooltip_suffix, "options", "tooltip",
                                             "valueSuffix")
+
+        if self.color_selection is not None:
+            try:
+                colors = PALETTES[self.color_selection]
+            except KeyError:
+                raise ValueError(f"color_selection argument not valid. Must in {PALETTES.keys()}")
+
+            self.output = self.impose_value(self.color_selection, "options", "colorSelection")
+            self.output = self.impose_value(colors, "options", "colors")
+
 
     @staticmethod
     def get_data(input_file_name, index_col=0, csv_separator=";", decimal=","):
