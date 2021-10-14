@@ -178,15 +178,16 @@ class CBSHighChart:
                           defaults_file_name: str = None,
                           cbs_hc_defaults: str = "cbs_hc_defaults"):
         """
-        Lees de settings uit een default template json en overschrijf met de instellingen uit een modification json
+        Lees de settings uit een default template json
 
         Parameters
         ----------
         chart_type: str of None
-            Type plot die we maken (bar, column, line). De default template wordt gebaseerd hierop gemaakt
+            Type plot die we maken (bar, column, line). De default template wordt gebaseerd hierop
+            gemaakt
         defaults_directory: str of None
-            Locatie waar de default template staat. Als niet gegeven en default file naam is niet mee gegeven, dan
-            is dit <PACKAGELOCATIE>/Path(cbs_hc_defaults)
+            Locatie waar de default template staat. Als niet gegeven en default file naam is niet
+            mee gegeven, dan is dit <PACKAGELOCATIE>/Path(cbs_hc_defaults)
         defaults_file_name: str of None
             Naam van de defaults input file. Als niet gegeven wordt deze gebaseerd op *chart_type*
         cbs_hc_defaults: str
@@ -195,7 +196,8 @@ class CBSHighChart:
 
         if defaults_directory is None:
             if defaults_file_name is None:
-                # er is geen default filenaam meegegeven. Ga ervan uit dat we de default uit de package folder halen
+                # er is geen default filenaam meegegeven. Ga ervan uit dat we de default uit de
+                # package folder halen
                 defaults_directory = Path(__file__).parent / Path(cbs_hc_defaults)
         else:
             defaults_directory = Path(defaults_directory)
@@ -204,7 +206,8 @@ class CBSHighChart:
             # alde default filename None is dan is default directory sowieso gezet
             defaults_file_name = defaults_directory / Path(chart_type + ".json")
         else:
-            # default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven was dan combineren
+            # default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven
+            # was dan combineren
             # we de naam met de directory, anders nemen we direct de filenaam
             if defaults_directory is None:
                 defaults_file_name = Path(defaults_file_name)
@@ -315,7 +318,8 @@ class CBSHighChart:
         output_file_name: str of None
             Naam van de output file
         input_file_name: str of None
-            Naam van de input data file. Als we geen output filenaam geven zal de output file hierop gebaseerd worden.
+            Naam van de input data file. Als we geen output filenaam geven zal de output file hierop
+            gebaseerd worden.
         chart_type: str
             Type plot (bar, column, line). Als gegeven wordt dit in de filenaam verwerkt.
 
