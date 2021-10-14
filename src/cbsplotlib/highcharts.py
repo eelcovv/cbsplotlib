@@ -84,7 +84,7 @@ class CBSHighChart:
                  color_selection: str = None,
                  sources_text: str = None,
                  footnote_text: str = None,
-                 series_description: pd.Series = None,
+                 series_description: pd.DataFrame = None,
                  tooltip_prefix: str = None,
                  tooltip_suffix: str = None,
                  ):
