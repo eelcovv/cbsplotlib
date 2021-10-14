@@ -13,8 +13,13 @@ data_input_directory = Path("../data/highcharts_examples")
 input_file_name = data_input_directory / Path("cbs_hc_bar.csv")
 data_df = pd.read_csv(input_file_name, sep=";", index_col=0, decimal=",")
 
+series_description = pd.DataFrame(index=data_df.columns,
+                                  data=[f"Getallen voor {_}" for _ in data_df.columns.values])
+
 hc = CBSHighChart(data=data_df,
                   chart_type="column",
                   output_directory=output_directory,
-                  output_file_name="cbs_hc_column_plot")
+                  output_file_name="cbs_hc_column_plot",
+                  series_description=series_description,
+                  )
 print("Done")

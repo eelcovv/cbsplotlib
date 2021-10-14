@@ -70,7 +70,7 @@ class CBSHighChart:
                  decimal: str = ",",
                  index_col: int = 0,
                  y_format: str = None,
-                 start: bool = False,
+                 start: bool = True,
                  title: str = None,
                  subtitle: str = None,
                  xlabel: str = None,
@@ -307,8 +307,6 @@ class CBSHighChart:
         if self.footnote_text is not None:
             _logger.debug(f"Imposing {self.footnote_text} to [options][footNote][text]")
             self.output = self.impose_value(self.footnote_text, "options", "footNote", "text")
-        if self.series_description is not None:
-            pass
         if self.tooltip_prefix is not None:
             _logger.debug(f"Imposing {self.tooltip_prefix} to [options][tooltip][valuePrefix]")
             self.output = self.impose_value(self.tooltip_prefix, "options", "tooltip",
@@ -327,6 +325,15 @@ class CBSHighChart:
             self.output = self.impose_value(self.color_selection, "options", "colorSelection")
             self.output = self.impose_value(colors, "options", "colors")
 
+        if self.series_description is not None:
+            self.series_description.index = self.series_description.index.map(str)
+            new_entries = list()
+            for entry in self.output["options"]["series"]:
+                name = entry["name"]
+                description = self.series_description.loc[name].values[0]
+                entry["description"] = description
+                new_entries.append(entry)
+            self.output["options"]["series"] = new_entries
 
     @staticmethod
     def get_data(input_file_name, index_col=0, csv_separator=";", decimal=","):
