@@ -170,7 +170,7 @@ class CBSHighChart:
             # als de start optie meegeven is dan gaan we de highcharts file bouwen
             self.make_highchart()
 
-            self.modify_highchart()
+            # self.modify_highchart()
 
             # finally write the result to file
             self.write_to_file(output=self.output,
@@ -472,6 +472,12 @@ class CBSHighChart:
             }
             for index, row in self.data_df[[col_name]].iterrows():
                 value = row.values[0]
+                try:
+                    # integer value kan je niet naar json schrijven, dus maak er een flow van
+                    value = float(value)
+                except TypeError:
+                    # als type cast naar float niet lukt is het ene string. Ook goed
+                    pass
                 y_string = self.y_format.format(value)
                 entry = {
                     "y": value,
