@@ -17,6 +17,26 @@ def set_loglevel(*args, **kwargs):
 
 
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
+PLOT_TEMPLATES = {"area_percentage_grouped",
+                  "area_stacked_grouped",
+                  "bar",
+                  "bar_percentage",
+                  "bar_stacked",
+                  "bar_stacked_percentage",
+                  "bar_with_negative_stack",
+                  "bubblechart_tourist",
+                  "choropleth_youthcare",
+                  "column_grouped",
+                  "column_grouped_stacked",
+                  "column",
+                  "column_percentage",
+                  "column_stacked_percentage",
+                  "line_column_combination_grouped",
+                  "line",
+                  "pie_donut",
+                  "polar_spider_line",
+                  "spline_grouped"
+                  }
 
 PALETTES = {
     "Warm":
@@ -400,6 +420,9 @@ class CBSHighChart:
             # was dan combineren
             # we de naam met de directory, anders nemen we direct de filenaam
             if defaults_directory is None:
+                if Path(defaults_file_name).stem not in PLOT_TEMPLATES:
+                    _logger.warning(f"default filename {defaults_file_name} not in:\n"
+                                    f"{PLOT_TEMPLATES}")
                 defaults_file_name = Path(defaults_file_name)
             else:
                 defaults_file_name = defaults_directory / Path(defaults_file_name)
