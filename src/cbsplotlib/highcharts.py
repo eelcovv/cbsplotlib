@@ -170,7 +170,7 @@ class CBSHighChart:
             # als de start optie meegeven is dan gaan we de highcharts file bouwen
             self.make_highchart()
 
-            # self.modify_highchart()
+            self.modify_highchart()
 
             # finally write the result to file
             self.write_to_file(output=self.output,
