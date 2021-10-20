@@ -190,7 +190,7 @@ class CBSHighChart:
             # als de start optie meegeven is dan gaan we de highcharts file bouwen
             self.make_highchart()
 
-            # self.modify_highchart()
+            self.modify_highchart()
 
             # finally write the result to file
             self.write_to_file(output=self.output,
@@ -370,12 +370,14 @@ class CBSHighChart:
 
     def get_categories(self):
         if self.data_df.index.nlevels == 1:
-            categories = self.data_df.index.to_list()
+            categories = [str(_) for _ in self.data_df.index.to_list()]
         elif self.data_df.index.nlevels == 2:
             categories = list()
+
             for first_level_key, df in self.data_df.groupby(level=0):
+                categories_strings = [str(_) for _ in df.index.get_level_values(1).to_list()]
                 group_categories = {"name": str(first_level_key),
-                                    "categories": df.index.get_level_values(1).to_list()}
+                                    "categories": categories_strings}
                 categories.append(group_categories)
         else:
             raise TypeError("Multilevel with more than 2 levels not implemented")
