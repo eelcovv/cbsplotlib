@@ -430,8 +430,16 @@ class CBSHighChart:
                 defaults_file_name = defaults_directory / Path(defaults_file_name)
 
         _logger.info(f"Reading template {defaults_file_name}")
-        with open(defaults_file_name, "r") as stream:
-            defaults = json.load(stream)
+        try:
+            with open(defaults_file_name, "r") as stream:
+                defaults = json.load(stream)
+        except FileNotFoundError as err:
+            _logger.warning(err)
+            _logger.warning(f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
+                            f"{defaults_file_name} niet vinden. De volgende templates zijn"
+                            f"tot nu geïmplementeerd:\n{PLOT_TEMPLATES}")
+            raise
+
 
         return defaults
 
