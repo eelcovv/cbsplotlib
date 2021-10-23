@@ -2,6 +2,7 @@ import codecs
 import functools
 import json
 import logging
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -437,9 +438,8 @@ class CBSHighChart:
             _logger.warning(err)
             _logger.warning(f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
                             f"{defaults_file_name} niet vinden. De volgende templates zijn"
-                            f"tot nu geïmplementeerd:\n{PLOT_TEMPLATES}")
-            raise
-
+                            f"tot nu geïmplementeerd:\n{PLOT_TEMPLATES}\n.Stop hier")
+            sys.exit(-1)
 
         return defaults
 
