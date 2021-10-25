@@ -29,9 +29,10 @@ CBS_COLORS_RBG = {
     "appelgroen": (175, 203, 5),
     "appelgroenvergrijsd": (137, 157, 12),
     "violet": (172, 33, 142),
+    "highchartslichtgrijs": (239, 239, 239),  # 6.3% zwart, wordt in highcharts gebruikt
     "lichtgrijs": (224, 224, 224),  # 12% zwart
     "grijs": (102, 102, 102),  # 60% zwart
-    "logogrijs": (115, 115, 115),  # 55% zwart
+    "logogrijs": (146, 146, 146),  # 55% zwart
     "codekleur": (88, 88, 88),
 }
 

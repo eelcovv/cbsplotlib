@@ -186,7 +186,7 @@ def add_cbs_logo_to_plot(fig,
                          width=None,
                          height=None,
                          zorder_start=1,
-                         fillcolor="cbs:lichtgrijs",
+                         fillcolor="cbs:highchartslichtgrijs",
                          edgecolor="cbs:logogrijs",
                          ):
     # maak een box met de coordinaten van de linker onderhoek van het grijze vierkant in axis
@@ -389,8 +389,8 @@ def add_axis_label_background(fig, axes, alpha=1,
                               logo_margin_y_in_mm=1,
                               add_logo=True,
                               aspect=None,
-                              backgroundcolor="cbs:lichtgrijs",
-                              logo_fillcolor="cbs:lichtgrijs",
+                              backgroundcolor="cbs:highchartslichtgrijs",
+                              logo_fillcolor="cbs:highchartslichtgrijs",
                               logo_edgecolor="cbs:logogrijs",
                               ):
     """
