@@ -230,7 +230,8 @@
         "fontFamily": "\"Soho W01 Medium\", \"Cambria\", sans-serif",
         "fontSize": "17px",
         "color": "#000"
-      }
+      },
+      "text": "Tweelingen vs Drielingen"
     },
     "subtitle": {},
     "plotOptions": {
@@ -268,7 +269,7 @@
       }
     },
     "sources": {
-      "prefix": "",
+      "prefix": "Bron: CBS,",
       "text": ""
     },
     "legend": {
@@ -1043,7 +1044,32 @@
     ],
     "yAxis": [
       {}
-    ]
+    ],
+    "lang": {
+      "downloadJPEG": "Download JPEG afbeelding",
+      "downloadPDF": "Download PDF document",
+      "downloadPNG": "Download PNG afbeelding",
+      "downloadSVG": "Download SVG",
+      "drillUpText": "Terug naar {series.name}",
+      "loading": "Laden...",
+      "noData": "Geen data om weer te geven",
+      "printChart": "Afdrukken",
+      "resetZoom": "Herstel zoom",
+      "resetZoomTitle": "Herstel zoom level 1:1",
+      "legend": {
+        "less": "Minder dan",
+        "more": "of meer",
+        "to": "tot",
+        "noData": "Geen data"
+      },
+      "tooltip": {
+        "nullDataMessage": "Data is onbekend of geheim"
+      },
+      "decimalPoint": ",",
+      "thousandsSep": " "
+    },
+    "cultureSelection": "Dutch",
+    "selectedCultureId": "nl"
   },
   "selectedTemplate": {
     "masterID": "Line",
