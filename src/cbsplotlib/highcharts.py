@@ -344,7 +344,6 @@ class CBSHighChart:
             self.output = self.impose_value(self.tooltip_suffix, "options", "settings",
                                             "hasGroupedCategories")
 
-
         if self.color_selection is not None:
             try:
                 colors = PALETTES[self.color_selection]
