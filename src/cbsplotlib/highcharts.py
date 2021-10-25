@@ -108,6 +108,7 @@ class CBSHighChart:
                  series_description: pd.DataFrame = None,
                  tooltip_prefix: str = None,
                  tooltip_suffix: str = None,
+                 has_grouped_categories: bool = None,
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
@@ -132,6 +133,7 @@ class CBSHighChart:
         self.tooltip_prefix = tooltip_prefix
         self.tooltip_suffix = tooltip_suffix
         self.y_format = y_format
+        self.has_grouped_categories = has_grouped_categories
 
         if chart_type is None:
             # defaults chart type is a bar plot
@@ -336,6 +338,12 @@ class CBSHighChart:
             _logger.debug(f"Imposing {self.tooltip_suffix} to [options][tooltip][valueSuffix]")
             self.output = self.impose_value(self.tooltip_suffix, "options", "tooltip",
                                             "valueSuffix")
+
+        if self.has_grouped_categories is not None:
+            _logger.debug(f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
+            self.output = self.impose_value(self.tooltip_suffix, "options", "settings",
+                                            "hasGroupedCategories")
+
 
         if self.color_selection is not None:
             try:
