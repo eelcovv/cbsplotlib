@@ -32,7 +32,7 @@ CBS_COLORS_RBG = {
     "highchartslichtgrijs": (239, 239, 239),  # 6.3% zwart, wordt in highcharts gebruikt
     "lichtgrijs": (224, 224, 224),  # 12% zwart
     "grijs": (102, 102, 102),  # 60% zwart
-    "logogrijs": (146, 146, 146),  # 55% zwart
+    "logogrijs": (146, 146, 146),  # 42% zwart, kleur van het CBS logo in het grijze vlak
     "codekleur": (88, 88, 88),
 }
 
