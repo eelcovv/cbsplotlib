@@ -104,6 +104,7 @@ class CBSHighChart:
                  chart_height: int = None,
                  color_selection: str = None,
                  sources_text: str = None,
+                 sources_prefix: str = None,
                  footnote_text: str = None,
                  series_description: pd.DataFrame = None,
                  tooltip_prefix: str = None,
@@ -128,6 +129,7 @@ class CBSHighChart:
         self.chart_height = chart_height
         self.color_selection = color_selection
         self.sources_text = sources_text
+        self.sources_prefix = sources_prefix
         self.footnote_text = footnote_text
         self.series_description = series_description
         self.tooltip_prefix = tooltip_prefix
@@ -272,7 +274,7 @@ class CBSHighChart:
                     axis = self.impose_value(label, "cbsTitle", output=axis)
             if tick_interval is not None:
                 _logger.debug(f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]")
-                axis = self.impose_value(str(tick_interval), "tickInterval", output=axis)
+                axis = self.impose_value(tick_interval, "tickInterval", output=axis)
             if lim is not None:
                 if lim[0] is not None:
                     _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
@@ -327,6 +329,9 @@ class CBSHighChart:
         if self.sources_text is not None:
             _logger.debug(f"Imposing {self.sources_text} to [options][sources][text]")
             self.output = self.impose_value(self.sources_text, "options", "sources", "text")
+        if self.sources_prefix is not None:
+            _logger.debug(f"Imposing {self.sources_prefix} to [options][sources][prefix]")
+            self.output = self.impose_value(self.sources_prefix, "options", "sources", "prefix")
         if self.footnote_text is not None:
             _logger.debug(f"Imposing {self.footnote_text} to [options][footNote][text]")
             self.output = self.impose_value(self.footnote_text, "options", "footNote", "text")
