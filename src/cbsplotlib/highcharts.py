@@ -435,14 +435,20 @@ class CBSHighChart:
             with open(defaults_file_name, "r") as stream:
                 defaults = json.load(stream)
         except FileNotFoundError as err:
-            _logger.warning(err)
-            template_list = "\n".join(PLOT_TEMPLATES)
-            _logger.warning(f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
-                            f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
-                            f"tot nu geïmplementeerd:\n{template_list}")
-            _logger.warning("Geef een goede template via char_type of kies een custom template"
-                            "via input_file_name. Stop hier")
-            sys.exit(-1)
+            try:
+                _logger.debug(f"Failed reading {defaults_file_name}. Try again with .json suffuix")
+                defaults_file_name = defaults_file_name.with_suffix(".json")
+                with open(defaults_file_name, "r") as stream:
+                    defaults = json.load(stream)
+            except FileNotFoundError as err:
+                _logger.warning(err)
+                template_list = "\n".join(PLOT_TEMPLATES)
+                _logger.warning(f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
+                                f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
+                                f"tot nu geïmplementeerd:\n{template_list}")
+                _logger.warning("Geef een goede template via char_type of kies een custom template"
+                                "via input_file_name. Stop hier")
+                sys.exit(-1)
 
         return defaults
 
