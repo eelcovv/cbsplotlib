@@ -5,6 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 import cbsplotlib
@@ -531,16 +532,22 @@ class CBSHighChart:
             for index, row in self.data_df[[col_name]].iterrows():
                 value = row.values[0]
                 try:
-                    # integer value kan je niet naar json schrijven, dus maak er een flow van
+                    # integer value kan je niet naar json schrijven, dus maak er een float van
                     value = float(value)
                 except TypeError:
-                    # als type cast naar float niet lukt is het ene string. Ook goed
+                    # als type cast naar float niet lukt is het een string. Ook goed
                     pass
-                y_string = self.y_format.format(value)
-                entry = {
-                    "y": value,
-                    "yString": y_string,
-                }
+                if np.isnan(value):
+                    y_string = "."
+                    entry = {
+                        "yString": y_string,
+                    }
+                else:
+                    y_string = self.y_format.format(value)
+                    entry = {
+                        "y": value,
+                        "yString": y_string,
+                    }
                 if isinstance(index, str):
                     entry["name"] = index
                 item["data"].append(entry)
