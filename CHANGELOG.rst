@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.3
+===========
+
+- Diverse nieuwe highcharts standaard templates toegevoegd
+
+
 Version 0.2
 ===========
 
