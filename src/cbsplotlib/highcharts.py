@@ -521,15 +521,22 @@ class CBSHighChart:
         if self.y_format is None:
             self.y_format = "{:g}"
 
+        try:
+            # als data_df een Series is maken we er een dataframe van.
+            data_df = self.data_df.to_frame()
+        except AttributeError:
+            # het was al een dataframe. geen probleem, ga gewoon door
+            data_df = self.data_df
+
         series = list()
-        for col_name in self.data_df.columns:
+        for col_name in data_df.columns:
             item = {
                 "name": col_name,
                 "isSerie": True,
                 "borderColor": "#FFFFFF",
                 "data": list()
             }
-            for index, row in self.data_df[[col_name]].iterrows():
+            for index, row in data_df[[col_name]].iterrows():
                 value = row.values[0]
                 try:
                     # integer value kan je niet naar json schrijven, dus maak er een float van
