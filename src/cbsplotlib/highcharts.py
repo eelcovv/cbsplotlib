@@ -384,8 +384,12 @@ class CBSHighChart:
     def get_categories(self):
         if self.data_df.index.nlevels == 1:
             categories = [str(_) for _ in self.data_df.index.to_list()]
+            if self.has_grouped_categories is None:
+                self.has_grouped_categories = False
         elif self.data_df.index.nlevels == 2:
             categories = list()
+            if self.has_grouped_categories is None:
+                self.has_grouped_categories = True
 
             for first_level_key, df in self.data_df.groupby(level=0, sort=False):
                 categories_strings = [str(_) for _ in df.index.get_level_values(1).to_list()]
