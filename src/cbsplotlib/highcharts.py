@@ -525,7 +525,7 @@ class CBSHighChart:
             # als data_df een Series is maken we er een dataframe van.
             data_df = self.data_df.to_frame()
         except AttributeError:
-            # het was al een dataframe. geen probleem, ga gewoon door
+            # het was al een dataframe. geen probleem, ga gewoon door.
             data_df = self.data_df
 
         series = list()
