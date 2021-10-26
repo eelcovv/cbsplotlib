@@ -341,12 +341,12 @@ class CBSHighChart:
                                             "valuePrefix")
         if self.tooltip_suffix is not None:
             _logger.debug(f"Imposing {self.tooltip_suffix} to [options][tooltip][valueSuffix]")
-            self.output = self.impose_value(self.has_grouped_categories, "options", "tooltip",
+            self.output = self.impose_value(self.tooltip_suffix, "options", "tooltip",
                                             "valueSuffix")
 
         if self.has_grouped_categories is not None:
             _logger.debug(f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
-            self.output = self.impose_value(self.tooltip_suffix, "options", "settings",
+            self.output = self.impose_value(self.has_grouped_categories, "options", "settings",
                                             "hasGroupedCategories")
 
         if self.color_selection is not None:
