@@ -387,7 +387,7 @@ class CBSHighChart:
         elif self.data_df.index.nlevels == 2:
             categories = list()
 
-            for first_level_key, df in self.data_df.groupby(level=0):
+            for first_level_key, df in self.data_df.groupby(level=0, sort=False):
                 categories_strings = [str(_) for _ in df.index.get_level_values(1).to_list()]
                 group_categories = {"name": str(first_level_key),
                                     "categories": categories_strings}
