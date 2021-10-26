@@ -347,6 +347,11 @@ class CBSHighChart:
             self.output = self.impose_value(self.tooltip_suffix, "options", "tooltip",
                                             "valueSuffix")
 
+        if self.enable_legend is not None:
+            _logger.debug(f"Imposing {self.enable_legend} to [template][legend][enabled]")
+            self.output = self.impose_value(self.enable_legend, "template", "legend",
+                                            "enabled")
+
         if self.has_grouped_categories is not None:
             _logger.debug(
                 f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
