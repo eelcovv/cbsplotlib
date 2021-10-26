@@ -111,11 +111,13 @@ class CBSHighChart:
                  tooltip_prefix: str = None,
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
+                 enable_legend: bool = None,
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
         self.index_col = index_col
+        self.enable_legend = enable_legend
 
         # plot settings
         self.title = title
@@ -346,7 +348,8 @@ class CBSHighChart:
                                             "valueSuffix")
 
         if self.has_grouped_categories is not None:
-            _logger.debug(f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
+            _logger.debug(
+                f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
             self.output = self.impose_value(self.has_grouped_categories, "options", "settings",
                                             "hasGroupedCategories")
 
@@ -393,7 +396,8 @@ class CBSHighChart:
                 self.has_grouped_categories = True
 
             for first_level_key, df in self.data_df.groupby(level=0, sort=False):
-                categories_strings = ["0" if _ == 0 else _ for _ in df.index.get_level_values(1).to_list()]
+                categories_strings = ["0" if _ == 0 else _ for _ in
+                                      df.index.get_level_values(1).to_list()]
                 group_categories = {"name": str(first_level_key),
                                     "categories": categories_strings}
                 categories.append(group_categories)
@@ -460,9 +464,10 @@ class CBSHighChart:
             except FileNotFoundError as err:
                 _logger.warning(err)
                 template_list = "\n".join(PLOT_TEMPLATES)
-                _logger.warning(f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
-                                f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
-                                f"tot nu geïmplementeerd:\n{template_list}")
+                _logger.warning(
+                    f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
+                    f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
+                    f"tot nu geïmplementeerd:\n{template_list}")
                 _logger.warning("Geef een goede template via char_type of kies een custom template"
                                 "via input_file_name. Stop hier")
                 sys.exit(-1)
