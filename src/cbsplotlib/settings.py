@@ -115,15 +115,27 @@ class CBSPlotSettings(object):
                       'grid.linewidth': 1.5,
                       'hatch.color': 'cbs:highchartslichtgrijs',
                       'axes.prop_cycle': get_color_palette(color_palette),
-                      'xtick.color': "cbs:grijs",
-                      'ytick.color': "cbs:grijs",
-                      'xtick.labelcolor': "black",
-                      'ytick.labelcolor': "black",
                       'axes.edgecolor': "cbs:grijs",
                       'axes.linewidth': 1.5,
                       }
 
         set_cbs_colors()
         mpl.rcParams.update(self.params)
+        if plot_parameters is None:
+            try:
+                mpl.rcParams.update({
+                    'xtick.labelcolor': "black",
+                    'ytick.labelcolor': "black"})
+            except KeyError:
+                _logger.debug("In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
+                              "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
+                              "in je script dan gewoon "
+                              "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')")
+            else:
+                # we konden de label kleur op black zetten. Verander dan nu de tick kleur
+                mpl.rcParams.update({
+                    'xtick.color': "cbs:grijs",
+                    'ytick.color': "cbs:grijs"
+                })
 
 
