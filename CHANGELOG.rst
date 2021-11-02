@@ -2,10 +2,11 @@
 Changelog
 =========
 
-Version 0.3
+Version 0.3.1
 ===========
 
 - Diverse nieuwe highcharts standaard templates toegevoegd
+- Kleuren automatisch geladen bij maken CBSSettings
 
 
 Version 0.2
