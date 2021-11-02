@@ -115,7 +115,10 @@ class CBSPlotSettings(object):
                       'grid.linewidth': 1.5,
                       'hatch.color': 'cbs:highchartslichtgrijs',
                       'axes.prop_cycle': get_color_palette(color_palette),
+                      'xtick.color': "cbs:grijs",
+                      'ytick.color': "cbs:grijs",
                       'axes.edgecolor': "cbs:grijs",
+                      'axes.labelcolor': "black",
                       'axes.linewidth': 1.5,
                       }
 
