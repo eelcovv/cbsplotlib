@@ -117,8 +117,9 @@ class CBSPlotSettings(object):
                       'axes.prop_cycle': get_color_palette(color_palette),
                       'xtick.color': "cbs:grijs",
                       'ytick.color': "cbs:grijs",
+                      'xtick.labelcolor': "black",
+                      'ytick.labelcolor': "black",
                       'axes.edgecolor': "cbs:grijs",
-                      'axes.labelcolor': "black",
                       'axes.linewidth': 1.5,
                       }
 
