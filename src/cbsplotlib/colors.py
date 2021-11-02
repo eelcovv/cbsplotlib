@@ -60,9 +60,6 @@ CBS_COLORS_HEX = {name: rgb_to_hex(rgb_value) for name, rgb_value in CBS_COLORS_
 CBS_COLORS = {"cbs:" + name: (value[0] / 255, value[1] / 255, value[2] / 255)
               for name, value in CBS_COLORS_RBG.items()}
 
-# update the matplotlib colors
-mcolors.get_named_colors_mapping().update(CBS_COLORS)
-
 # deze dictionairy bevat meerdere palettes
 CBS_PALETS = dict(
     koel=[
@@ -82,6 +79,11 @@ CBS_PALETS = dict(
         "cbs:appelgroen",
     ]
 )
+
+
+def set_cbs_colors():
+    # update the matplotlib colors
+    mcolors.get_named_colors_mapping().update(CBS_COLORS)
 
 
 def get_color_palette(style="koel"):
@@ -106,6 +108,9 @@ def get_color_palette(style="koel"):
         from cbs_utils.plotting import get_color_palette
         mpl.rcParams.update({'axes.prop_cycle': get_color_palette("warm")}
     """
+
+    set_cbs_colors()
+
     try:
         cbs_palette = CBS_PALETS[style]
     except KeyError:

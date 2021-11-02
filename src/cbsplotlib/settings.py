@@ -7,7 +7,7 @@ import math
 
 import matplotlib as mpl
 
-from cbsplotlib.colors import get_color_palette
+from cbsplotlib.colors import get_color_palette, set_cbs_colors
 
 _logger = logging.getLogger(__name__)
 
@@ -103,9 +103,9 @@ class CBSPlotSettings(object):
         self.fig_size = (self.fig_width, self.fig_height)
 
         if plot_parameters is not None:
-            params = plot_parameters
+            self.params = plot_parameters
         else:
-            params = {'axes.labelsize': font_size,
+            self.params = {'axes.labelsize': font_size,
                       'font.size': font_size,
                       'legend.fontsize': font_size,
                       'xtick.labelsize': font_size,
@@ -119,6 +119,7 @@ class CBSPlotSettings(object):
                       'axes.linewidth': 1.5,
                       }
 
-        mpl.rcParams.update(params)
+        set_cbs_colors()
+        mpl.rcParams.update(self.params)
 
 
