@@ -60,8 +60,8 @@ class CBSPlotSettings(object):
                  plot_parameters: dict = None,
                  color_palette: str = "koel",
                  font_size: float = 8,
-                 set_gray_x_tics=False,
-                 set_gray_y_tics=False,
+                 set_gray_x_tics: bool = False,
+                 set_gray_y_tics: bool = False,
                  ):
 
         # set scale factor
