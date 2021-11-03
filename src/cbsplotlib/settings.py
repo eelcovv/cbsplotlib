@@ -59,7 +59,9 @@ class CBSPlotSettings(object):
                  ratio_option="golden_ratio",
                  plot_parameters: dict = None,
                  color_palette: str = "koel",
-                 font_size: float = 8
+                 font_size: float = 8,
+                 set_gray_x_tics=False,
+                 set_gray_y_tics=False,
                  ):
 
         # set scale factor
@@ -106,36 +108,55 @@ class CBSPlotSettings(object):
             self.params = plot_parameters
         else:
             self.params = {'axes.labelsize': font_size,
-                      'font.size': font_size,
-                      'legend.fontsize': font_size,
-                      'xtick.labelsize': font_size,
-                      'ytick.labelsize': font_size,
-                      'figure.figsize': self.fig_size,
-                      'grid.color': 'cbs:highchartslichtgrijs',
-                      'grid.linewidth': 1.5,
-                      'hatch.color': 'cbs:highchartslichtgrijs',
-                      'axes.prop_cycle': get_color_palette(color_palette),
-                      'axes.edgecolor': "cbs:grijs",
-                      'axes.linewidth': 1.5,
-                      }
+                           'font.size': font_size,
+                           'legend.fontsize': font_size,
+                           'xtick.labelsize': font_size,
+                           'ytick.labelsize': font_size,
+                           'figure.figsize': self.fig_size,
+                           'grid.color': 'cbs:highchartslichtgrijs',
+                           'grid.linewidth': 1.5,
+                           'hatch.color': 'cbs:highchartslichtgrijs',
+                           'axes.prop_cycle': get_color_palette(color_palette),
+                           'axes.edgecolor': "cbs:grijs",
+                           'axes.linewidth': 1.5,
+                           }
 
         set_cbs_colors()
         mpl.rcParams.update(self.params)
-        if plot_parameters is None:
-            try:
-                mpl.rcParams.update({
-                    'xtick.labelcolor': "black",
-                    'ytick.labelcolor': "black"})
-            except KeyError:
-                _logger.debug("In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
-                              "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
-                              "in je script dan gewoon "
-                              "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')")
-            else:
-                # we konden de label kleur op black zetten. Verander dan nu de tick kleur
-                mpl.rcParams.update({
-                    'xtick.color': "cbs:grijs",
-                    'ytick.color': "cbs:grijs"
-                })
 
+        if set_gray_x_tics:
+            self.set_tick_color(axis="x")
+        if set_gray_y_tics:
+            self.set_tick_color(axis="y")
 
+    def set_tick_color(self, axis: str = None):
+        """
+        zet de kleur van de tikcs grijs.
+
+        Parameters
+        ----------
+        axis: str
+
+        Notes
+        -----
+        * Dit is ook hoe highcharts dat heeft.
+        * Probleem is dat de kleur van de tick en de tick label voor matplotlib <3.4 gekoppeld zijn,
+          zodat dit niet goed mogelijk is.
+
+        """
+        if axis is None or axis not in ('x', 'y'):
+            msg = "Specificeer de axis waarvan je de ticks wilt kleuren met axis='x' of axis='y'"
+            raise ValueError(msg)
+
+        try:
+            mpl.rcParams.update({f'{axis}tick.labelcolor': "black"})
+        except KeyError:
+            _logger.warning("In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
+                            "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
+                            "in je script dan gewoon "
+                            "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')")
+        else:
+            # we konden de label kleur op black zetten. Verander dan nu de tick kleur
+            mpl.rcParams.update({
+                f'{axis}tick.color': "cbs:grijs",
+            })
