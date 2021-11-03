@@ -456,13 +456,13 @@ class CBSHighChart:
             else:
                 defaults_file_name = defaults_directory / Path(defaults_file_name)
 
-        _logger.info(f"Reading template {defaults_file_name}")
+        _logger.debug(f"Reading template {defaults_file_name}")
         try:
             with open(defaults_file_name, "r") as stream:
                 defaults = json.load(stream)
         except FileNotFoundError as err:
             try:
-                _logger.debug(f"Failed reading {defaults_file_name}. Try again with .json suffuix")
+                _logger.debug(f"Failed reading {defaults_file_name}. Try again with .json suffix")
                 defaults_file_name = defaults_file_name.with_suffix(".json")
                 with open(defaults_file_name, "r") as stream:
                     defaults = json.load(stream)
