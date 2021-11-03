@@ -114,7 +114,7 @@ class CBSPlotSettings(object):
                            'ytick.labelsize': font_size,
                            'figure.figsize': self.fig_size,
                            'grid.color': 'cbs:highchartslichtgrijs',
-                           'grid.linewidth': 1.5,
+                           'grid.linewidth': 1.0,
                            'hatch.color': 'cbs:highchartslichtgrijs',
                            'axes.prop_cycle': get_color_palette(color_palette),
                            'axes.edgecolor': "cbs:grijs",
