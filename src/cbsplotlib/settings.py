@@ -59,7 +59,7 @@ class CBSPlotSettings(object):
                  ratio_option="golden_ratio",
                  plot_parameters: dict = None,
                  color_palette: str = "koel",
-                 font_size: int = 8
+                 font_size: float = 8
                  ):
 
         # set scale factor
