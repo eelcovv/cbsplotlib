@@ -129,7 +129,8 @@ class CBSPlotSettings(object):
         if set_gray_y_tics:
             self.set_tick_color(axis="y")
 
-    def set_tick_color(self, axis: str = None):
+    @staticmethod
+    def set_tick_color(axis: str = None):
         """
         zet de kleur van de tikcs grijs.
 
