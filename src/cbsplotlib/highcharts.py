@@ -603,7 +603,7 @@ class CBSHighChart:
 
         """
         if output_directory is not None:
-            output_directory.mkdir(exist_ok=True)
+            output_directory.mkdir(exist_ok=True, parents=True)
         if output_file_name is None:
             if input_file_name is None:
                 if chart_type is None:
