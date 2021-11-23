@@ -8,13 +8,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 import cbsplotlib
 
-DRIVER="\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
-
+DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
+         "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
 
 _logger = logging.getLogger(__name__)
 
@@ -90,6 +91,8 @@ class CBSHighChart:
                  input_file_name: str = None,
                  output_file_name: str = None,
                  output_directory: str = None,
+                 javascript_directory: str = None,
+                 javascript_filename: str = None,
                  defaults_directory: str = None,
                  defaults_file_name: str = None,
                  defaults_out_file: str = None,
@@ -118,8 +121,8 @@ class CBSHighChart:
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
                  enable_legend: bool = None,
-                 convert_to_html: bool=False,
-                 driver_path: str=None,
+                 convert_to_html: bool = False,
+                 driver_path: str = None,
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
@@ -131,6 +134,16 @@ class CBSHighChart:
             self.driver_path = DRIVER
         else:
             self.driver_path = driver_path
+
+        if javascript_directory is None:
+            self.javascript_directory = Path(__file__).parent / Path("js_queries")
+        else:
+            self.javascript_directory = Path(javascript_directory)
+
+        if javascript_filename is None:
+            self.javascript_filename = Path("highcharts-editor.min.js")
+        else:
+            self.javascript_filename = Path(javascript_filename)
 
         # plot settings
         self.title = title
@@ -220,7 +233,8 @@ class CBSHighChart:
                                input_file_name=self.input_file_name,
                                chart_type=self.chart_type,
                                convert_to_html=convert_to_html,
-                               driver_path=self.driver_path)
+                               driver_path=self.driver_path,
+                               )
 
         else:
             _logger.info("The data was read successfully. To create the highcharts, call the "
@@ -592,8 +606,8 @@ class CBSHighChart:
     def add_selected_templated(self, key="selectedTemplate"):
         self.output[key] = self.defaults[key]
 
-    @staticmethod
-    def write_to_file(output,
+    def write_to_file(self,
+                      output,
                       json_indent=2,
                       output_directory: Path = None,
                       output_file_name: str = None,
@@ -650,33 +664,40 @@ class CBSHighChart:
         if convert_to_html:
             _logger.debug(f"Connecting to  {driver_path}")
             driver = webdriver.Chrome(driver_path)
-            #driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
+            # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
             driver.get("https://highcharts.cbs.nl/")
 
-            driver.switch_to.default_content()
+            #driver.switch_to.default_content()
 
-            # 2) Download jquery lib file to your current folder manually & set path here
-            with open('highcharts-editor.min.js', 'r') as jquery_js:
-                # 3) Read the jquery from a file
+            # 1) js_file  is the downloaded javascript js file
+            js_file = self.javascript_directory / self.javascript_filename
+            with open(js_file, 'r') as jquery_js:
+                # 2) Read the jquery from a file
                 jquery = jquery_js.read()
-                # 4) Load jquery lib
+                # 3) Load jquery lib
                 driver.execute_script(jquery)
-                # 5) Execute your command
-                driver.execute_script(f"window.Highcharts.readLocalFile({chart_container})")
 
-            #output = driver.execute_script(f'return window.Highcharts.chart.container({chart_container})')
+                # 4) Execute your command
+                try:
+                    result = driver.execute_script(f"highed.DefaultContextMenu.readLocalFile({outfile.as_posix()})")
+                except selenium.common.exceptions.JavascriptException as err:
+                    _logger.warning(err)
+                else:
+                    _logger.debug("Succeeded loading!")
 
-            #driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
+            # output = driver.execute_script(f'return window.Highcharts.chart.container({chart_container})')
+
+            # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
             load_button_id = "btn-load-project"
             export_button_id = "btn-load-project"
-            #_logger.debug("Loading button key")
-            #exe = driver.find_element(by="name", value="readLocalFile")
+            # _logger.debug("Loading button key")
+            # exe = driver.find_element(by="name", value="readLocalFile")
 
-            #driver.execute_script(f"readLocalFile(\"{outfile}\")")
+            # driver.execute_script(f"readLocalFile(\"{outfile}\")")
 
-            #import_button = driver.find_element_by_id(load_button_id)
+            # import_button = driver.find_element_by_id(load_button_id)
             _logger.debug(f"Sending key {outfile}")
-            #import_button.send_keys(outfile.as_posix())
-            #_logger.debug(import_button)
+            # import_button.send_keys(outfile.as_posix())
+            # _logger.debug(import_button)
             driver.close()
             _logger.debug(f"Success")
