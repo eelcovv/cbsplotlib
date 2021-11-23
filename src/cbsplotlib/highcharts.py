@@ -8,7 +8,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 import cbsplotlib
+
+DRIVER="\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
+
 
 _logger = logging.getLogger(__name__)
 
@@ -112,12 +118,19 @@ class CBSHighChart:
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
                  enable_legend: bool = None,
+                 convert_to_html: bool=False,
+                 driver_path: str=None,
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
         self.index_col = index_col
         self.enable_legend = enable_legend
+
+        if driver_path is None:
+            self.driver_path = DRIVER
+        else:
+            self.driver_path = driver_path
 
         # plot settings
         self.title = title
@@ -205,7 +218,10 @@ class CBSHighChart:
                                output_directory=self.output_directory,
                                output_file_name=self.output_file_name,
                                input_file_name=self.input_file_name,
-                               chart_type=self.chart_type)
+                               chart_type=self.chart_type,
+                               convert_to_html=convert_to_html,
+                               driver_path=self.driver_path)
+
         else:
             _logger.info("The data was read successfully. To create the highcharts, call the "
                          "*make_highcharts()* method or pass the start=True argument")
@@ -582,7 +598,10 @@ class CBSHighChart:
                       output_directory: Path = None,
                       output_file_name: str = None,
                       input_file_name: str = None,
-                      chart_type=None):
+                      chart_type=None,
+                      convert_to_html=True,
+                      driver_path=None,
+                      ):
         """
         Write the dictionary to an json output file
         Parameters
@@ -600,6 +619,8 @@ class CBSHighChart:
             gebaseerd worden.
         chart_type: str
             Type plot (bar, column, line). Als gegeven wordt dit in de filenaam verwerkt.
+        convert_to_html: bool
+            Convert the result to html
 
         """
         if output_directory is not None:
@@ -622,5 +643,40 @@ class CBSHighChart:
             else:
                 outfile = output_directory / Path(output_file_name).with_suffix(".json")
         _logger.info(f"Writing to {outfile}")
+        chart_container = json.dumps(output, indent=json_indent, ensure_ascii=False)
         with codecs.open(outfile.as_posix(), "w", encoding='utf-8') as stream:
-            stream.write(json.dumps(output, indent=json_indent, ensure_ascii=False))
+            stream.write(chart_container)
+
+        if convert_to_html:
+            _logger.debug(f"Connecting to  {driver_path}")
+            driver = webdriver.Chrome(driver_path)
+            #driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
+            driver.get("https://highcharts.cbs.nl/")
+
+            driver.switch_to.default_content()
+
+            # 2) Download jquery lib file to your current folder manually & set path here
+            with open('highcharts-editor.min.js', 'r') as jquery_js:
+                # 3) Read the jquery from a file
+                jquery = jquery_js.read()
+                # 4) Load jquery lib
+                driver.execute_script(jquery)
+                # 5) Execute your command
+                driver.execute_script(f"window.Highcharts.readLocalFile({chart_container})")
+
+            #output = driver.execute_script(f'return window.Highcharts.chart.container({chart_container})')
+
+            #driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
+            load_button_id = "btn-load-project"
+            export_button_id = "btn-load-project"
+            #_logger.debug("Loading button key")
+            #exe = driver.find_element(by="name", value="readLocalFile")
+
+            #driver.execute_script(f"readLocalFile(\"{outfile}\")")
+
+            #import_button = driver.find_element_by_id(load_button_id)
+            _logger.debug(f"Sending key {outfile}")
+            #import_button.send_keys(outfile.as_posix())
+            #_logger.debug(import_button)
+            driver.close()
+            _logger.debug(f"Success")
