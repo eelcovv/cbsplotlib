@@ -227,14 +227,14 @@ class CBSHighChart:
             self.modify_highchart()
 
             # finally write the result to file
-            self.write_to_file(output=self.output,
-                               output_directory=self.output_directory,
-                               output_file_name=self.output_file_name,
-                               input_file_name=self.input_file_name,
-                               chart_type=self.chart_type,
-                               convert_to_html=convert_to_html,
-                               driver_path=self.driver_path,
-                               )
+            out_file = self.write_to_file(output=self.output,
+                                          output_directory=self.output_directory,
+                                          output_file_name=self.output_file_name,
+                                          input_file_name=self.input_file_name,
+                                          chart_type=self.chart_type,
+                                          )
+            if convert_to_html:
+                self.convert_json_to_html(json_input_file=out_file)
 
         else:
             _logger.info("The data was read successfully. To create the highcharts, call the "
@@ -613,8 +613,6 @@ class CBSHighChart:
                       output_file_name: str = None,
                       input_file_name: str = None,
                       chart_type=None,
-                      convert_to_html=True,
-                      driver_path=None,
                       ):
         """
         Write the dictionary to an json output file
@@ -661,43 +659,55 @@ class CBSHighChart:
         with codecs.open(outfile.as_posix(), "w", encoding='utf-8') as stream:
             stream.write(chart_container)
 
-        if convert_to_html:
-            _logger.debug(f"Connecting to  {driver_path}")
-            driver = webdriver.Chrome(driver_path)
-            # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
-            driver.get("https://highcharts.cbs.nl/")
+        return outfile
 
-            #driver.switch_to.default_content()
+    def convert_json_to_html(self, json_input_file=None):
+        """
+        Convert the json output file to html
 
-            # 1) js_file  is the downloaded javascript js file
-            js_file = self.javascript_directory / self.javascript_filename
-            with open(js_file, 'r') as jquery_js:
-                # 2) Read the jquery from a file
-                jquery = jquery_js.read()
-                # 3) Load jquery lib
-                driver.execute_script(jquery)
+        Parameters
+        ----------
+        json_input_file: Path
+            Name of the json file
 
-                # 4) Execute your command
-                try:
-                    result = driver.execute_script(f"highed.DefaultContextMenu.readLocalFile({outfile.as_posix()})")
-                except selenium.common.exceptions.JavascriptException as err:
-                    _logger.warning(err)
-                else:
-                    _logger.debug("Succeeded loading!")
+        """
 
-            # output = driver.execute_script(f'return window.Highcharts.chart.container({chart_container})')
+        _logger.debug(f"Connecting to  {self.driver_path}")
+        driver = webdriver.Chrome(self.driver_path)
+        # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
+        driver.get("https://highcharts.cbs.nl/")
 
-            # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
-            load_button_id = "btn-load-project"
-            export_button_id = "btn-load-project"
-            # _logger.debug("Loading button key")
-            # exe = driver.find_element(by="name", value="readLocalFile")
+        # driver.switch_to.default_content()
 
-            # driver.execute_script(f"readLocalFile(\"{outfile}\")")
+        html_output_file =json_input_file.with_suffix(".html")
 
-            # import_button = driver.find_element_by_id(load_button_id)
-            _logger.debug(f"Sending key {outfile}")
-            # import_button.send_keys(outfile.as_posix())
-            # _logger.debug(import_button)
-            driver.close()
-            _logger.debug(f"Success")
+        # 1) js_file  is the downloaded javascript js file
+        js_file = self.javascript_directory / self.javascript_filename
+        with open(js_file, 'r') as jquery_js:
+            # 2) Read the jquery from a file
+            jquery = jquery_js.read()
+            # 3) Load jquery lib
+            driver.execute_script(jquery)
+
+            js_import = "{try {t = " + f"JSON.parse({json_input_file.as_posix()})" + "}" + \
+                        " catch (e) {return highed.snackBar(\"Error loading JSON: \" + e)}" + \
+                        " var x=e.loadProject(t); return x}"
+            print(js_import)
+            # 4) Execute your command
+            try:
+                _logger.debug(f"Executing: {js_import}")
+                driver.execute_script(js_import)
+            except selenium.common.exceptions.JavascriptException as err:
+                _logger.warning(err)
+            else:
+                _logger.debug("Succeeded loading!")
+
+                # js_preview = "{highed.dom.style(x," \
+                #             "{ width: \"100%\", maxWidth: \"700px\" }), G.resize() }"
+
+                # _logger.debug(f"Executing: {js_preview}")
+                # driver.execute_script(js_preview)
+
+        # input("quit?")
+        driver.close()
+        _logger.info(f"Success")

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from cbsplotlib.highcharts import CBSHighChart
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 output_directory = "out"
