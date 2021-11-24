@@ -4,6 +4,8 @@ import json
 import logging
 import sys
 from pathlib import Path
+from string import Template
+import re
 
 import numpy as np
 import pandas as pd
@@ -11,13 +13,15 @@ import pandas as pd
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
 import cbsplotlib
 
 DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
          "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
 
 _logger = logging.getLogger(__name__)
+
+_selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+_selenium_logger.setLevel(logging.WARNING)
 
 
 @functools.wraps(cbsplotlib.set_loglevel)
@@ -83,6 +87,15 @@ PALETTES = {
          "#e1b600",
          "#b23d02"]
 }
+
+
+def clean_js_query(js_multiline_query, substitutes=None):
+    if substitutes is None:
+        substitutes = {}
+    js_query = Template(js_multiline_query).substitute(substitutes)
+    js_query = re.sub("\n", "", js_query)
+    js_query = re.sub("\s{2,}", " ", js_query)
+    return js_query
 
 
 class CBSHighChart:
@@ -679,34 +692,65 @@ class CBSHighChart:
 
         # driver.switch_to.default_content()
 
-        html_output_file =json_input_file.with_suffix(".html")
+        html_output_file = json_input_file.with_suffix(".html")
 
         # 1) js_file  is the downloaded javascript js file
-        js_file = self.javascript_directory / self.javascript_filename
-        with open(js_file, 'r') as jquery_js:
-            # 2) Read the jquery from a file
-            jquery = jquery_js.read()
-            # 3) Load jquery lib
-            driver.execute_script(jquery)
-
-            js_import = "{try {t = " + f"JSON.parse({json_input_file.as_posix()})" + "}" + \
-                        " catch (e) {return highed.snackBar(\"Error loading JSON: \" + e)}" + \
-                        " var x=e.loadProject(t); return x}"
-            print(js_import)
-            # 4) Execute your command
+        for js_file_name in ["highcharts-editor.min.js", "highcharts.src.js", "highcharts-more.js"]:
+            js_file = self.javascript_directory / js_file_name
+            _logger.debug(f"Loading {js_file}")
             try:
-                _logger.debug(f"Executing: {js_import}")
-                driver.execute_script(js_import)
-            except selenium.common.exceptions.JavascriptException as err:
-                _logger.warning(err)
+                with open(js_file, 'r') as jquery_js:
+                    # 2) Read the jquery from a file
+                    jquery = jquery_js.read()
+            except FileNotFoundError:
+                _logger.warning(f"Could not load {js_file}")
             else:
-                _logger.debug("Succeeded loading!")
+                try:
+                    # 3) Load jquery lib
+                    driver.execute_script(jquery)
+                except selenium.common.exceptions.JavascriptException as err:
+                    _logger.warning(f"FAILED for {js_file}")
+                    _logger.warning(err)
+                else:
+                    _logger.debug(f"Succeeded loading! {js_file}")
 
-                # js_preview = "{highed.dom.style(x," \
-                #             "{ width: \"100%\", maxWidth: \"700px\" }), G.resize() }"
+        js_import2 = clean_js_query(
+            js_multiline_query="""
+                     {
+                        try 
+                        {
+                            t = JSON.parse($filename)
+                        }
+                        catch (e) 
+                        {
+                            return highed.snackBar("Error loading JSON: " + e)
+                        }
+                        {
+                            var x = e.loadProject(t); 
+                            x.redraw()
+                        }
+                      }
+                      """,
+            substitutes=dict(filename=json_input_file.as_posix()))
+        _logger.debug(f"first: {js_import2}")
+        # 4) Execute your command
+        try:
+            _logger.debug(f"Executing: {js_import2}")
+            driver.execute_script(js_import2)
+        except selenium.common.exceptions.JavascriptException as err:
+            _logger.warning("FAILED")
+            _logger.warning(err)
+        else:
+            _logger.debug("Succeeded loading!")
 
-                # _logger.debug(f"Executing: {js_preview}")
-                # driver.execute_script(js_preview)
+            js_export = Template(
+                """
+                        return ["exporting:{", "chartOptions: { isExporting: true},", "buttons:{contextButton:{menuItems:[", '{textKey:"printChart", onclick: function(){ this.print(); } },', "{separator:true},", '{textKey:"downloadPNG", onclick: function(){ this.exportChartLocal(); this.redraw(); } },', '{textKey:"downloadJPEG", onclick: function(){ this.exportChartLocal({type: "image/jpeg"}); this.redraw(); } },', '{textKey:"downloadSVG", onclick: function(){ this.exportChartLocal({type: "image/svg+xml"}); this.redraw(); } },', '{textKey:"downloadCSV", onclick: function(){ this.downloadCSV(); } },', "]}}}"].join("") + "\n"
+                """
+            )
+
+            _logger.debug(f"Executing: {js_export}")
+            # driver.execute_script(js_preview)
 
         # input("quit?")
         driver.close()
