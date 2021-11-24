@@ -10,18 +10,12 @@ import re
 import numpy as np
 import pandas as pd
 
-import selenium
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import cbsplotlib
 
 DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
          "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
 
 _logger = logging.getLogger(__name__)
-
-_selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
-_selenium_logger.setLevel(logging.WARNING)
 
 
 @functools.wraps(cbsplotlib.set_loglevel)
@@ -89,23 +83,12 @@ PALETTES = {
 }
 
 
-def clean_js_query(js_multiline_query, substitutes=None):
-    if substitutes is None:
-        substitutes = {}
-    js_query = Template(js_multiline_query).substitute(substitutes)
-    js_query = re.sub("\n", "", js_query)
-    js_query = re.sub("\s{2,}", " ", js_query)
-    return js_query
-
-
 class CBSHighChart:
     def __init__(self,
                  data: pd.DataFrame = None,
                  input_file_name: str = None,
                  output_file_name: str = None,
                  output_directory: str = None,
-                 javascript_directory: str = None,
-                 javascript_filename: str = None,
                  defaults_directory: str = None,
                  defaults_file_name: str = None,
                  defaults_out_file: str = None,
@@ -147,16 +130,6 @@ class CBSHighChart:
             self.driver_path = DRIVER
         else:
             self.driver_path = driver_path
-
-        if javascript_directory is None:
-            self.javascript_directory = Path(__file__).parent / Path("js_queries")
-        else:
-            self.javascript_directory = Path(javascript_directory)
-
-        if javascript_filename is None:
-            self.javascript_filename = Path("highcharts-editor.min.js")
-        else:
-            self.javascript_filename = Path(javascript_filename)
 
         # plot settings
         self.title = title
@@ -246,9 +219,6 @@ class CBSHighChart:
                                           input_file_name=self.input_file_name,
                                           chart_type=self.chart_type,
                                           )
-            if convert_to_html:
-                self.convert_json_to_html(json_input_file=out_file)
-
         else:
             _logger.info("The data was read successfully. To create the highcharts, call the "
                          "*make_highcharts()* method or pass the start=True argument")
@@ -673,86 +643,3 @@ class CBSHighChart:
             stream.write(chart_container)
 
         return outfile
-
-    def convert_json_to_html(self, json_input_file=None):
-        """
-        Convert the json output file to html
-
-        Deze poging loopt dood, omdat je het niet is toegestaan om zonder interacties files
-        in te lezen met chrome + javascript.
-
-        Parameters
-        ----------
-        json_input_file: Path
-            Name of the json file
-
-        """
-
-        _logger.debug(f"Connecting to  {self.driver_path}")
-        driver = webdriver.Chrome(self.driver_path)
-        # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
-        driver.get("https://highcharts.cbs.nl/")
-
-        # driver.switch_to.default_content()
-
-        html_output_file = json_input_file.with_suffix(".html")
-
-        # 1) js_file  is the downloaded javascript js file
-        for js_file_name in ["highcharts-editor.min.js", "highcharts-more.js"]:
-            js_file = self.javascript_directory / js_file_name
-            _logger.debug(f"Loading {js_file}")
-            with open(js_file, 'r') as jquery_js:
-                # 2) Read the jquery from a file
-                jquery = jquery_js.read()
-            try:
-                # 3) Load jquery lib
-                driver.execute_script(jquery)
-            except selenium.common.exceptions.JavascriptException as err:
-                _logger.warning(f"FAILED for {js_file}")
-                _logger.warning(err)
-            else:
-                _logger.debug(f"Succeeded loading! {js_file}")
-
-        logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
-        logger.setLevel(logging.WARNING)
-
-        js_import2 = clean_js_query(
-            js_multiline_query="""
-                     {
-                        try 
-                        {
-                            t = JSON.parse($filename)
-                        }
-                        catch (e) 
-                        {
-                            return highed.snackBar("Error loading JSON: " + e)
-                        }
-                        {
-                            var x = e.loadProject(t); 
-                        }
-                      }
-                      """,
-            substitutes=dict(filename=json_input_file.as_posix()))
-        _logger.debug(f"first: {js_import2}")
-        # 4) Execute your command
-        try:
-            _logger.debug(f"Executing: {js_import2}")
-            driver.execute_script(js_import2)
-        except selenium.common.exceptions.JavascriptException as err:
-            _logger.warning("FAILED")
-            _logger.warning(err)
-        else:
-            _logger.debug("Succeeded loading!")
-
-            js_export = Template(
-                """
-                        return ["exporting:{", "chartOptions: { isExporting: true},", "buttons:{contextButton:{menuItems:[", '{textKey:"printChart", onclick: function(){ this.print(); } },', "{separator:true},", '{textKey:"downloadPNG", onclick: function(){ this.exportChartLocal(); this.redraw(); } },', '{textKey:"downloadJPEG", onclick: function(){ this.exportChartLocal({type: "image/jpeg"}); this.redraw(); } },', '{textKey:"downloadSVG", onclick: function(){ this.exportChartLocal({type: "image/svg+xml"}); this.redraw(); } },', '{textKey:"downloadCSV", onclick: function(){ this.downloadCSV(); } },', "]}}}"].join("") + "\n"
-                """
-            )
-
-            _logger.debug(f"Executing: {js_export}")
-            # driver.execute_script(js_preview)
-
-        # input("quit?")
-        driver.close()
-        _logger.info(f"Success")
