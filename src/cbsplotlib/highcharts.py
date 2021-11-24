@@ -678,6 +678,9 @@ class CBSHighChart:
         """
         Convert the json output file to html
 
+        Deze poging loopt dood, omdat je het niet is toegestaan om zonder interacties files
+        in te lezen met chrome + javascript.
+
         Parameters
         ----------
         json_input_file: Path
@@ -713,7 +716,6 @@ class CBSHighChart:
         logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
         logger.setLevel(logging.WARNING)
 
-
         js_import2 = clean_js_query(
             js_multiline_query="""
                      {
@@ -727,7 +729,6 @@ class CBSHighChart:
                         }
                         {
                             var x = e.loadProject(t); 
-                            x.redraw()
                         }
                       }
                       """,
