@@ -695,24 +695,24 @@ class CBSHighChart:
         html_output_file = json_input_file.with_suffix(".html")
 
         # 1) js_file  is the downloaded javascript js file
-        for js_file_name in ["highcharts-editor.min.js", "highcharts.src.js", "highcharts-more.js"]:
+        for js_file_name in ["highcharts-editor.min.js", "highcharts-more.js"]:
             js_file = self.javascript_directory / js_file_name
             _logger.debug(f"Loading {js_file}")
+            with open(js_file, 'r') as jquery_js:
+                # 2) Read the jquery from a file
+                jquery = jquery_js.read()
             try:
-                with open(js_file, 'r') as jquery_js:
-                    # 2) Read the jquery from a file
-                    jquery = jquery_js.read()
-            except FileNotFoundError:
-                _logger.warning(f"Could not load {js_file}")
+                # 3) Load jquery lib
+                driver.execute_script(jquery)
+            except selenium.common.exceptions.JavascriptException as err:
+                _logger.warning(f"FAILED for {js_file}")
+                _logger.warning(err)
             else:
-                try:
-                    # 3) Load jquery lib
-                    driver.execute_script(jquery)
-                except selenium.common.exceptions.JavascriptException as err:
-                    _logger.warning(f"FAILED for {js_file}")
-                    _logger.warning(err)
-                else:
-                    _logger.debug(f"Succeeded loading! {js_file}")
+                _logger.debug(f"Succeeded loading! {js_file}")
+
+        logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+        logger.setLevel(logging.WARNING)
+
 
         js_import2 = clean_js_query(
             js_multiline_query="""
