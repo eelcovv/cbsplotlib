@@ -201,6 +201,11 @@ class CBSHighChart:
             _logger.debug(f"Using dataframe")
             self.data_df = data
 
+        if self.chart_type == "bar_with_negative_stack":
+            self.negative_stack = True
+        else:
+            self.negative_stack = False
+
         # get the categories from the data
         self.categories = self.get_categories()
 
@@ -228,6 +233,7 @@ class CBSHighChart:
         # now add all the items of the highcarts
         self.add_chart()
         self.add_plot_options()
+        self.check_and_modify_data()
 
         self.add_title(text_key="title")
         self.add_title(text_key="subtitle")
@@ -237,6 +243,7 @@ class CBSHighChart:
         self.add_legend()
         self.add_tooltip()
         self.add_credits()
+        self.add_bar_type()
 
         self.add_options()
         self.add_csv_data()
@@ -245,6 +252,25 @@ class CBSHighChart:
         self.add_axis(key="options", axis_key="yAxis")
 
         self.add_selected_templated()
+
+    def check_and_modify_data(self):
+        """
+        Voor negative bar type moeten we 2 kolommen hebben waarvan we de eerste hier negatief maken
+        """
+        if self.negative_stack:
+            if len(self.data_df.columns) < 2:
+                raise ValueError("Need at least 2 columns for chart type 'bar_with_negative_stack'")
+
+            # voor negative stack moet je de eerste kolom negatief make
+            first_column = self.data_df.columns[0]
+            _logger.debug(f"Negating column {first_column}")
+            self.data_df[first_column] *= -1
+
+            # ook moet de index een string zijn
+            try:
+                self.data_df.index = self.data_df.index.astype(str)
+            except ValueError:
+                _logger.debug("Kan niet naar string converteren. Hopelijk is dit het al")
 
     def impose_value(self, value, key_1, key_2=None, key_3=None, output=None):
         if output is None:
@@ -486,8 +512,8 @@ class CBSHighChart:
                     f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
                     f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
                     f"tot nu geïmplementeerd:\n{template_list}")
-                _logger.warning("Geef een goede template via char_type of kies een custom template"
-                                "via input_file_name. Stop hier")
+                _logger.warning("Geef een goede template via de chart_type optie of kies een "
+                                "custom template via input_file_name. Stop hier")
                 sys.exit(-1)
 
         return defaults
@@ -514,6 +540,11 @@ class CBSHighChart:
     def add_credits(self, key="template"):
 
         self.output[key]["credits"] = self.defaults[key]["credits"]
+
+    def add_bar_type(self, key="template"):
+
+        if self.chart_type == "bar_with_negative_stack":
+            self.output[key]["barType"] = {"negative": True}
 
     def add_legend(self, key="template"):
 
