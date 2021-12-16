@@ -70,6 +70,15 @@ CBS_PALETS = dict(
         "cbs:oranje",
         "cbs:roze",
     ],
+    koelextended=[
+        "cbs:corporatelichtblauw",
+        "cbs:donkerblauw",
+        "cbs:appelgroen",
+        "cbs:grasgroen",
+        "cbs:oranje",
+        "cbs:roze",
+        "cbs:violet",
+    ],
     warm=[
         "cbs:rood",
         "cbs:geel",
@@ -77,6 +86,15 @@ CBS_PALETS = dict(
         "cbs:oranje",
         "cbs:grasgroen",
         "cbs:appelgroen",
+    ],
+    warmextended = [
+        "cbs:rood",
+        "cbs:geel",
+        "cbs:roze",
+        "cbs:oranje",
+        "cbs:grasgroen",
+        "cbs:appelgroen",
+        "cbs:violet",
     ]
 )
 
