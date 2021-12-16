@@ -77,7 +77,7 @@ CBS_PALETS = dict(
         "cbs:grasgroen",
         "cbs:oranje",
         "cbs:roze",
-        "cbs:violet",
+        "cbs:corporateblauw",
     ],
     warm=[
         "cbs:rood",
