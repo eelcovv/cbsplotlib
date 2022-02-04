@@ -117,7 +117,6 @@ class CBSHighChart:
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
                  enable_legend: bool = None,
-                 convert_to_html: bool = False,
                  driver_path: str = None,
                  ):
         self.input_file_name = input_file_name
@@ -388,8 +387,8 @@ class CBSHighChart:
                                             "valueSuffix")
 
         if self.enable_legend is not None:
-            _logger.debug(f"Imposing {self.enable_legend} to [template][legend][enabled]")
-            self.output = self.impose_value(self.enable_legend, "template", "legend",
+            _logger.debug(f"Imposing {self.enable_legend} to [options][legend][enabled]")
+            self.output = self.impose_value(self.enable_legend, "options", "legend",
                                             "enabled")
 
         if self.has_grouped_categories is not None:
@@ -646,8 +645,6 @@ class CBSHighChart:
             gebaseerd worden.
         chart_type: str
             Type plot (bar, column, line). Als gegeven wordt dit in de filenaam verwerkt.
-        convert_to_html: bool
-            Convert the result to html
 
         """
         if output_directory is not None:
