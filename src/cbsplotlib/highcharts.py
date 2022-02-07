@@ -393,7 +393,8 @@ class CBSHighChart:
 
         if self.has_grouped_categories is not None:
             _logger.debug(
-                f"Imposing {self.has_grouped_categories} to [options][settings][hasGroupedCategories]")
+                f"Imposing {self.has_grouped_categories}"
+                f" to [options][settings][hasGroupedCategories]")
             self.output = self.impose_value(self.has_grouped_categories, "options", "settings",
                                             "hasGroupedCategories")
 
