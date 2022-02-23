@@ -96,7 +96,10 @@ class CBSHighChart:
                  csv_separator: str = ";",
                  decimal: str = ",",
                  index_col: int = 0,
+                 x_format: str = None,
                  y_format: str = None,
+                 x_labels_format: str = None,
+                 y_labels_format: str = None,
                  start: bool = True,
                  title: str = None,
                  subtitle: str = None,
@@ -148,7 +151,10 @@ class CBSHighChart:
         self.series_description = series_description
         self.tooltip_prefix = tooltip_prefix
         self.tooltip_suffix = tooltip_suffix
+        self.x_format = x_format
         self.y_format = y_format
+        self.x_labels_format = x_labels_format
+        self.y_labels_format = y_labels_format
         self.has_grouped_categories = has_grouped_categories
 
         if chart_type is None:
@@ -237,8 +243,9 @@ class CBSHighChart:
         self.add_title(text_key="title")
         self.add_title(text_key="subtitle")
 
-        self.add_axis(axis_key="xAxis", categories=self.categories)
-        self.add_axis(axis_key="yAxis")
+        self.add_axis(axis_key="xAxis", categories=self.categories,
+                      labels_format=self.x_labels_format)
+        self.add_axis(axis_key="yAxis", labels_format=self.y_labels_format)
         self.add_legend()
         self.add_tooltip()
         self.add_credits()
@@ -247,8 +254,9 @@ class CBSHighChart:
         self.add_options()
         self.add_csv_data()
         self.add_series()
-        self.add_axis(key="options", axis_key="xAxis", categories=self.categories)
-        self.add_axis(key="options", axis_key="yAxis")
+        self.add_axis(key="options", axis_key="xAxis", categories=self.categories,
+                      labels_format=self.x_labels_format)
+        self.add_axis(key="options", axis_key="yAxis", labels_format=self.y_labels_format)
 
         self.add_selected_templated()
 
@@ -316,7 +324,8 @@ class CBSHighChart:
             if tick_interval is not None:
                 _logger.debug(f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]")
                 # let op: tick interval moet je als string wegschrijven
-                axis = self.impose_value(str(tick_interval), "tickInterval", output=axis)
+                # toch niet als string. doe dat als gebruiker
+                axis = self.impose_value(tick_interval, "tickInterval", output=axis)
             if lim is not None:
                 if lim[0] is not None:
                     _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
@@ -555,9 +564,19 @@ class CBSHighChart:
                  key="template",
                  axis_key="xAxis",
                  categories=None,
+                 labels_format=None
                  ):
 
         self.output[key][axis_key] = self.defaults[key][axis_key]
+        if labels_format is not None:
+            for ax in self.output[key][axis_key]:
+                try:
+                    labels = ax["labels"]
+                except KeyError:
+                    ax["labels"] = dict()
+                    labels = ax["labels"]
+
+                labels["format"] = labels_format
 
         if categories is not None:
             for ax in self.output[key][axis_key]:
@@ -605,7 +624,10 @@ class CBSHighChart:
                         "yString": y_string,
                     }
                 else:
-                    y_string = self.y_format.format(value)
+                    if self.y_format is None:
+                        y_string = value
+                    else:
+                        y_string = self.y_format.format(value)
                     entry = {
                         "y": value,
                         "yString": y_string,
