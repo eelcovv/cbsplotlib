@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.4
+===========
+
+- Html viewer toegevoegd
+
 Version 0.3.1
 ===========
 
