@@ -67,6 +67,11 @@ class HtmlViewer:
 
         if show:
             self.show()
+        else:
+            self.keep = True
+
+        if not self.keep:
+            self.clean()
 
     def make_html_template(self):
         if self.view_template_directory is not None:
@@ -184,9 +189,6 @@ def main(args):
     hc_view = HtmlViewer(filename=args.filename, output_html_file=args.output_filename,
                          output_directory=args.output_directory, show=args.show_html,
                          keep=args.keep, overwrite=args.overwrite)
-
-    if not hc_view.keep:
-        hc_view.clean()
 
 
 def run():
