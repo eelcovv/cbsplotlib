@@ -97,11 +97,12 @@ class HtmlViewer:
         url = "file://" + self.output_html_file.absolute().as_posix()
 
         _logger.info(f"Showing {url}")
+        webbrowser.open(url)
 
     def clean(self):
 
         _logger.info(f"Remove {self.output_html_file}")
-    #    self.output_html_file.unlink()
+        self.output_html_file.unlink()
 
 
 def parse_args(args):
