@@ -1,4 +1,7 @@
+import sys
 import argparse
+import string
+import random
 import logging
 import sys
 import webbrowser
@@ -17,7 +20,9 @@ class HtmlViewer:
                  output_directory: Union[str, Path] = None,
                  view_template: Union[str, Path] = None,
                  view_template_directory: Union[str, Path] = None,
-                 show: bool = False
+                 show: bool = False,
+                 keep: bool = None,
+                 overwrite: bool = False
                  ):
         self.filename = Path(filename)
 
@@ -26,19 +31,37 @@ class HtmlViewer:
         else:
             self.output_directory = Path(output_directory)
 
+        self.keep = keep
+
         if output_html_file is None:
-            out_file_base = self.filename.stem + self.filename.suffix
+            out_file_base = "_".join([self.filename.stem, "rendered"]) + self.filename.suffix
+            if keep is None:
+                self.keep = False
         else:
             out_file_base = Path(output_html_file)
+            if keep is None:
+                self.keep = True
 
         self.output_html_file = self.output_directory / out_file_base
+
+        if self.keep and self.output_html_file.exists() and not overwrite:
+            question = f"File {self.output_html_file} already exists.  Overwrite it? (Enter y/n)"
+            answer = None
+            while answer not in {"y", "n"}:
+                answer = input(question).lower()
+                if answer == "n":
+                    sys.exit()
+                elif answer == "y":
+                    pass
+                else:
+                    print("Please enter 'y' or 'n'")
 
         self.view_template = view_template
         self.view_template_directory = view_template_directory
 
         html_contents = self.make_html_template()
 
-        _logger.info(f"Writing to {output_html_file}")
+        _logger.info(f"Writing to {self.output_html_file}")
         with open(self.output_html_file, "w") as fp:
             fp.write(html_contents)
 
@@ -73,7 +96,12 @@ class HtmlViewer:
 
         url = "file://" + self.output_html_file.absolute().as_posix()
 
-        webbrowser.open(url)
+        _logger.info(f"Showing {url}")
+
+    def clean(self):
+
+        _logger.info(f"Remove {self.output_html_file}")
+    #    self.output_html_file.unlink()
 
 
 def parse_args(args):
@@ -100,6 +128,12 @@ def parse_args(args):
                         help="Naam van de output directory. Als niet gegeven wordt het"
                              "door de input filenaam bepaald", metavar="OUTPUT_DIRECTORY")
     parser.add_argument("--show_html", help="Open een browser en laat de html zien",
+                        action="store_true", default=True)
+    parser.add_argument("--no_show_html", help="Laat de html niet zien. Impliceert keep is true",
+                        action="store_false", dest="show_html")
+    parser.add_argument("--keep", help="Schrijf alleen de html maar laat nog niet zien",
+                        action="store_true")
+    parser.add_argument("--overwrite", help="Forceer overschrijven",
                         action="store_true")
     parser.add_argument(
         "-v",
@@ -146,8 +180,12 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
-    HtmlViewer(filename=args.filename, output_html_file=args.output_filename,
-               output_directory=args.output_directory, show=args.show_html)
+    hc_view = HtmlViewer(filename=args.filename, output_html_file=args.output_filename,
+                         output_directory=args.output_directory, show=args.show_html,
+                         keep=args.keep, overwrite=args.overwrite)
+
+    if not hc_view.keep:
+        hc_view.clean()
 
 
 def run():
