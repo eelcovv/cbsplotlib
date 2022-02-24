@@ -16,6 +16,9 @@ finally:
 
 LOGGER_BASE_NAME = __name__
 
+HC_DEFAULTS_DIRECTORY = "cbs_hc_defaults"
+HC_HTML_VIEW_TEMPLATE = "highcharts_view.html"
+
 __tool_name__ = Path(__file__).parent.stem
 
 _log = logging.getLogger(__name__)

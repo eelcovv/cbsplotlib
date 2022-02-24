@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 import cbsplotlib
+from cbsplotlib import HC_DEFAULTS_DIRECTORY
 
 DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
          "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
@@ -463,8 +464,7 @@ class CBSHighChart:
     @staticmethod
     def read_the_defaults(chart_type: str = None,
                           defaults_directory: str = None,
-                          defaults_file_name: str = None,
-                          cbs_hc_defaults: str = "cbs_hc_defaults"):
+                          defaults_file_name: str = None):
         """
         Lees de settings uit een default template json
 
@@ -486,7 +486,7 @@ class CBSHighChart:
             if defaults_file_name is None:
                 # er is geen default filenaam meegegeven. Ga ervan uit dat we de default uit de
                 # package folder halen
-                defaults_directory = Path(__file__).parent / Path(cbs_hc_defaults)
+                defaults_directory = Path(__file__).parent / Path(HC_DEFAULTS_DIRECTORY)
         else:
             defaults_directory = Path(defaults_directory)
 
