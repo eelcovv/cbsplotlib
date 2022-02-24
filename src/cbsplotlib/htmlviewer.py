@@ -71,7 +71,7 @@ class HtmlViewer:
 
     def show(self):
 
-        url = "file://" + self.output_html_file
+        url = "file://" + self.output_html_file.absolute().as_posix()
 
         webbrowser.open(url)
 
