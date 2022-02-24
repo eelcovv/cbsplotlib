@@ -90,19 +90,17 @@ def parse_args(args):
     parser.add_argument(
         "--version",
         action="version",
-        version="tabular2xls {ver}".format(ver=__version__),
+        version="highcharts_html_viewer {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
     parser.add_argument("--output_filename",
-                        help="Naam van de xls output file. Moet extensie .xlsx "
+                        help="Naam van de html output file. Moet extensie .html "
                              "hebben", metavar="OUTPUT_FILENAME")
     parser.add_argument("--output_directory",
                         help="Naam van de output directory. Als niet gegeven wordt het"
-                             "door de output filenaam bepaald", metavar="OUTPUT_DIRECTORY")
-    parser.add_argument("--search_and_replace",
-                        help="Search en Replace patterns als je nog string wilt veranderen."
-                             "Default worden cdots en ast naar resp . en * vervangen",
-                        nargs="*", action="append")
+                             "door de input filenaam bepaald", metavar="OUTPUT_DIRECTORY")
+    parser.add_argument("--show_html", help="Open een browser en laat de html zien",
+                        action="store_true")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -119,11 +117,6 @@ def parse_args(args):
         help="set loglevel to DEBUG",
         action="store_const",
         const=logging.DEBUG,
-    )
-    parser.add_argument(
-        "--multi_index",
-        help="Forceer een multiindex dataframe",
-        action="store_true",
     )
     return parser.parse_args(args)
 
@@ -153,20 +146,8 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
-    filename = Path(args.filename)
-
-    if args.output_filename is None:
-        html_outfile = filename.with_suffix(".xlsx")
-    else:
-        html_outfile = Path(args.output_filename)
-
-    if args.output_directory is not None:
-        output_directory = Path(args.output_directory)
-        html_out_base = html_outfile.stem + html_outfile.suffix
-        html_outfile = output_directory / Path(html_out_base)
-
-    if ".html" not in html_outfile.suffix:
-        raise ValueError("Output filename does not have .html extension. Please correct")
+    HtmlViewer(filename=args.filename, output_html_file=args.output_filename,
+               output_directory=args.output_directory, show=args.show_html)
 
 
 def run():
