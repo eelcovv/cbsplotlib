@@ -87,7 +87,7 @@ CBS_PALETS = dict(
         "cbs:grasgroen",
         "cbs:appelgroen",
     ],
-    warmextended = [
+    warmextended=[
         "cbs:rood",
         "cbs:geel",
         "cbs:roze",
@@ -104,7 +104,7 @@ def set_cbs_colors():
     mcolors.get_named_colors_mapping().update(CBS_COLORS)
 
 
-def get_color_palette(style="koel"):
+def get_color_palette(style="koel", reverse=False, offset=0):
     """
     Set the color palette
 
@@ -137,6 +137,29 @@ def get_color_palette(style="koel"):
         cbs_color_cycle = mpl.cycler(color=cbs_palette)
 
     return cbs_color_cycle
+
+
+def update_color_palette(reverse=False, offset=0):
+    """
+    Functie om de color cycle om te draaien en met een off set te laten beginnen
+
+    Parameters
+    ----------
+    reverse: bool
+        inverteer de color set
+    offset: int
+        geef een offset
+    """
+    plot_colors = mpl.rcParams.get('axes.prop_cycle')
+    cbs_palette = plot_colors.keys().values()
+    if reverse:
+        cbs_palette = cbs_palette[-1::-1]
+    if offset > 0:
+        offset = offset % len(cbs_palette)
+        cbs_palette = cbs_palette[offset:] + cbs_palette[:offset]
+    cbs_color_cycle = mpl.cycler(color=cbs_palette)
+    param = {'axes.prop_cycle': cbs_color_cycle}
+    mpl.rcParams.update(param)
 
 
 def report_colors():
