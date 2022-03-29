@@ -62,6 +62,8 @@ class CBSPlotSettings(object):
                  font_size: float = 8,
                  set_gray_x_tics: bool = False,
                  set_gray_y_tics: bool = False,
+                 reverse: bool= False,
+                 offset: int= 0,
                  ):
 
         # set scale factor
@@ -104,6 +106,8 @@ class CBSPlotSettings(object):
 
         self.fig_size = (self.fig_width, self.fig_height)
 
+        prop_cycle = get_color_palette(color_palette, reverse=reverse, offset=offset)
+
         if plot_parameters is not None:
             self.params = plot_parameters
         else:
@@ -116,7 +120,7 @@ class CBSPlotSettings(object):
                            'grid.color': 'cbs:highchartslichtgrijs',
                            'grid.linewidth': 1.0,
                            'hatch.color': 'cbs:highchartslichtgrijs',
-                           'axes.prop_cycle': get_color_palette(color_palette),
+                           'axes.prop_cycle': prop_cycle,
                            'axes.edgecolor': "cbs:grijs",
                            'axes.linewidth': 1.5,
                            }
@@ -128,6 +132,7 @@ class CBSPlotSettings(object):
             self.set_tick_color(axis="x")
         if set_gray_y_tics:
             self.set_tick_color(axis="y")
+
 
     @staticmethod
     def set_tick_color(axis: str = None):
