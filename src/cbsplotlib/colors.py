@@ -151,7 +151,7 @@ def update_color_palette(reverse=False, offset=0):
         geef een offset
     """
     plot_colors = mpl.rcParams.get('axes.prop_cycle')
-    cbs_palette = plot_colors.by_key().values()
+    cbs_palette = list(plot_colors.by_key().values())
     if reverse:
         cbs_palette = cbs_palette[-1::-1]
     if offset > 0:
