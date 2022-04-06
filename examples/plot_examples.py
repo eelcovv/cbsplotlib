@@ -126,7 +126,7 @@ def main():
     except FileNotFoundError:
         _logger.info(f"Obtaining iris data from seaborn site")
         iris = sns.load_dataset('iris')
-        iris.to_csv(csv_file)
+        iris.to_csv(csv_file, index=None)
 
     _logger.info(f"\n{iris.head()}")
 
