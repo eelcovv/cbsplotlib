@@ -1,9 +1,14 @@
 import logging
+from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+
 from cbsplotlib.settings import CBSPlotSettings
 from cbsplotlib.utils import add_axis_label_background
+
+csv_file = Path("../data/iris.csv")
 
 logging.basicConfig(level=logging.INFO,
                     format="[%(levelname)8s] %(message)s"
@@ -115,7 +120,14 @@ def make_bar_plot(data_df, orientation="horizontal"):
 
 def main():
     # laad de dataset
-    iris = sns.load_dataset('iris')
+    try:
+        iris = pd.read_csv(csv_file)
+        _logger.info(f"Read iris data from local cache {csv_file}")
+    except FileNotFoundError:
+        _logger.info(f"Obtaining iris data from seaborn site")
+        iris = sns.load_dataset('iris')
+        iris.to_csv(csv_file)
+
     _logger.info(f"\n{iris.head()}")
 
     # hernoem de kolommen
