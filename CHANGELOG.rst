@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Version 0.4.1
+Version 0.4.2
 ===========
 - Installer update for pyscaffold 4
+- Bugfix na update
 
 Version 0.4
 ===========
