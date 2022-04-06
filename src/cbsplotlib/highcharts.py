@@ -1,28 +1,15 @@
 import codecs
-import functools
 import json
 import logging
 import sys
 from pathlib import Path
-from string import Template
-import re
 
 import numpy as np
 import pandas as pd
 
-import cbsplotlib
-from cbsplotlib import HC_DEFAULTS_DIRECTORY
-
-DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
-         "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
+HC_DEFAULTS_DIRECTORY = "cbs_hc_defaults"
 
 _logger = logging.getLogger(__name__)
-
-
-@functools.wraps(cbsplotlib.set_loglevel)
-def set_loglevel(*args, **kwargs):
-    return cbsplotlib.set_loglevel(*args, **kwargs)
-
 
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
 PLOT_TEMPLATES = {"area_percentage_grouped",
@@ -120,19 +107,13 @@ class CBSHighChart:
                  tooltip_prefix: str = None,
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
-                 enable_legend: bool = None,
-                 driver_path: str = None,
+                 enable_legend: bool = None
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
         self.index_col = index_col
         self.enable_legend = enable_legend
-
-        if driver_path is None:
-            self.driver_path = DRIVER
-        else:
-            self.driver_path = driver_path
 
         # plot settings
         self.title = title
