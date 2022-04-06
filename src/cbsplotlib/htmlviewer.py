@@ -6,8 +6,10 @@ import webbrowser
 from pathlib import Path
 from typing import Union
 
-from cbsplotlib import (HC_DEFAULTS_DIRECTORY, HC_HTML_VIEW_TEMPLATE)
 from cbsplotlib import __version__
+from cbsplotlib.highcharts import HC_DEFAULTS_DIRECTORY
+
+HC_HTML_VIEW_TEMPLATE = "highcharts_view.html"
 
 _logger = logging.getLogger(__name__)
 
