@@ -57,3 +57,4 @@ MANIFEST
 /examples/out
 /examples/cbs_hc_bar.json
 /data/htmlviewer_testdata/line_with_dates_rendered.html
+/install.ps1
