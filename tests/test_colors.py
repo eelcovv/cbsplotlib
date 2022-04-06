@@ -30,5 +30,5 @@ def test_hex():
     assert CBS_COLORS_HEX["violet"] == "#AC218E"
     assert CBS_COLORS_HEX["lichtgrijs"] == "#E0E0E0"
     assert CBS_COLORS_HEX["grijs"] == "#666666"
-    assert CBS_COLORS_HEX["logogrijs"] == "#737373"
+    assert CBS_COLORS_HEX["logogrijs"] == "#929292"
     assert CBS_COLORS_HEX["codekleur"] == "#585858"

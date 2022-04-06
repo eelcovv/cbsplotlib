@@ -62,8 +62,14 @@ class HtmlViewer:
         html_contents = self.make_html_template()
 
         _logger.info(f"Writing to {self.output_html_file}")
-        with open(self.output_html_file, "w") as fp:
-            fp.write(html_contents)
+        try:
+            with open(self.output_html_file, "w") as fp:
+                fp.write(html_contents)
+        except FileNotFoundError as err:
+            _logger.warning(err)
+            raise FileNotFoundError("Run eerst de script highchart_example_line_with_datetimes.py om "
+                                    "de html file te maken!")
+
 
         if show:
             self.show()
