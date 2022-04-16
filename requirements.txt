@@ -1,6 +1,5 @@
 matplotlib
 numpy
-importlib_metadata
 sphinx
 seaborn
 setuptools

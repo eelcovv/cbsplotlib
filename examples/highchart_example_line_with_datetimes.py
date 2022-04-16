@@ -14,7 +14,7 @@ data_input_directory = Path("../data/highcharts_examples")
 input_file_name = data_input_directory / Path("line_with_dates.csv")
 data_df = pd.read_csv(input_file_name, index_col=0, parse_dates=True)
 
-# pas het datumtijd fomraat aan
+# pas het datumtijd-formaat aan, wordt nu maand jaar met 2 digit (mei 21)
 data_df.index = pd.to_datetime(data_df.index).strftime("%b '%y")
 # data_df.index = pd.to_datetime(data_df.index).strftime("%Y%m")
 output_file = input_file_name.stem
