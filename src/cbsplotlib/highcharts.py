@@ -307,14 +307,14 @@ class CBSHighChart:
                 _logger.debug(f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]")
                 # let op: tick interval moet je als string wegschrijven
                 # toch niet als string. doe dat als gebruiker
-                axis = self.impose_value(tick_interval, "tickInterval", output=axis)
+                axis = self.impose_value(str(tick_interval), "tickInterval", output=axis)
             if lim is not None:
                 if lim[0] is not None:
                     _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
-                    axis = self.impose_value(lim[0], "min", output=axis)
+                    axis = self.impose_value(str(lim[0]), "min", output=axis)
                 if lim[1] is not None:
                     _logger.debug(f"Imposing {lim[1]} to [{section}][{axis_key}][max]")
-                    axis = self.impose_value(lim[1], "max", output=axis)
+                    axis = self.impose_value(str(lim[1]), "max", output=axis)
             new_axis.append(axis)
         output[section][axis_key] = new_axis
 
