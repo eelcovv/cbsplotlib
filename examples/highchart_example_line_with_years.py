@@ -44,7 +44,7 @@ hc = CBSHighChart(data=temperature_df,
                                     "temperature anomalies in degrees Celsius from 1880 to the "
                                     "present.",
                   sources_text="https://datahub.io",
-                  sources_prefix=""
+                  sources_prefix="Bron: "
                   )
 
 logger.info("Done")
