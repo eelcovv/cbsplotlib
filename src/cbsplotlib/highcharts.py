@@ -561,7 +561,7 @@ class CBSHighChart:
 
         if categories is not None:
             for ax in self.output[key][axis_key]:
-                ax["categories"] = str(categories)
+                ax["categories"] = [str(c) for c in categories]
 
     def add_options(self):
         self.output["options"] = self.defaults["options"]
