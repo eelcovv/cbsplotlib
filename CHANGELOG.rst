@@ -4,7 +4,7 @@ Changelog
 
 Version 0.4.3
 ===========
-- Categorieern nu altijd als str geschreven
+- Categorieën nu altijd als str geschreven
 - Nieuw voorbeeld met lijnplot 
 - Installer update for pyscaffold 4
 - Bugfix na update
