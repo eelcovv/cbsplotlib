@@ -3,6 +3,7 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -95,8 +96,8 @@ class CBSHighChart:
                  ylabel: str = None,
                  x_lim: tuple = None,
                  y_lim: tuple = None,
-                 x_tick_interval: int = None,
-                 y_tick_interval: int = None,
+                 x_tick_interval: Union[int, str] = None,
+                 y_tick_interval: Union[int, str] = None,
                  chart_description: str = None,
                  chart_height: int = None,
                  color_selection: str = None,
