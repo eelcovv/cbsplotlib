@@ -93,7 +93,7 @@ class HtmlViewer:
             html_template = fp.read()
 
         _logger.info(f"Reading  {self.filename}")
-        with open(self.filename) as stream:
+        with open(self.filename, mode="r", encoding="utf-8") as stream:
             highchart_script = stream.read()
 
         new_html = html_template.replace("HIGHCHARTS_SCRIPT", highchart_script)
