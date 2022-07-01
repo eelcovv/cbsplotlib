@@ -63,12 +63,12 @@ class HtmlViewer:
 
         _logger.info(f"Writing to {self.output_html_file}")
         try:
-            with open(self.output_html_file, "w") as fp:
+            with open(self.output_html_file, "w", encoding="utf-8") as fp:
                 fp.write(html_contents)
         except FileNotFoundError as err:
             _logger.warning(err)
-            raise FileNotFoundError("Run eerst de script highchart_example_line_with_datetimes.py om "
-                                    "de html file te maken!")
+            raise FileNotFoundError("Run eerst de script highchart_example_line_with_datetimes.py "
+                                    "om de html file te maken!")
 
 
         if show:
