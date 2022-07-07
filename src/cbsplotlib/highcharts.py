@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from typing import Union
 
-import numpy as np
 import pandas as pd
 
 HC_DEFAULTS_DIRECTORY = "cbs_hc_defaults"
