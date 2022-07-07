@@ -13,6 +13,9 @@ data_input_directory = Path("../data/highcharts_examples")
 input_file_name = data_input_directory / Path("cbs_hc_bar.csv")
 data_df = pd.read_csv(input_file_name, sep=";", index_col=0, decimal=",")
 
+# we voegen 1 NAN toe om te kijken of deze goed weggelaten worden door highcharts
+data_df.loc["Duitsland", "2013"] = pd.NA
+
 series_description = pd.DataFrame(index=data_df.columns,
                                   data=[f"Getallen voor {_}" for _ in data_df.columns.values])
 

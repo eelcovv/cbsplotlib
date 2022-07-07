@@ -605,7 +605,8 @@ class CBSHighChart:
                 except TypeError:
                     # als type cast naar float niet lukt is het een string. Ook goed
                     pass
-                if np.isnan(value):
+
+                if pd.isnull(value):
                     y_string = "."
                     entry = {
                         "yString": y_string,
