@@ -71,6 +71,60 @@ PALETTES = {
 }
 
 
+def write_to_json_file(output,
+                       json_indent=2,
+                       output_directory: Path = None,
+                       output_file_name: str = None,
+                       input_file_name: str = None,
+                       chart_type=None,
+                       ):
+    """
+    Write the dictionary to a json output file
+
+    Parameters
+    ----------
+    output: dict
+        The settings dictionary to write
+    json_indent: int
+        Number of indenting spaces. If None is give, a compact json is written
+    output_directory: Path of None
+        Output directory
+    output_file_name: str of None
+        Naam van de output file
+    input_file_name: str of None
+        Naam van de input data file. Als we geen output filenaam geven zal de output file hierop
+        gebaseerd worden.
+    chart_type: str
+        Type plot (bar, column, line). Als gegeven wordt dit in de filenaam verwerkt.
+
+    """
+    if output_directory is not None:
+        output_directory.mkdir(exist_ok=True, parents=True)
+    if output_file_name is None:
+        if input_file_name is None:
+            if chart_type is None:
+                chart_label = ""
+            else:
+                chart_label = chart_type
+            default_file_name = Path("_".join(["highchart", chart_label, "plot"]) + ".json")
+        else:
+            file_stem = Path(input_file_name).stem
+            default_file_name = Path(file_stem).with_suffix(".json")
+
+        outfile = output_directory / default_file_name
+    else:
+        if output_directory is None:
+            outfile = Path(output_file_name).with_suffix(".json")
+        else:
+            outfile = output_directory / Path(output_file_name).with_suffix(".json")
+    _logger.info(f"Writing to {outfile}")
+    chart_container = json.dumps(output, indent=json_indent, ensure_ascii=False)
+    with codecs.open(outfile.as_posix(), "w", encoding='utf-8') as stream:
+        stream.write(chart_container)
+
+    return outfile
+
+
 class CBSHighChart:
     def __init__(self,
                  data: pd.DataFrame = None,
@@ -169,7 +223,7 @@ class CBSHighChart:
         if defaults_out_file is not None:
             # als we een default output file geven dan schrijven we alleen de huidige template naar
             # deze file
-            self.write_to_file(output=self.defaults, output_file_name=defaults_out_file)
+            write_to_json_file(output=self.defaults, output_file_name=defaults_out_file)
             _logger.info(
                 """
                 We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
@@ -199,13 +253,13 @@ class CBSHighChart:
         _logger.debug(f"categories: {self.categories}")
 
         if start:
-            # als de start optie meegeven is dan gaan we de highcharts file bouwen
+            # als de start optie meegeven is dan gaan we de highcharts file bouwen.
             self.make_highchart()
 
             self.modify_highchart()
 
             # finally write the result to file
-            out_file = self.write_to_file(output=self.output,
+            out_file = write_to_json_file(output=self.output,
                                           output_directory=self.output_directory,
                                           output_file_name=self.output_file_name,
                                           input_file_name=self.input_file_name,
@@ -475,7 +529,7 @@ class CBSHighChart:
             # alde default filename None is dan is default directory sowieso gezet
             defaults_file_name = defaults_directory / Path(chart_type + ".json")
         else:
-            # default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven
+            # Default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven
             # was dan combineren
             # we de naam met de directory, anders nemen we direct de filenaam
             if defaults_directory is None:
@@ -590,8 +644,9 @@ class CBSHighChart:
 
         series = list()
         for col_name in data_df.columns:
+            # Let op dat de name van een serie altijd een string moet zijn.
             item = {
-                "name": col_name,
+                "name": str(col_name),
                 "isSerie": True,
                 "borderColor": "#FFFFFF",
                 "data": list()
@@ -629,56 +684,3 @@ class CBSHighChart:
 
     def add_selected_templated(self, key="selectedTemplate"):
         self.output[key] = self.defaults[key]
-
-    def write_to_file(self,
-                      output,
-                      json_indent=2,
-                      output_directory: Path = None,
-                      output_file_name: str = None,
-                      input_file_name: str = None,
-                      chart_type=None,
-                      ):
-        """
-        Write the dictionary to an json output file
-        Parameters
-        ----------
-        output: dict
-            The settings dictionary to write
-        json_indent: int
-            Number of indenting spaces. If None is give, a compact json is written
-        output_directory: Path of None
-            Output directory
-        output_file_name: str of None
-            Naam van de output file
-        input_file_name: str of None
-            Naam van de input data file. Als we geen output filenaam geven zal de output file hierop
-            gebaseerd worden.
-        chart_type: str
-            Type plot (bar, column, line). Als gegeven wordt dit in de filenaam verwerkt.
-
-        """
-        if output_directory is not None:
-            output_directory.mkdir(exist_ok=True, parents=True)
-        if output_file_name is None:
-            if input_file_name is None:
-                if chart_type is None:
-                    chart_label = ""
-                else:
-                    chart_label = chart_type
-                default_file_name = Path("_".join(["highchart", chart_label, "plot"]) + ".json")
-            else:
-                file_stem = Path(input_file_name).stem
-                default_file_name = Path(file_stem).with_suffix(".json")
-
-            outfile = output_directory / default_file_name
-        else:
-            if output_directory is None:
-                outfile = Path(output_file_name).with_suffix(".json")
-            else:
-                outfile = output_directory / Path(output_file_name).with_suffix(".json")
-        _logger.info(f"Writing to {outfile}")
-        chart_container = json.dumps(output, indent=json_indent, ensure_ascii=False)
-        with codecs.open(outfile.as_posix(), "w", encoding='utf-8') as stream:
-            stream.write(chart_container)
-
-        return outfile
