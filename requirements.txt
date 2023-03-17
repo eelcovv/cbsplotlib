@@ -3,5 +3,4 @@ numpy
 sphinx
 seaborn
 setuptools
-cbsplotlib
 pandas
