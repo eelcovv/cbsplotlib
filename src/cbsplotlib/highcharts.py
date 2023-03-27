@@ -161,8 +161,9 @@ class CBSHighChart:
                  tooltip_prefix: str = None,
                  tooltip_suffix: str = None,
                  has_grouped_categories: bool = None,
-                 enable_legend: bool = None
-                 ):
+                 enable_legend: bool = None,
+                 keep_tick_interval_format: bool = False
+    ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
         self.decimal = decimal
@@ -178,6 +179,7 @@ class CBSHighChart:
         self.y_lim = y_lim
         self.x_tick_interval = x_tick_interval
         self.y_tick_interval = y_tick_interval
+        self.keep_tick_interval_format = keep_tick_interval_format
         self.chart_description = chart_description
         self.chart_height = chart_height
         self.color_selection = color_selection
@@ -346,7 +348,7 @@ class CBSHighChart:
         return output
 
     def impose_axis_prop(self, output, section="template", axis_key="xAxis", label=None,
-                         tick_interval=None, lim=None):
+                         tick_interval=None, lim=None, keep_tick_interval_format=False):
 
         new_axis = list()
         for axis in self.output[section][axis_key]:
@@ -359,9 +361,15 @@ class CBSHighChart:
                     axis = self.impose_value(label, "cbsTitle", output=axis)
             if tick_interval is not None:
                 _logger.debug(f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]")
-                # let op: tick interval moet je soms als string wegschrijven en soms niet
+                if axis_key == "xAxis" or keep_tick_interval_format:
+                    tick_interval_on_axis = tick_interval
+                else:
+                    tick_interval_on_axis = str(tick_interval)
+                # Let op: tick interval moet je soms als string wegschrijven en soms niet
                 # Regel dit daarom als gebruiker
-                axis = self.impose_value(str(tick_interval), "tickInterval", output=axis)
+                # volgens mijn is xAxis een int, yAxis een float. Introduceer anders vlag 'keep_tick_interval_format
+                # als je het als gebruiker zelf wil bepalen
+                axis = self.impose_value(tick_interval_on_axis, "tickInterval", output=axis)
             if lim is not None:
                 if lim[0] is not None:
                     _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
@@ -392,7 +400,8 @@ class CBSHighChart:
                                                     axis_key="xAxis",
                                                     label=self.xlabel,
                                                     tick_interval=self.x_tick_interval,
-                                                    lim=self.x_lim)
+                                                    lim=self.x_lim,
+                                                    keep_tick_interval_format=self.keep_tick_interval_format)
 
         if self.ylabel is not None or self.y_tick_interval is not None or self.y_lim is not None:
             for section in ("template", "options"):
@@ -402,7 +411,8 @@ class CBSHighChart:
                                                     axis_key="yAxis",
                                                     label=self.ylabel,
                                                     tick_interval=self.y_tick_interval,
-                                                    lim=self.y_lim)
+                                                    lim=self.y_lim,
+                                                    keep_tick_interval_format=self.keep_tick_interval_format)
 
         if self.chart_description is not None:
             _logger.debug(f"Imposing {self.chart_description} to [options][chart][description]")
