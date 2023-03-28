@@ -41,6 +41,7 @@ hc = CBSHighChart(input_file_name=input_file_name.as_posix(),
                   footnote_text="Dit is een footnote",
                   tooltip_prefix="voor ",
                   tooltip_suffix="na ",
+                  convert_to_html=True,
                   )
 
 logger.info("Done")
