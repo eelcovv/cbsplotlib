@@ -22,7 +22,7 @@ if not Path(defaults_out_file).exists():
                       defaults_out_file=input_file_name.stem)
 
 # pas nu de template aan en run nogmaals zonder defaults_out_file om de highcharts met onze data te
-# maken als je niks aan de template aanpast kan je ook direct de output highcharts maken.
+# maken als je niets aan de template aanpast kun je ook direct de output highcharts maken.
 hc = CBSHighChart(input_file_name=input_file_name.as_posix(),
                   defaults_file_name=defaults_out_file,
                   chart_type="bar",
