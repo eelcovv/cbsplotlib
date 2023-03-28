@@ -272,7 +272,7 @@ class CBSHighChart:
 
         if defaults_out_file is not None:
             # als we een default output file geven dan schrijven we alleen de huidige template naar
-            # deze file
+            # deze file.
             write_to_json_file(output=self.defaults, output_file_name=defaults_out_file)
             _logger.info(
                 """
