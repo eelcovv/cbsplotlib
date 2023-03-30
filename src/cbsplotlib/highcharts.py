@@ -25,12 +25,6 @@ _logger = logging.getLogger(__name__)
 _selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
 _selenium_logger.setLevel(logging.WARNING)
 
-
-@functools.wraps(cbsplotlib.set_loglevel)
-def set_loglevel(*args, **kwargs):
-    return cbsplotlib.set_loglevel(*args, **kwargs)
-
-
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
 PLOT_TEMPLATES = {"area_percentage_grouped",
                   "area_stacked_grouped",
@@ -761,7 +755,13 @@ class CBSHighChart:
         """
 
         _logger.debug(f"Connecting to  {self.driver_path}")
-        driver = webdriver.Chrome(self.driver_path)
+        try:
+            driver = webdriver.Chrome(self.driver_path)
+        except selenium.common.exceptions.WebDriverException as err:
+            _logger.warning(err)
+            _logger.warning(f"Cannot get driver from path {self.driver_path}. Stop writing html here")
+            return
+
         # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
         driver.get("https://highcharts.cbs.nl/")
 
