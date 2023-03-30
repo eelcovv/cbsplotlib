@@ -852,8 +852,11 @@ class CBSHighChart:
                 """
             )
 
-            _logger.debug(f"Executing: {js_export}")
-            # driver.execute_script(js_preview)
+            _logger.info(f"Executing: {js_export}")
+            try:
+                driver.execute_script(js_export)
+            except TypeError as err:
+                _logger.warning(err)
 
         # input("quit?")
         driver.close()
