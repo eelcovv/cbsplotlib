@@ -17,8 +17,19 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import cbsplotlib
 
-DRIVER = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\" \
-         "CBS_Python\\share\\data\\drivers\\chrome\\chromedriver.exe"
+# de drivers staan in het pad:
+# "\\cbsp.nl\productie\secundair\DecentraleTools\Output\CBS_Python\share\data\drivers\chrome\111.0.5563.64\chromedriver.exe"
+# maar geef andere versies op en de mogelijkheid om te switchen
+DRIVERBASE = "\\\\cbsp.nl\\productie\\secundair\\DecentraleTools\\Output\\CBS_Python\\share\\data\\drivers\\chrome"
+DRIVERNAME = "chromedriver.exe"
+DRIVERVERSIONS = {
+    "100": "100.0.4896.60",
+    "105": "105.0.5195.52",
+    "106": "106.0.5249.21",
+    "107": "109.0.5414.74",
+    "111": "111.0.5563.64",
+    "112": "112.0.5615.28"
+}
 
 _logger = logging.getLogger(__name__)
 
@@ -190,6 +201,8 @@ class CBSHighChart:
                  keep_tick_interval_format: bool = False,
                  convert_to_html: bool = False,
                  driver_path: str = None,
+                 driver_version: str = None,
+                 driver_version_short: str = None
                  ):
         self.input_file_name = input_file_name
         self.csv_separator = csv_separator
@@ -197,10 +210,27 @@ class CBSHighChart:
         self.index_col = index_col
         self.enable_legend = enable_legend
 
-        if driver_path is None:
-            self.driver_path = DRIVER
+        if driver_version is not None:
+            current_driver_version = driver_version
         else:
-            self.driver_path = driver_path
+            if driver_version_short is None:
+                driver_version_short = "111"
+
+            else:
+                driver_version_short = driver_version_short
+            try:
+                current_driver_version = DRIVERVERSIONS[driver_version_short]
+            except Exception as err:
+                _logger.warning(err)
+                raise ValueError(f"Driver version {driver_version_short} is not defined. Please give full version name")
+
+        if driver_path is None:
+            path_to_driver = DRIVERBASE
+        else:
+            path_to_driver = driver_path
+
+        # "\\cbsp.nl\productie\secundair\DecentraleTools\Output\CBS_Python\share\data\drivers\chrome\111.0.5563.64\chromedriver.exe"
+        self.driver = "\\".join([path_to_driver, current_driver_version, DRIVERNAME ])
 
         if javascript_directory is None:
             self.javascript_directory = Path(__file__).parent / Path("js_queries")
@@ -754,12 +784,12 @@ class CBSHighChart:
 
         """
 
-        _logger.debug(f"Connecting to  {self.driver_path}")
+        _logger.debug(f"Connecting to  {self.driver}")
         try:
-            driver = webdriver.Chrome(self.driver_path)
+            driver = webdriver.Chrome(self.driver)
         except selenium.common.exceptions.WebDriverException as err:
             _logger.warning(err)
-            _logger.warning(f"Cannot get driver from path {self.driver_path}. Stop writing html here")
+            _logger.warning(f"Cannot get driver from path {self.driver}. Stop writing html here")
             return
 
         # driver.get("https://highcharts.cbs.nl/highcharts-editor.min.js")
