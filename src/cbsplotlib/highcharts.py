@@ -784,6 +784,14 @@ class CBSHighChart:
 
         """
 
+        _logger.debug(f"Reading the json file from {json_input_file}")
+        with open(json_input_file, mode="r") as stream:
+            json_data = json.load(stream)
+
+        json_serie = json.dumps(json_data)
+
+        _logger.debug(f"{json_serie}")
+
         _logger.debug(f"Connecting to  {self.driver}")
         try:
             driver = webdriver.Chrome(self.driver)
@@ -823,18 +831,18 @@ class CBSHighChart:
                      {
                         try 
                         {
-                            t = JSON.parse($filename)
+                            t = JSON.parse(" $json_serie ")
                         }
                         catch (e) 
                         {
-                            return highed.snackBar("Error loading JSON: " + e)
+                            return highed.snackBar("Error loading JSON: " + e);
                         }
                         {
                             var x = e.loadProject(t); 
                         }
                       }
                       """,
-            substitutes=dict(filename=json_input_file.as_posix()))
+            substitutes=dict(json_serie=json_serie))
         _logger.debug(f"first: {js_import2}")
         # 4) Execute your command
         try:

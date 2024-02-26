@@ -59,3 +59,4 @@ MANIFEST
 /data/htmlviewer_testdata/line_with_dates_rendered.html
 /install.ps1
 /install_exe.ps1
+/src/cbsplotlib/js_queries
