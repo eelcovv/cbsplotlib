@@ -15,15 +15,17 @@ _logger = logging.getLogger(__name__)
 
 
 class HtmlViewer:
-    def __init__(self, filename: Union[str, Path],
-                 output_html_file: Union[str, Path] = None,
-                 output_directory: Union[str, Path] = None,
-                 view_template: Union[str, Path] = None,
-                 view_template_directory: Union[str, Path] = None,
-                 show: bool = False,
-                 keep: bool = None,
-                 overwrite: bool = False
-                 ):
+    def __init__(
+        self,
+        filename: Union[str, Path],
+        output_html_file: Union[str, Path] = None,
+        output_directory: Union[str, Path] = None,
+        view_template: Union[str, Path] = None,
+        view_template_directory: Union[str, Path] = None,
+        show: bool = False,
+        keep: bool = None,
+        overwrite: bool = False,
+    ):
         self.filename = Path(filename)
 
         if output_directory is None:
@@ -34,7 +36,9 @@ class HtmlViewer:
         self.keep = keep
 
         if output_html_file is None:
-            out_file_base = "_".join([self.filename.stem, "rendered"]) + self.filename.suffix
+            out_file_base = (
+                "_".join([self.filename.stem, "rendered"]) + self.filename.suffix
+            )
             if keep is None:
                 self.keep = False
         else:
@@ -67,9 +71,10 @@ class HtmlViewer:
                 fp.write(html_contents)
         except FileNotFoundError as err:
             _logger.warning(err)
-            raise FileNotFoundError("Run eerst de script highchart_example_line_with_datetimes.py "
-                                    "om de html file te maken!")
-
+            raise FileNotFoundError(
+                "Run eerst de script highchart_example_line_with_datetimes.py "
+                "om de html file te maken!"
+            )
 
         if show:
             self.show()
@@ -123,27 +128,46 @@ def parse_args(args):
     Returns:
       :obj:`argparse.Namespace`: command line parameters namespace
     """
-    parser = argparse.ArgumentParser(description="Tool om latex tabulars in xls files om te zetten")
+    parser = argparse.ArgumentParser(
+        description="Tool om latex tabulars in xls files om te zetten"
+    )
     parser.add_argument(
         "--version",
         action="version",
         version="highcharts_html_viewer {ver}".format(ver=__version__),
     )
     parser.add_argument("filename", help="Tabular file name", metavar="FILENAME")
-    parser.add_argument("--output_filename",
-                        help="Naam van de html output file. Moet extensie .html "
-                             "hebben", metavar="OUTPUT_FILENAME")
-    parser.add_argument("--output_directory",
-                        help="Naam van de output directory. Als niet gegeven wordt het"
-                             "door de input filenaam bepaald", metavar="OUTPUT_DIRECTORY")
-    parser.add_argument("--show_html", help="Open een browser en laat de html zien",
-                        action="store_true", default=True)
-    parser.add_argument("--no_show_html", help="Laat de html niet zien. Impliceert keep is true",
-                        action="store_false", dest="show_html")
-    parser.add_argument("--keep", help="Schrijf alleen de html maar laat nog niet zien",
-                        action="store_true")
-    parser.add_argument("--overwrite", help="Forceer overschrijven",
-                        action="store_true")
+    parser.add_argument(
+        "--output_filename",
+        help="Naam van de html output file. Moet extensie .html " "hebben",
+        metavar="OUTPUT_FILENAME",
+    )
+    parser.add_argument(
+        "--output_directory",
+        help="Naam van de output directory. Als niet gegeven wordt het"
+        "door de input filenaam bepaald",
+        metavar="OUTPUT_DIRECTORY",
+    )
+    parser.add_argument(
+        "--show_html",
+        help="Open een browser en laat de html zien",
+        action="store_true",
+        default=True,
+    )
+    parser.add_argument(
+        "--no_show_html",
+        help="Laat de html niet zien. Impliceert keep is true",
+        action="store_false",
+        dest="show_html",
+    )
+    parser.add_argument(
+        "--keep",
+        help="Schrijf alleen de html maar laat nog niet zien",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--overwrite", help="Forceer overschrijven", action="store_true"
+    )
     parser.add_argument(
         "-v",
         "--verbose",
@@ -189,9 +213,14 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
-    hc_view = HtmlViewer(filename=args.filename, output_html_file=args.output_filename,
-                         output_directory=args.output_directory, show=args.show_html,
-                         keep=args.keep, overwrite=args.overwrite)
+    hc_view = HtmlViewer(
+        filename=args.filename,
+        output_html_file=args.output_filename,
+        output_directory=args.output_directory,
+        show=args.show_html,
+        keep=args.keep,
+        overwrite=args.overwrite,
+    )
 
     if not hc_view.keep:
         time.sleep(10)
