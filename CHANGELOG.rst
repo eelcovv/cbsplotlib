@@ -2,9 +2,11 @@
 Changelog
 =========
 
-Version 0.4.4
+Version 0.4.5
 =============
 - small update before packaging
+- removed strong selenium dependency
+- reformatted code with black
 
 Version 0.4.3
 =============
