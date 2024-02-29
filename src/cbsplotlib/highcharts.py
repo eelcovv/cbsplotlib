@@ -12,10 +12,13 @@ import numpy as np
 import pandas as pd
 
 HC_DEFAULTS_DIRECTORY = "cbs_hc_defaults"
-import selenium
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import cbsplotlib
+try:
+    import selenium
+except ModuleNotFoundError:
+    selenium = None
+else:
+    from selenium import webdriver
+    from selenium.webdriver.common.keys import Keys
 
 # de drivers staan in het pad:
 # "\\cbsp.nl\productie\secundair\DecentraleTools\Output\CBS_Python\share\data\drivers\chrome\111.0.5563.64\chromedriver.exe"
@@ -33,8 +36,9 @@ DRIVERVERSIONS = {
 
 _logger = logging.getLogger(__name__)
 
-_selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
-_selenium_logger.setLevel(logging.WARNING)
+if selenium is not None:
+    _selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+    _selenium_logger.setLevel(logging.WARNING)
 
 PLOT_TYPES = {"line", "area", "column", "bar", "pie", "polar", "choropleth", "bubbleChart"}
 PLOT_TEMPLATES = {"area_percentage_grouped",
@@ -230,7 +234,7 @@ class CBSHighChart:
             path_to_driver = driver_path
 
         # "\\cbsp.nl\productie\secundair\DecentraleTools\Output\CBS_Python\share\data\drivers\chrome\111.0.5563.64\chromedriver.exe"
-        self.driver = "\\".join([path_to_driver, current_driver_version, DRIVERNAME ])
+        self.driver = "\\".join([path_to_driver, current_driver_version, DRIVERNAME])
 
         if javascript_directory is None:
             self.javascript_directory = Path(__file__).parent / Path("js_queries")
@@ -340,7 +344,10 @@ class CBSHighChart:
                                           chart_type=self.chart_type,
                                           )
             if convert_to_html:
-                self.convert_json_to_html(json_input_file=out_file)
+                if selenium is None:
+                    _logger.warning("convert to html requested, but selenium is not installed. Skipping")
+                else:
+                    self.convert_json_to_html(json_input_file=out_file)
 
         else:
             _logger.info("The data was read successfully. To create the highcharts, call the "
