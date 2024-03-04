@@ -30,10 +30,6 @@ class CBSPlotSettings(object):
         Height of the text in pt: default = 693
     text_margin_bot_in_inch: float, optional
         Space at the bottom in inch. Default = 1 inch
-    text_height_in_inch: float, optional
-        Explicitly over rules the calculated text height if not None. Default = None
-    text_width_in_inch = None,
-        Explicitly over rules the calculated text height if not None. Default = None
     plot_parameters: dict, optional
         Dictionary with plot settings. If None (default), take the cbs defaults
     color_palette: {"koel", "warm"}, optional
@@ -48,23 +44,24 @@ class CBSPlotSettings(object):
       here as in the document
     """
 
-    def __init__(self,
-                 fig_width_in_inch: float = None,
-                 fig_height_in_inch: float = None,
-                 number_of_figures_cols: int = 1,
-                 number_of_figures_rows: int = 2,
-                 text_width_in_pt: float = 392.64813,
-                 text_height_in_pt: float = 693,
-                 text_margin_bot_in_inch: float = 1.0,  # margin in inch
-                 ratio_option="golden_ratio",
-                 plot_parameters: dict = None,
-                 color_palette: str = "koel",
-                 font_size: float = 8,
-                 set_gray_x_tics: bool = False,
-                 set_gray_y_tics: bool = False,
-                 reverse: bool= False,
-                 offset: int= 0,
-                 ):
+    def __init__(
+        self,
+        fig_width_in_inch: float = None,
+        fig_height_in_inch: float = None,
+        number_of_figures_cols: int = 1,
+        number_of_figures_rows: int = 2,
+        text_width_in_pt: float = 392.64813,
+        text_height_in_pt: float = 693,
+        text_margin_bot_in_inch: float = 1.0,  # margin in inch
+        ratio_option="golden_ratio",
+        plot_parameters: dict = None,
+        color_palette: str = "koel",
+        font_size: float = 8,
+        set_gray_x_tics: bool = False,
+        set_gray_y_tics: bool = False,
+        reverse: bool = False,
+        offset: int = 0,
+    ):
 
         # set scale factor
         inches_per_pt = 1 / 72.27
@@ -75,12 +72,16 @@ class CBSPlotSettings(object):
         self.text_height_in_pt = text_height_in_pt
         self.text_margin_bot_in_inch = text_margin_bot_in_inch
 
-        self.text_height = text_height_in_pt * inches_per_pt,
+        self.text_height = (text_height_in_pt * inches_per_pt,)
         self.text_width = text_width_in_pt * inches_per_pt
 
         inches_per_pt = 1 / 72.27
-        text_width_in_pt = 392.64813  # add the line \showthe\columnwidth above you figure in latex
-        text_height_in_pt = 693  # add the line \showthe\columnwidth above you figure in latex
+        text_width_in_pt = (
+            392.64813  # add the line \showthe\columnwidth above you figure in latex
+        )
+        text_height_in_pt = (
+            693  # add the line \showthe\columnwidth above you figure in latex
+        )
         text_height = text_height_in_pt * inches_per_pt
         text_width = text_width_in_pt * inches_per_pt
         text_margin_bot = 1.0  # margin in inch
@@ -101,8 +102,10 @@ class CBSPlotSettings(object):
         elif ratio_option == "from_rows":
             self.fig_height = (text_height - text_margin_bot) / number_of_figures_rows
         else:
-            raise ValueError(f"fig height is not given by 'fig_height_in_inch' and 'ratio_option' "
-                             f"= {ratio_option} is not in {RATIO_OPTIONS}")
+            raise ValueError(
+                f"fig height is not given by 'fig_height_in_inch' and 'ratio_option' "
+                f"= {ratio_option} is not in {RATIO_OPTIONS}"
+            )
 
         self.fig_size = (self.fig_width, self.fig_height)
 
@@ -111,19 +114,20 @@ class CBSPlotSettings(object):
         if plot_parameters is not None:
             self.params = plot_parameters
         else:
-            self.params = {'axes.labelsize': font_size,
-                           'font.size': font_size,
-                           'legend.fontsize': font_size,
-                           'xtick.labelsize': font_size,
-                           'ytick.labelsize': font_size,
-                           'figure.figsize': self.fig_size,
-                           'grid.color': 'cbs:highchartslichtgrijs',
-                           'grid.linewidth': 1.0,
-                           'hatch.color': 'cbs:highchartslichtgrijs',
-                           'axes.prop_cycle': prop_cycle,
-                           'axes.edgecolor': "cbs:grijs",
-                           'axes.linewidth': 1.5,
-                           }
+            self.params = {
+                "axes.labelsize": font_size,
+                "font.size": font_size,
+                "legend.fontsize": font_size,
+                "xtick.labelsize": font_size,
+                "ytick.labelsize": font_size,
+                "figure.figsize": self.fig_size,
+                "grid.color": "cbs:highchartslichtgrijs",
+                "grid.linewidth": 1.0,
+                "hatch.color": "cbs:highchartslichtgrijs",
+                "axes.prop_cycle": prop_cycle,
+                "axes.edgecolor": "cbs:grijs",
+                "axes.linewidth": 1.5,
+            }
 
         set_cbs_colors()
         mpl.rcParams.update(self.params)
@@ -133,11 +137,10 @@ class CBSPlotSettings(object):
         if set_gray_y_tics:
             self.set_tick_color(axis="y")
 
-
     @staticmethod
     def set_tick_color(axis: str = None):
         """
-        zet de kleur van de tikcs grijs.
+        Zet de kleur van de ticks grijs.
 
         Parameters
         ----------
@@ -150,19 +153,23 @@ class CBSPlotSettings(object):
           zodat dit niet goed mogelijk is.
 
         """
-        if axis is None or axis not in ('x', 'y'):
+        if axis is None or axis not in ("x", "y"):
             msg = "Specificeer de axis waarvan je de ticks wilt kleuren met axis='x' of axis='y'"
             raise ValueError(msg)
 
         try:
-            mpl.rcParams.update({f'{axis}tick.labelcolor': "black"})
+            mpl.rcParams.update({f"{axis}tick.labelcolor": "black"})
         except KeyError:
-            _logger.warning("In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
-                            "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
-                            "in je script dan gewoon "
-                            "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')")
+            _logger.warning(
+                "In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
+                "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
+                "in je script dan gewoon "
+                "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')"
+            )
         else:
-            # we konden de label kleur op black zetten. Verander dan nu de tick kleur
-            mpl.rcParams.update({
-                f'{axis}tick.color': "cbs:grijs",
-            })
+            # We konden de label kleur op black zetten. Verander dan nu de tick kleur
+            mpl.rcParams.update(
+                {
+                    f"{axis}tick.color": "cbs:grijs",
+                }
+            )

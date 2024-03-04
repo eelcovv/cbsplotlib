@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 import matplotlib.patches as mpatches
 import matplotlib.transforms as trn
@@ -11,9 +10,17 @@ _logger = logging.getLogger(__name__)
 RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
 
 
-def add_values_to_bars(axis, type="bar",
-                       position="c", format="{:.0f}", x_offset=0, y_offset=0, color="k",
-                       horizontalalignment="center", verticalalignment="center"):
+def add_values_to_bars(
+    axis,
+    type="bar",
+    position="c",
+    format="{:.0f}",
+    x_offset=0,
+    y_offset=0,
+    color="k",
+    horizontalalignment="center",
+    verticalalignment="center",
+):
     """
     Add the values of the bars as number in the center
 
@@ -47,8 +54,8 @@ def add_values_to_bars(axis, type="bar",
         b = patch.get_bbox()
         cx = (b.x1 + b.x0) / 2
         cy = (b.y1 + b.y0) / 2
-        hh = (b.y1 - b.y0)
-        ww = (b.x1 - b.x0)
+        hh = b.y1 - b.y0
+        ww = b.x1 - b.x0
         if position == "c":
             (px, py) = (cx, cy)
         elif position == "t":
@@ -75,120 +82,28 @@ def add_values_to_bars(axis, type="bar",
         # make the value string using the format specifier
         value_string = format.format(value)
 
-        axis.annotate(value_string, (px, py), color=color,
-                      horizontalalignment=horizontalalignment,
-                      verticalalignment=verticalalignment)
+        axis.annotate(
+            value_string,
+            (px, py),
+            color=color,
+            horizontalalignment=horizontalalignment,
+            verticalalignment=verticalalignment,
+        )
 
 
-def add_cbs_pnglogo_to_plot(fig,
-                            axes=None,
-                            image=None,
-                            margin_x=6,
-                            margin_y=6,
-                            loc="lower left",
-                            zorder=10, color="blauw", alpha=1.0,
-                            logo_width_in_mm=3.234,
-                            logo_height_in_mm=4.995,
-                            resample=False,
-                            ):
-    """
-    Add a CBS logo to a plot
-
-    Parameters
-    ----------
-    fig : `mpl.pyplot.axes.Axes` object
-    image: mpl.image or None
-        To prevent reading the logo many time you can read it once and pass the return image as an
-        argument in the next call
-    color: {"blauw", "wit", "grijs"}
-        Color of the logo. Three colors are available: blauw (blue), wit (white) and grijs (grey).
-        Default = "blauw"
-    margin_x, margin_y : int
-        The *x*/*y* image offset in mm.
-    alpha : None or float
-        The alpha blending value.
-    loc: {"lower left", "upper left", "upper right", "lower right"} or tuple
-        Location of the logo.
-    size: int
-        Size of the icon in pixels
-
-    Returns
-    -------
-    mpl.image:
-        The image of the logo
-
-    """
-    bbox = fig.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-    width = bbox.width * fig.dpi
-    height = bbox.height * fig.dpi
-
-    size_x = (logo_width_in_mm / 25.4) * fig.dpi
-    size_y = (logo_height_in_mm / 25.4) * fig.dpi
-
-    if image is None:
-        # only load the image if it is not already defined. The image is returned by the
-        # function, so you can use this retrun value for the next call, speeding up the code
-        image_dir = Path(__file__).parent / "logos"
-        if color == "blauw":
-            logo_name = "cbs_logo_tiny.png"
-        elif color == "wit":
-            logo_name = "cbs_logo_wit.png"
-        elif color == "grijs":
-            logo_name = "cbs_logo_tiny_grijs.pdf"
-        else:
-            raise ValueError(f"Color {color} not recognised. Please check")
-        image_name = image_dir / logo_name
-
-        # image = Image.open(str(image_name))
-        # image = imread(str(image_name))
-        image = PyPDF2.PdfFileReader(str(image_name))
-        if resample:
-            image.thumbnail((size_x, size_y))
-            # image.resize((int(size_x), int(size_y)), Image.ANTIALIAS)
-
-    # concerteer de marge van mm naar pixles
-    margin_x = (margin_x / 25.4) * fig.dpi
-    margin_x = (margin_x / 25.4) * fig.dpi
-
-    if isinstance(loc, str):
-        # if loc is a string, set the coordinates based on the value
-        if loc == "lower left":
-            xp = margin_x
-            yp = margin_y
-        elif loc == "upper left":
-            xp = margin_x
-            yp = height - image.size[1] - margin_y
-        elif loc == "upper right":
-            xp = width - image.size[0] - margin_x
-            yp = height - image.size[1] - margin_y
-        elif loc == "lower right":
-            xp = width - image.size[0] - margin_x
-            yp = margin_y
-        else:
-            raise ValueError(f"loc {loc} not recognised. Pleas check")
-    else:
-        # if it is a tuple, get the values
-        xp = width * loc[0]
-        yp = height * loc[1]
-
-    # image.shape = [logo_width_in_mm, logo_height_in_mm]
-    fig.figimage(image, xo=xp, yo=yp, zorder=zorder, alpha=alpha)
-
-    return image
-
-
-def add_cbs_logo_to_plot(fig,
-                         axes=None,
-                         margin_x_in_mm=6.0,
-                         margin_y_in_mm=6.0,
-                         x0=0,
-                         y0=0,
-                         width=None,
-                         height=None,
-                         zorder_start=1,
-                         fillcolor="cbs:highchartslichtgrijs",
-                         edgecolor="cbs:logogrijs",
-                         ):
+def add_cbs_logo_to_plot(
+    fig,
+    axes=None,
+    margin_x_in_mm=6.0,
+    margin_y_in_mm=6.0,
+    x0=0,
+    y0=0,
+    width=None,
+    height=None,
+    zorder_start=1,
+    fillcolor="cbs:highchartslichtgrijs",
+    edgecolor="cbs:logogrijs",
+):
     # maak een box met de coordinaten van de linker onderhoek van het grijze vierkant in axis
     # fractie coordinaten
     if width is None:
@@ -221,7 +136,7 @@ def add_cbs_logo_to_plot(fig,
     for points_in_out in all_points:
 
         for ii, points in enumerate(points_in_out):
-            points[:, :2] *= (fig.dpi / 25.4)
+            points[:, :2] *= fig.dpi / 25.4
             points[:, 0] += x0
             points[:, 1] += y0
             pl = points[:, :2]
@@ -231,10 +146,9 @@ def add_cbs_logo_to_plot(fig,
                 color = edgecolor
             else:
                 color = fillcolor
-            poly = mpatches.PathPatch(tr_path, fc=color,
-                                      linewidth=0,
-                                      zorder=zorder,
-                                      transform=trans)
+            poly = mpatches.PathPatch(
+                tr_path, fc=color, linewidth=0, zorder=zorder, transform=trans
+            )
             poly.set_clip_on(False)
             if axes is not None:
                 axes.add_patch(poly)
@@ -267,132 +181,167 @@ def get_cbs_logo_points(logo_width_in_mm=3.234, logo_height_in_mm=4.995, rrcor=0
 
     # punten C, beginnen links onder, tegen klok in, binnen en buiten kant
     points_c = [
-        np.array(list([
-            [0.000, 2.663, mPath.MOVETO],
-            [1.430, 2.663, mPath.LINETO],
-            [1.430, 3.308, mPath.LINETO],
-            [0.644, 3.308, mPath.LINETO],
-            [0.644, 3.577, mPath.LINETO],
-            [1.430, 3.577, mPath.LINETO],
-            [1.430, 4.221, mPath.LINETO],
-            [rrcor, 4.221, mPath.LINETO],
-            [0.000, 4.221, mPath.CURVE3],
-            [0.000, 4.221 - rrcor, mPath.CURVE3],
-            [0.000, 2.663, mPath.CLOSEPOLY],
-        ])),
-        np.array(list([
-            [0.188, 2.851, mPath.MOVETO],
-            [1.242, 2.851, mPath.LINETO],
-            [1.242, 3.120, mPath.LINETO],
-            [1.242, 3.120, mPath.LINETO],
-            [0.457, 3.120, mPath.LINETO],
-            [0.457, 3.765, mPath.LINETO],
-            [1.242, 3.765, mPath.LINETO],
-            [1.242, 4.033, mPath.LINETO],
-            [0.188, 4.033, mPath.LINETO],
-            [0.188, 2.851, mPath.CLOSEPOLY],
-        ])),
+        np.array(
+            list(
+                [
+                    [0.000, 2.663, mPath.MOVETO],
+                    [1.430, 2.663, mPath.LINETO],
+                    [1.430, 3.308, mPath.LINETO],
+                    [0.644, 3.308, mPath.LINETO],
+                    [0.644, 3.577, mPath.LINETO],
+                    [1.430, 3.577, mPath.LINETO],
+                    [1.430, 4.221, mPath.LINETO],
+                    [rrcor, 4.221, mPath.LINETO],
+                    [0.000, 4.221, mPath.CURVE3],
+                    [0.000, 4.221 - rrcor, mPath.CURVE3],
+                    [0.000, 2.663, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
+        np.array(
+            list(
+                [
+                    [0.188, 2.851, mPath.MOVETO],
+                    [1.242, 2.851, mPath.LINETO],
+                    [1.242, 3.120, mPath.LINETO],
+                    [1.242, 3.120, mPath.LINETO],
+                    [0.457, 3.120, mPath.LINETO],
+                    [0.457, 3.765, mPath.LINETO],
+                    [1.242, 3.765, mPath.LINETO],
+                    [1.242, 4.033, mPath.LINETO],
+                    [0.188, 4.033, mPath.LINETO],
+                    [0.188, 2.851, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
     ]
 
     points_b1 = [
-        np.array(list([
-            [1.674, 2.663, mPath.MOVETO],
-            [3.234, 2.663, mPath.LINETO],
-            [3.234, 4.221 - rrcor, mPath.LINETO],
-            [3.234, 4.221, mPath.CURVE3],
-            [3.063, 4.221, mPath.CURVE3],
-            [2.318, 4.221, mPath.LINETO],
-            [2.318, 4.996 - rrcor, mPath.LINETO],
-            [2.318, 4.996, mPath.CURVE3],
-            [2.147, 4.996, mPath.CURVE3],
-            [1.674, 4.996, mPath.LINETO],
-            [1.674, 2.663, mPath.CLOSEPOLY],
-        ])),
-        np.array(list([
-            [1.862, 2.851, mPath.MOVETO],
-            [3.046, 2.851, mPath.LINETO],
-            [3.046, 4.034, mPath.LINETO],
-            [2.130, 4.034, mPath.LINETO],
-            [2.130, 4.808, mPath.LINETO],
-            [1.862, 4.808, mPath.LINETO],
-            [1.862, 2.851, mPath.CLOSEPOLY],
-        ])),
+        np.array(
+            list(
+                [
+                    [1.674, 2.663, mPath.MOVETO],
+                    [3.234, 2.663, mPath.LINETO],
+                    [3.234, 4.221 - rrcor, mPath.LINETO],
+                    [3.234, 4.221, mPath.CURVE3],
+                    [3.063, 4.221, mPath.CURVE3],
+                    [2.318, 4.221, mPath.LINETO],
+                    [2.318, 4.996 - rrcor, mPath.LINETO],
+                    [2.318, 4.996, mPath.CURVE3],
+                    [2.147, 4.996, mPath.CURVE3],
+                    [1.674, 4.996, mPath.LINETO],
+                    [1.674, 2.663, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
+        np.array(
+            list(
+                [
+                    [1.862, 2.851, mPath.MOVETO],
+                    [3.046, 2.851, mPath.LINETO],
+                    [3.046, 4.034, mPath.LINETO],
+                    [2.130, 4.034, mPath.LINETO],
+                    [2.130, 4.808, mPath.LINETO],
+                    [1.862, 4.808, mPath.LINETO],
+                    [1.862, 2.851, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
     ]
 
     # in binnen stuk van de b
     points_b2 = [
-        np.array(list([
-            [2.129, 3.121, mPath.MOVETO],
-            [2.775, 3.121, mPath.LINETO],
-            [2.775, 3.766, mPath.LINETO],
-            [2.129, 3.766, mPath.LINETO],
-            [2.129, 3.121, mPath.CLOSEPOLY],
-        ])),
-        np.array(list([
-            [2.317, 3.309, mPath.MOVETO],
-            [2.588, 3.309, mPath.LINETO],
-            [2.588, 3.578, mPath.LINETO],
-            [2.317, 3.578, mPath.LINETO],
-            [2.317, 3.309, mPath.CLOSEPOLY],
-        ])),
+        np.array(
+            list(
+                [
+                    [2.129, 3.121, mPath.MOVETO],
+                    [2.775, 3.121, mPath.LINETO],
+                    [2.775, 3.766, mPath.LINETO],
+                    [2.129, 3.766, mPath.LINETO],
+                    [2.129, 3.121, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
+        np.array(
+            list(
+                [
+                    [2.317, 3.309, mPath.MOVETO],
+                    [2.588, 3.309, mPath.LINETO],
+                    [2.588, 3.578, mPath.LINETO],
+                    [2.317, 3.578, mPath.LINETO],
+                    [2.317, 3.309, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
     ]
 
     # de punten van de S, beginnende linksboven, tegen de klok in. Eerst array is de
     # buitenkant, tweede array is de binnenkant
     points_s = [
-        np.array(list([
-            [0.000, 2.420, mPath.MOVETO],
-            [0.000, 0.888, mPath.LINETO],
-            [2.589, 0.888, mPath.LINETO],
-            [2.589, 0.645, mPath.LINETO],
-            [0.000, 0.645, mPath.LINETO],
-            [0.000, rrcor, mPath.LINETO],
-            [0.000, 0.000, mPath.CURVE3],
-            [rrcor, 0, mPath.CURVE3],
-            [ww - rrcor, 0, mPath.LINETO],
-            [ww, 0, mPath.CURVE3],
-            [ww, rrcor, mPath.CURVE3],
-            [ww, 1.533, mPath.LINETO],
-            [0.646, 1.533, mPath.LINETO],
-            [0.646, 1.772, mPath.LINETO],
-            [3.234, 1.772, mPath.LINETO],
-            [3.234, 2.420, mPath.LINETO],
-            [0.000, 2.420, mPath.CLOSEPOLY],
-        ])),
-        np.array(list([
-            [0.188, 2.232, mPath.MOVETO],
-            [0.188, 1.076, mPath.LINETO],
-            [2.777, 1.076, mPath.LINETO],
-            [2.777, 0.457, mPath.LINETO],
-            [0.188, 0.457, mPath.LINETO],
-            [0.188, 0.188, mPath.LINETO],
-            [3.045, 0.188, mPath.LINETO],
-            [3.045, 1.345, mPath.LINETO],
-            [0.458, 1.345, mPath.LINETO],
-            [0.458, 1.960, mPath.LINETO],
-            [3.045, 1.960, mPath.LINETO],
-            [3.045, 2.232, mPath.LINETO],
-            [0.188, 2.232, mPath.CLOSEPOLY],
-        ])),
+        np.array(
+            list(
+                [
+                    [0.000, 2.420, mPath.MOVETO],
+                    [0.000, 0.888, mPath.LINETO],
+                    [2.589, 0.888, mPath.LINETO],
+                    [2.589, 0.645, mPath.LINETO],
+                    [0.000, 0.645, mPath.LINETO],
+                    [0.000, rrcor, mPath.LINETO],
+                    [0.000, 0.000, mPath.CURVE3],
+                    [rrcor, 0, mPath.CURVE3],
+                    [ww - rrcor, 0, mPath.LINETO],
+                    [ww, 0, mPath.CURVE3],
+                    [ww, rrcor, mPath.CURVE3],
+                    [ww, 1.533, mPath.LINETO],
+                    [0.646, 1.533, mPath.LINETO],
+                    [0.646, 1.772, mPath.LINETO],
+                    [3.234, 1.772, mPath.LINETO],
+                    [3.234, 2.420, mPath.LINETO],
+                    [0.000, 2.420, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
+        np.array(
+            list(
+                [
+                    [0.188, 2.232, mPath.MOVETO],
+                    [0.188, 1.076, mPath.LINETO],
+                    [2.777, 1.076, mPath.LINETO],
+                    [2.777, 0.457, mPath.LINETO],
+                    [0.188, 0.457, mPath.LINETO],
+                    [0.188, 0.188, mPath.LINETO],
+                    [3.045, 0.188, mPath.LINETO],
+                    [3.045, 1.345, mPath.LINETO],
+                    [0.458, 1.345, mPath.LINETO],
+                    [0.458, 1.960, mPath.LINETO],
+                    [3.045, 1.960, mPath.LINETO],
+                    [3.045, 2.232, mPath.LINETO],
+                    [0.188, 2.232, mPath.CLOSEPOLY],
+                ]
+            )
+        ),
     ]
 
     return [points_c, points_b1, points_b2, points_s]
 
 
-def add_axis_label_background(fig, axes, alpha=1,
-                              margin=0.05,
-                              x0=None,
-                              y0=None,
-                              loc="east",
-                              radius_corner_in_mm=1,
-                              logo_margin_x_in_mm=1,
-                              logo_margin_y_in_mm=1,
-                              add_logo=True,
-                              aspect=None,
-                              backgroundcolor="cbs:highchartslichtgrijs",
-                              logo_fillcolor="cbs:highchartslichtgrijs",
-                              logo_edgecolor="cbs:logogrijs",
-                              ):
+def add_axis_label_background(
+    fig,
+    axes,
+    alpha=1,
+    margin=0.05,
+    x0=None,
+    y0=None,
+    loc="east",
+    radius_corner_in_mm=1,
+    logo_margin_x_in_mm=1,
+    logo_margin_y_in_mm=1,
+    add_logo=True,
+    aspect=None,
+    backgroundcolor="cbs:highchartslichtgrijs",
+    logo_fillcolor="cbs:highchartslichtgrijs",
+    logo_edgecolor="cbs:logogrijs",
+):
     """
     Add a background to the axis label
 
@@ -429,7 +378,9 @@ def add_axis_label_background(fig, axes, alpha=1,
 
     # the bounding box with respect to the axis coordinates
     # (0 is bottom left axis, 1 is top right axis)
-    bbox_axi = axes.get_tightbbox(fig.canvas.get_renderer()).transformed(axes.transAxes.inverted())
+    bbox_axi = axes.get_tightbbox(fig.canvas.get_renderer()).transformed(
+        axes.transAxes.inverted()
+    )
 
     if loc == "east":
         if x0 is None:
@@ -447,7 +398,9 @@ def add_axis_label_background(fig, axes, alpha=1,
             y0 = bbox_axi.y0 - margin * bbox_axi.height
         y1 = 0
     else:
-        raise ValueError(f"Location loc = {loc} is not recognised. Only east and south implemented")
+        raise ValueError(
+            f"Location loc = {loc} is not recognised. Only east and south implemented"
+        )
 
     # width and height of the grey box area
     width = x1 - x0
@@ -467,14 +420,15 @@ def add_axis_label_background(fig, axes, alpha=1,
     else:
         raise AssertionError(f"This should not happen")
 
-    p1 = mpatches.Rectangle(rec_p,
-                            width=rec_w,
-                            height=rec_h,
-                            alpha=alpha,
-                            facecolor=backgroundcolor,
-                            edgecolor=backgroundcolor,
-                            zorder=0
-                            )
+    p1 = mpatches.Rectangle(
+        rec_p,
+        width=rec_w,
+        height=rec_h,
+        alpha=alpha,
+        facecolor=backgroundcolor,
+        edgecolor=backgroundcolor,
+        zorder=0,
+    )
     p1.set_transform(axes.transAxes)
     p1.set_clip_on(False)
 
@@ -487,15 +441,17 @@ def add_axis_label_background(fig, axes, alpha=1,
     if aspect is None:
         aspect = bbox_axis_fig.height / bbox_axis_fig.width
     _logger.debug(f"Using aspect ratio {aspect}")
-    p2 = mpatches.FancyBboxPatch((x0 + xshift, y0 + yshift),
-                                 width=width - 2 * xshift,
-                                 height=height - 2 * yshift,
-                                 mutation_aspect=1 / aspect,
-                                 alpha=alpha,
-                                 facecolor=backgroundcolor,
-                                 edgecolor=backgroundcolor,
-                                 transform=fig.transFigure,
-                                 zorder=0)
+    p2 = mpatches.FancyBboxPatch(
+        (x0 + xshift, y0 + yshift),
+        width=width - 2 * xshift,
+        height=height - 2 * yshift,
+        mutation_aspect=1 / aspect,
+        alpha=alpha,
+        facecolor=backgroundcolor,
+        edgecolor=backgroundcolor,
+        transform=fig.transFigure,
+        zorder=0,
+    )
     p2.set_boxstyle("round", pad=pad)
     p2.set_transform(axes.transAxes)
     p2.set_clip_on(False)
@@ -507,16 +463,18 @@ def add_axis_label_background(fig, axes, alpha=1,
     axes.add_patch(p2)
 
     if add_logo:
-        add_cbs_logo_to_plot(fig=fig,
-                             axes=axes,
-                             x0=x0,
-                             y0=y0,
-                             width=width,
-                             height=height,
-                             margin_x_in_mm=logo_margin_x_in_mm,
-                             margin_y_in_mm=logo_margin_y_in_mm,
-                             edgecolor=logo_edgecolor,
-                             fillcolor=logo_fillcolor)
+        add_cbs_logo_to_plot(
+            fig=fig,
+            axes=axes,
+            x0=x0,
+            y0=y0,
+            width=width,
+            height=height,
+            margin_x_in_mm=logo_margin_x_in_mm,
+            margin_y_in_mm=logo_margin_y_in_mm,
+            edgecolor=logo_edgecolor,
+            fillcolor=logo_fillcolor,
+        )
 
 
 def clean_up_artists(axis, artist_list):

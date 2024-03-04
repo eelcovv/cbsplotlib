@@ -32,19 +32,23 @@ CBS_COLORS_RBG = {
     "highchartslichtgrijs": (239, 239, 239),  # 6.3% zwart, wordt in highcharts gebruikt
     "lichtgrijs": (224, 224, 224),  # 12% zwart
     "grijs": (102, 102, 102),  # 60% zwart
-    "logogrijs": (146, 146, 146),  # 42% zwart, kleur van het CBS logo in het grijze vlak
+    "logogrijs": (
+        146,
+        146,
+        146,
+    ),  # 42% zwart, kleur van het CBS logo in het grijze vlak
     "codekleur": (88, 88, 88),
 }
 
 
 def rgb_to_hex(rgb):
     """
-    Converteer een tuple met rgb waardes in  een hex
+    Converteer een tuple met rgb waardes in een hex
 
     Parameters
     ----------
     rgb: tuple
-        tuple met rgb waardes met ints tussen de 0 en 255, bijv (10, 54, 255)
+        tuple met rgb waardes met ints tussen de 0 en 255, bijv. (10, 54, 255)
 
     Returns
     -------
@@ -54,13 +58,17 @@ def rgb_to_hex(rgb):
     return "#{0:02x}{1:02x}{2:02x}".format(rgb[0], rgb[1], rgb[2]).upper()
 
 
-CBS_COLORS_HEX = {name: rgb_to_hex(rgb_value) for name, rgb_value in CBS_COLORS_RBG.items()}
+CBS_COLORS_HEX = {
+    name: rgb_to_hex(rgb_value) for name, rgb_value in CBS_COLORS_RBG.items()
+}
 
 # prepend 'cbs:' to all color names to prevent collision
-CBS_COLORS = {"cbs:" + name: (value[0] / 255, value[1] / 255, value[2] / 255)
-              for name, value in CBS_COLORS_RBG.items()}
+CBS_COLORS = {
+    "cbs:" + name: (value[0] / 255, value[1] / 255, value[2] / 255)
+    for name, value in CBS_COLORS_RBG.items()
+}
 
-# deze dictionairy bevat meerdere palettes
+# deze dictionary bevat meerdere palettes
 CBS_PALETS = dict(
     koel=[
         "cbs:corporatelichtblauw",
@@ -95,7 +103,7 @@ CBS_PALETS = dict(
         "cbs:grasgroen",
         "cbs:appelgroen",
         "cbs:violet",
-    ]
+    ],
 )
 
 
@@ -104,13 +112,13 @@ def set_cbs_colors():
     mcolors.get_named_colors_mapping().update(CBS_COLORS)
 
 
-def get_color_palette(style="koel", reverse=False, offset=0):
+def get_color_palette(style="koel"):
     """
     Set the color palette
 
     Parameters
     ----------
-    style: {"koel", "warm"), optional
+    style: {"koel", "warm"}, optional
         Color palette to pick. Default = "koel"
 
     Returns
@@ -132,7 +140,9 @@ def get_color_palette(style="koel", reverse=False, offset=0):
     try:
         cbs_palette = CBS_PALETS[style]
     except KeyError:
-        raise KeyError(f"Did not recognised style {style}. Should be one of {CBS_PALETS.keys()}")
+        raise KeyError(
+            f"Did not recognised style {style}. Should be one of {CBS_PALETS.keys()}"
+        )
     else:
         cbs_color_cycle = mpl.cycler(color=cbs_palette)
 
@@ -146,11 +156,11 @@ def update_color_palette(reverse=False, offset=0):
     Parameters
     ----------
     reverse: bool
-        inverteer de color set
+        Inverteer de color set
     offset: int
-        geef een offset
+        Geef een offset
     """
-    plot_colors = mpl.rcParams.get('axes.prop_cycle')
+    plot_colors = mpl.rcParams.get("axes.prop_cycle")
     cbs_palette = list(plot_colors.by_key().values())[0]
     if reverse:
         cbs_palette = cbs_palette[-1::-1]
@@ -158,7 +168,7 @@ def update_color_palette(reverse=False, offset=0):
         offset = offset % len(cbs_palette)
         cbs_palette = cbs_palette[offset:] + cbs_palette[:offset]
     cbs_color_cycle = mpl.cycler(color=cbs_palette)
-    param = {'axes.prop_cycle': cbs_color_cycle}
+    param = {"axes.prop_cycle": cbs_color_cycle}
     mpl.rcParams.update(param)
 
 
