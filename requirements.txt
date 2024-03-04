@@ -1,6 +1,4 @@
 matplotlib
 numpy
-sphinx
-seaborn
-setuptools
 pandas
+seaborn
