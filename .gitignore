@@ -59,3 +59,5 @@ MANIFEST
 /data/htmlviewer_testdata/line_with_dates_rendered.html
 /install.ps1
 /install_exe.ps1
+# ignore for master, not for js_queries branch
+/src/cbsplotlib/js_queries/
