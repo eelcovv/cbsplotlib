@@ -122,11 +122,10 @@ def parse_args(args):
     """Parse command line parameters
 
     Args:
-      args (List[str]): command line parameters as list of strings
-          (for example  ``["--help"]``).
+      args (List[str]): command line parameters as a list of strings, for example, ``["--help"]``.
 
     Returns:
-      :obj:`argparse.Namespace`: command line parameters namespace
+      `argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
         description="Tool om latex tabulars in xls files om te zetten"
@@ -196,7 +195,10 @@ def setup_logging(loglevel):
     """
     log_format = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(
-        level=loglevel, stream=sys.stdout, format=log_format, datefmt="%Y-%m-%d %H:%M:%S"
+        level=loglevel,
+        stream=sys.stdout,
+        format=log_format,
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
 

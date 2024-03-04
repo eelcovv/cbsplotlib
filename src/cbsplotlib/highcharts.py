@@ -249,7 +249,7 @@ class CBSHighChart:
             )
             return
 
-        # get the data here, if take from the argument
+        # get the data here or take from the argument
         if data is None:
             _logger.info(f"Reading data from {input_file_name}")
             self.data_df = self.get_data(
@@ -278,7 +278,7 @@ class CBSHighChart:
 
             self.modify_highchart()
 
-            # finally write the result to file
+            # Finally, write the result to file
             out_file = write_to_json_file(
                 output=self.output,
                 output_directory=self.output_directory,
@@ -286,6 +286,7 @@ class CBSHighChart:
                 input_file_name=self.input_file_name,
                 chart_type=self.chart_type,
             )
+            _logger.info(f"Successfully wrote to {out_file}")
         else:
             _logger.info(
                 "The data was read successfully. To create the highcharts, call the "
@@ -359,7 +360,7 @@ class CBSHighChart:
             try:
                 output[key_1][key_2][key_3] = value
             except KeyError:
-                # voor de laatste level kan het zijn dat de entry nog niet bestaat. Maak het gewoon
+                # Voor de laatste level kan het zijn dat de entry nog niet bestaat. Maak het gewoon
                 _logger.debug(f"Adding new key [{key_2}][{key_3}]")
                 output[key_1][key_2] = {}
                 output[key_1][key_2][key_3] = value
@@ -624,20 +625,18 @@ class CBSHighChart:
             mee gegeven, dan is dit <PACKAGELOCATIE>/Path(cbs_hc_defaults)
         defaults_file_name: str of None
             Naam van de defaults input file. Als niet gegeven wordt deze gebaseerd op *chart_type*
-        cbs_hc_defaults: str
-            Naam van de default directory in de package src.
         """
 
         if defaults_directory is None:
             if defaults_file_name is None:
-                # er is geen default filenaam meegegeven. Ga ervan uit dat we de default uit de
-                # package folder halen
+                # Er is geen default filenaam meegegeven.
+                # Ga ervan uit dat we de default uit de package folder halen
                 defaults_directory = Path(__file__).parent / Path(HC_DEFAULTS_DIRECTORY)
         else:
             defaults_directory = Path(defaults_directory)
 
         if defaults_file_name is None:
-            # alde default filename None is dan is default directory sowieso gezet
+            # Als de default filename None is, dan is default directory sowieso gezet.
             defaults_file_name = defaults_directory / Path(chart_type + ".json")
         else:
             # Default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven
@@ -660,6 +659,7 @@ class CBSHighChart:
         except FileNotFoundError as err:
             try:
                 _logger.debug(
+                    f"{err}\n"
                     f"Failed reading {defaults_file_name}. Try again with .json suffix"
                 )
                 defaults_file_name = defaults_file_name.with_suffix(".json")
@@ -756,7 +756,7 @@ class CBSHighChart:
             # als data_df een Series is maken we er een dataframe van.
             data_df = self.data_df.to_frame()
         except AttributeError:
-            # het was al een dataframe. geen probleem, ga gewoon door.
+            # Het was al een dataframe. Geen probleem, ga gewoon door.
             data_df = self.data_df
 
         series = list()
@@ -774,7 +774,7 @@ class CBSHighChart:
                     # integer value kan je niet naar json schrijven, dus maak er een float van
                     value = float(value)
                 except TypeError:
-                    # als type cast naar float niet lukt is het een string. Ook goed
+                    # Als type cast naar float niet lukt, is het een string. Ook goed
                     pass
 
                 if pd.isnull(value):
