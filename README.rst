@@ -9,7 +9,7 @@ Een library om CBS plaatjes in de huisstijl te maken
 Omschrijving
 ============
 
-Moet nog komen
+Met de cbsplotlib library kan je default instellingen laden om matplotlib plaatjes in de CBS-huisstijl te maken
 
 
 

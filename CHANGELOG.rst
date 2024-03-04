@@ -2,8 +2,12 @@
 Changelog
 =========
 
+Version 0.5.0
+=============
+- Eerste releaseversie via pypi
+
 Version 0.4.3
-===========
+=============
 - Categorieën nu altijd als str geschreven
 - Nieuw voorbeeld met lijnplot 
 - Installer update for pyscaffold 4
@@ -15,7 +19,7 @@ Version 0.4
 - Html viewer toegevoegd
 
 Version 0.3.1
-===========
+=============
 
 - Diverse nieuwe highcharts standaard templates toegevoegd
 - Kleuren automatisch geladen bij maken CBSSettings
