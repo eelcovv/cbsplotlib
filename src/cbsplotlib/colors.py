@@ -112,7 +112,7 @@ def set_cbs_colors():
     mcolors.get_named_colors_mapping().update(CBS_COLORS)
 
 
-def get_color_palette(style="koel"):
+def get_color_palette(style="koel", reverse=False, offset=0):
     """
     Set the color palette
 
@@ -128,7 +128,7 @@ def get_color_palette(style="koel"):
 
     Notes
     -----
-    in order to set the cbs color palette default::
+    In order to set the cbs color palette default::
 
         import matplotlib as mpl
         from cbs_utils.plotting import get_color_palette
@@ -136,6 +136,9 @@ def get_color_palette(style="koel"):
     """
 
     set_cbs_colors()
+
+    if reverse:
+        update_color_palette(reverse=reverse, offset=offset)
 
     try:
         cbs_palette = CBS_PALETS[style]

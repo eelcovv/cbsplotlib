@@ -13,6 +13,10 @@ _logger = logging.getLogger(__name__)
 
 RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
 
+PT_PER_INCHE = 72.27
+INCHES_PER_PT = 1 / PT_PER_INCHE
+GOLDEN_MEAN = (math.sqrt(5) - 1) / 2
+
 
 class CBSPlotSettings(object):
     """
@@ -63,30 +67,24 @@ class CBSPlotSettings(object):
         offset: int = 0,
     ):
 
-        # set scale factor
-        inches_per_pt = 1 / 72.27
-
         self.number_of_figures_rows = number_of_figures_rows
         self.number_of_figures_cols = number_of_figures_cols
         self.text_width_in_pt = text_width_in_pt
         self.text_height_in_pt = text_height_in_pt
         self.text_margin_bot_in_inch = text_margin_bot_in_inch
 
-        self.text_height = (text_height_in_pt * inches_per_pt,)
-        self.text_width = text_width_in_pt * inches_per_pt
+        self.text_height = (text_height_in_pt * INCHES_PER_PT,)
+        self.text_width = text_width_in_pt * INCHES_PER_PT
 
-        inches_per_pt = 1 / 72.27
         text_width_in_pt = (
             392.64813  # add the line \showthe\columnwidth above you figure in latex
         )
         text_height_in_pt = (
             693  # add the line \showthe\columnwidth above you figure in latex
         )
-        text_height = text_height_in_pt * inches_per_pt
-        text_width = text_width_in_pt * inches_per_pt
+        text_height = text_height_in_pt * INCHES_PER_PT
+        text_width = text_width_in_pt * INCHES_PER_PT
         text_margin_bot = 1.0  # margin in inch
-
-        golden_mean = (math.sqrt(5) - 1) / 2
 
         if fig_width_in_inch is not None:
             self.fig_width = fig_width_in_inch
@@ -96,7 +94,7 @@ class CBSPlotSettings(object):
         if fig_height_in_inch is not None:
             self.fig_height = fig_height_in_inch
         elif ratio_option == "golden_ratio":
-            self.fig_height = self.fig_width * golden_mean
+            self.fig_height = self.fig_width * GOLDEN_MEAN
         elif ratio_option == "equal":
             self.fig_height = self.fig_width
         elif ratio_option == "from_rows":
