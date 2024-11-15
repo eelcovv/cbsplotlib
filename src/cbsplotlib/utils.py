@@ -1,7 +1,10 @@
+"""
+Utility functions
+"""
 import logging
 from typing import List
 
-import matplotlib.patches as mpatches
+import matplotlib.patches as m_patches
 import matplotlib.transforms as trn
 import numpy as np
 from matplotlib.path import Path as mPath
@@ -51,7 +54,6 @@ def add_values_to_bars(
         Horizontal alignment of the numbers. Default = "center"
     verticalalignment: str, optional
         Vertical alignment of the numbers Default = "center"
-    ):
     """
 
     # voeg percentage to aan bars
@@ -169,7 +171,7 @@ def add_cbs_logo_to_plot(
     if axes is not None:
         tb = trn.Bbox.from_bounds(x0, y0, ww, hh).transformed(axes.transAxes)
 
-        # Calculate the bottom left corner of the figure in Figure coordinates (pt of bottom left corner)
+        # Calculate the bottom left corner of the figure in Figure coordinates (pt of the bottom left corner)
         x0 = tb.x0 + (margin_x_in_mm / 25.4) * fig.dpi
         y0 = tb.y0 + (margin_y_in_mm / 25.4) * fig.dpi
     else:
@@ -197,7 +199,7 @@ def add_cbs_logo_to_plot(
                 color = edgecolor
             else:
                 color = fillcolor
-            poly = mpatches.PathPatch(
+            poly = m_patches.PathPatch(
                 tr_path, fc=color, linewidth=0, zorder=zorder, transform=trans
             )
             poly.set_clip_on(False)
@@ -328,8 +330,8 @@ def get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
         ),
     ]
 
-    # de punten van de S, beginnende linksboven, tegen de klok in. Eerst array is de
-    # buitenkant, tweede array is de binnenkant
+    # De punten van de S, beginnende linksboven, tegen de klok in.
+    # Eerst array is de buitenkant, tweede array is de binnenkant
     points_s = [
         np.array(
             list(
@@ -417,7 +419,7 @@ def add_axis_label_background(
         The y-coordinate of the bottom left corner of the gray square in axes fraction coordinates.
         Default = None
     loc : str, optional
-        The location of the gray box. Only "east" and "south" implemented.
+        The location of the gray box. Only "east" and "south" are implemented.
         Default = "east"
     radius_corner_in_mm : float, optional
         The radius of the corner in mm. Default = 1
@@ -426,7 +428,7 @@ def add_axis_label_background(
     logo_margin_y_in_mm : float, optional
         The margin between the bottom of the Figure and the logo in mm. Default = 1
     add_logo : bool, optional
-        Whether or not to add the CBS logo to the plot.
+        Whether to add the CBS logo to the plot.
         Default = True
     aspect : float, optional
         The aspect ratio of the plot. If None, the aspect ratio of the Figure is used.
@@ -471,13 +473,13 @@ def add_axis_label_background(
             f"Location loc = {loc} is not recognised. Only east and south implemented"
         )
 
-    # width and height of the grey box area
+    # width and height of the gray box area
     width = x1 - x0
     height = y1 - y0
 
     _logger.debug(f"Adding rectangle with width {width} and height {height}")
 
-    # eerste vierkant zorgt voor rechte hoeken aan de rechter kant
+    # eerste vierkant zorgt voor rechte hoeken aan de rechterkant
     if loc == "east":
         rec_p = (x0 + width / 2, y0)
         rec_w = width / 2
@@ -489,7 +491,7 @@ def add_axis_label_background(
     else:
         raise AssertionError(f"This should not happen")
 
-    p1 = mpatches.Rectangle(
+    p1 = m_patches.Rectangle(
         rec_p,
         width=rec_w,
         height=rec_h,
@@ -501,7 +503,7 @@ def add_axis_label_background(
     p1.set_transform(axes.transAxes)
     p1.set_clip_on(False)
 
-    # tweede vierkant zorgt voor ronde hoeken aan de linker kant
+    # tweede vierkant zorgt voor ronde hoeken aan de linkerkant
     radius_in_inch = radius_corner_in_mm / 25.4
     xshift = radius_in_inch / bbox_axis_fig.width
     yshift = radius_in_inch / bbox_axis_fig.height
@@ -510,7 +512,7 @@ def add_axis_label_background(
     if aspect is None:
         aspect = bbox_axis_fig.height / bbox_axis_fig.width
     _logger.debug(f"Using aspect ratio {aspect}")
-    p2 = mpatches.FancyBboxPatch(
+    p2 = m_patches.FancyBboxPatch(
         (x0 + xshift, y0 + yshift),
         width=width - 2 * xshift,
         height=height - 2 * yshift,
@@ -525,9 +527,6 @@ def add_axis_label_background(
     p2.set_transform(axes.transAxes)
     p2.set_clip_on(False)
 
-    # add_artist wordt niet door mpld3 herkend. add_patch wel. Wel chechekn of het ong wel goed gaat
-    # axes.add_artist(p1)
-    # axes.add_artist(p2)
     axes.add_patch(p1)
     axes.add_patch(p2)
 
@@ -555,7 +554,7 @@ def clean_up_artists(axis, artist_list):
     """
     for artist in artist_list:
         try:
-            # fist attempt: try to remove collection of contours for instance
+            # fist attempt: try to remove a collection of contours for instance
             while artist.collections:
                 for col in artist.collections:
                     artist.collections.remove(col)
@@ -617,8 +616,8 @@ def swap_legend_boxes(handles: List, labels: List, n_cols: int):
     new_labels : list of str
         The rearranged list of legend labels.
     """
-    new_handles = [h for h in handles]
-    new_labels = [l for l in labels]
+    new_handles = [hh for hh in handles]
+    new_labels = [ll for ll in labels]
 
     n_rows_per_col = {}
 
