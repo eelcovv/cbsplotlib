@@ -14,7 +14,7 @@ def add_values_to_bars(
     axis,
     type="bar",
     position="c",
-    format="{:.0f}",
+    label_format="{:.0f}",
     x_offset=0,
     y_offset=0,
     color="k",
@@ -24,17 +24,21 @@ def add_values_to_bars(
     """
     Add the values of the bars as number in the center
 
+    This function adds the numerical value of each bar to the bar itself. By default, it will be
+    centered on the bar, but you can change this by using the `position` parameter. The value is
+    formatted according to the `format` parameter.
+
     Parameters
     ----------
-    axis : `mpl.pyplot.axes.Axes` object
+    axis: `mpl.pyplot.axes.Axes` object
         Axis containing the bar plot
+    type: {"bar", "barh"}
+        Direction of the bars. Default = "bar", meaning vertical bars. Alternatively, you need to
+        specify "barh" for horizontal bars.
     position: {"c", "t", "l", "r", "b"}, optional
         Location of the numbers, where "c" is center, "t" is top, "l" is left, "r" is right and "b"
         is bottom. Default = "c"
-    type: {"bar", "barh"}
-        Direction of the bars. Default = "bar", meaning vertical bars. Alternatively you need to
-        specify "barh" for horizontal bars.
-    format: str, optional
+    label_format: str, optional
         Formatter to use for the numbers. Default = "{:.0f}" (remove digits from float)
     x_offset: float, optional
         x offset in pt. Default = 0
@@ -52,26 +56,37 @@ def add_values_to_bars(
     # voeg percentage to aan bars
     for patch in axis.patches:
         b = patch.get_bbox()
+        # calculate the center of the bar
         cx = (b.x1 + b.x0) / 2
         cy = (b.y1 + b.y0) / 2
+
+        # calculate the height and width of the bar
         hh = b.y1 - b.y0
         ww = b.x1 - b.x0
+
+        # determine the position of the text
         if position == "c":
+            # center
             (px, py) = (cx, cy)
         elif position == "t":
+            # top
             (px, py) = (cx, cy + hh / 2)
         elif position == "b":
+            # bottom
             (px, py) = (cx, cy - hh / 2)
         elif position == "l":
+            # left
             (px, py) = (cx - ww / 2, cy)
         elif position == "r":
+            # right
             (px, py) = (cx + ww / 2, cy)
         else:
             raise ValueError(f"position = {position} not recognised. Please check")
 
-        # add offsets
+        # add the offsets
         (px, py) = (px + x_offset, py + y_offset)
 
+        # determine the value of the bar
         if type == "bar":
             value = hh
         elif type == "barh":
@@ -80,8 +95,9 @@ def add_values_to_bars(
             raise ValueError(f"type = {type} not recognised. Please check")
 
         # make the value string using the format specifier
-        value_string = format.format(value)
+        value_string = label_format.format(value)
 
+        # add the value to the plot
         axis.annotate(
             value_string,
             (px, py),
@@ -104,8 +120,42 @@ def add_cbs_logo_to_plot(
     fillcolor="cbs:highchartslichtgrijs",
     edgecolor="cbs:logogrijs",
 ):
-    # maak een box met de coordinaten van de linker onderhoek van het grijze vierkant in axis
-    # fractie coordinaten
+    """
+    Add the CBS logo to the plot.
+
+    Parameters
+    ----------
+    fig : `matplotlib.figure.Figure` object
+        The total canvas of the Figure
+    axes : `matplotlib.axes.Axes` object, optional
+        The axes of the plot to add a box
+    margin_x_in_mm : float, optional
+        The margin between the left of the Figure and the logo in mm. Default = 6.0
+    margin_y_in_mm : float, optional
+        The margin between the bottom of the Figure and the logo in mm. Default = 6.0
+    x0 : float, optional
+        The x-coordinate of the bottom left corner of the gray square in axis fraction coordinates.
+        Default = 0
+    y0 : float, optional
+        The y-coordinate of the bottom left corner of the gray square in axis fraction coordinates.
+        Default = 0
+    width : float, optional
+        The width of the gray square in axis fraction coordinates. Default = 1
+    height : float, optional
+        The height of the gray square in axis fraction coordinates. Default = 1
+    zorder_start : int, optional
+        The zorder of the first path of the logo. The zorders of the other paths are incremented by 1.
+        Default = 1
+    fillcolor : str, optional
+        The fill color of the logo. Default = "cbs:highchartslichtgrijs"
+    edgecolor : str, optional
+        The edge color of the logo. Default = "cbs:logogrijs"
+
+    Returns
+    -------
+    None
+
+    """
     if width is None:
         ww = 1
     else:
@@ -118,7 +168,7 @@ def add_cbs_logo_to_plot(
     if axes is not None:
         tb = trn.Bbox.from_bounds(x0, y0, ww, hh).transformed(axes.transAxes)
 
-        # bereken de linker onderhoek van het figure in Figure coordinaten (pt van linker onderhoek)
+        # Calculate the bottom left corner of the figure in Figure coordinates (pt of bottom left corner)
         x0 = tb.x0 + (margin_x_in_mm / 25.4) * fig.dpi
         y0 = tb.y0 + (margin_y_in_mm / 25.4) * fig.dpi
     else:
@@ -157,26 +207,28 @@ def add_cbs_logo_to_plot(
             zorder += 1
 
 
-def get_cbs_logo_points(logo_width_in_mm=3.234, logo_height_in_mm=4.995, rrcor=0.171):
+def get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
     """
-    Maak een array met de letters van het CBS logog
+    Generate the CBS logo points as a list of numpy arrays.
+
+    This function returns the points required to draw the CBS logo,
+    consisting of the letters 'C', 'B', and 'S'. Each letter is represented
+    by a set of points describing its outline and inner details, using
+    matplotlib's path codes for path drawing.
 
     Parameters
     ----------
-    logo_width_in_mm: float
-        Breeedte van het logo
-    logo_height_in_mm: float
-        Hoogte van het logo
-    rrcor: float
-        Radius of corners
+    logo_width_in_mm : float, optional
+        The width of the logo in millimeters. Default is 3.234.
+    rrcor : float, optional
+        The radius of the rounded corners in millimeters. Default is 0.171.
 
     Returns
     -------
     list
-        List met 3 Nx2 arrays
-
+        A list containing numpy arrays. Each numpy array represents a part
+        of a letter and contains point coordinates and path codes for the logo.
     """
-
     ww = logo_width_in_mm
 
     # punten C, beginnen links onder, tegen klok in, binnen en buiten kant
@@ -342,38 +394,55 @@ def add_axis_label_background(
     logo_fillcolor="cbs:highchartslichtgrijs",
     logo_edgecolor="cbs:logogrijs",
 ):
+
     """
-    Add a background to the axis label
+    Add a background to the axis labels.
 
     Parameters
     ----------
-    fig : `mpl.figure.Figure` object
+    fig : `matplotlib.figure.Figure` object
         The total canvas of the Figure
-    axes : `mpl.axes.Axes` object
+    axes : `matplotlib.axes.Axes` object
         The axes of the plot to add a box
-    alpha: float, optional
-        Transparency of the box. Default = 1 (not transparent)
-    margin: float, optional
-        The margin between the labels and the side of the gray box
-    loc: {"east", "south"}
-        Location of the background. Default = "east" (left to y-axis. Only "east" and "south" are
-        implemented
-    add_logo: bool, optional
-        If true, add the cbs logo. Default = True
-    radius_corner_in_mm: float, optional
-        Radius of the corner in mm. Default = 2
-    logo_margin_x_in_mm: float
-        Distance from bottom of logo in mm. Default = 2
-    logo_margin_y_in_mm=2,
-        Distance from left of logo in mm. Default = 2
-    backgroundcolor: str, optional
-        Color of the grey square. Default is "cbs:lichtgrijs"
-    logo_edgecolor: str, optional
-        Color of the logo edge. Default "cbs:logogrijs"
-    """
+    alpha : float, optional
+        The transparency of the background.
+        Default = 1
+    margin : float, optional
+        The margin between the axis labels and the border of the box in axes fraction coordinates.
+        Default = 0.05
+    x0 : float, optional
+        The x-coordinate of the bottom left corner of the gray square in axes fraction coordinates.
+        Default = None
+    y0 : float, optional
+        The y-coordinate of the bottom left corner of the gray square in axes fraction coordinates.
+        Default = None
+    loc : str, optional
+        The location of the gray box. Only "east" and "south" implemented.
+        Default = "east"
+    radius_corner_in_mm : float, optional
+        The radius of the corner in mm. Default = 1
+    logo_margin_x_in_mm : float, optional
+        The margin between the left of the Figure and the logo in mm. Default = 1
+    logo_margin_y_in_mm : float, optional
+        The margin between the bottom of the Figure and the logo in mm. Default = 1
+    add_logo : bool, optional
+        Whether or not to add the CBS logo to the plot.
+        Default = True
+    aspect : float, optional
+        The aspect ratio of the plot. If None, the aspect ratio of the Figure is used.
+        Default = None
+    backgroundcolor : str, optional
+        The background color of the plot. Default = "cbs:highchartslichtgrijs"
+    logo_fillcolor : str, optional
+        The fill color of the logo. Default = "cbs:highchartslichtgrijs"
+    logo_edgecolor : str, optional
+        The edge color of the logo. Default = "cbs:logogrijs"
 
-    # the bounding box with respect to the axis in Figure coordinates
-    # (0 is bottom left canvas, 1 is top right)
+    Returns
+    -------
+    None
+
+    """
     bbox_axis_fig = axes.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
 
     # the bounding box with respect to the axis coordinates
@@ -481,7 +550,7 @@ def clean_up_artists(axis, artist_list):
     """
     try to remove the artists stored in the artist list belonging to the 'axis'.
     :param axis: clean artists belonging to these axis
-    :param artist_list: list of artist to remove
+    :param artist_list: list of artists to remove
     :return: nothing
     """
     for artist in artist_list:
