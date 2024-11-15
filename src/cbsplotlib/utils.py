@@ -12,7 +12,7 @@ RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
 
 def add_values_to_bars(
     axis,
-    type="bar",
+    bar_type="bar",
     position="c",
     label_format="{:.0f}",
     x_offset=0,
@@ -32,7 +32,7 @@ def add_values_to_bars(
     ----------
     axis: `mpl.pyplot.axes.Axes` object
         Axis containing the bar plot
-    type: {"bar", "barh"}
+    bar_type: {"bar", "barh"}
         Direction of the bars. Default = "bar", meaning vertical bars. Alternatively, you need to
         specify "barh" for horizontal bars.
     position: {"c", "t", "l", "r", "b"}, optional
@@ -87,12 +87,12 @@ def add_values_to_bars(
         (px, py) = (px + x_offset, py + y_offset)
 
         # determine the value of the bar
-        if type == "bar":
+        if bar_type == "bar":
             value = hh
-        elif type == "barh":
+        elif bar_type == "barh":
             value = ww
         else:
-            raise ValueError(f"type = {type} not recognised. Please check")
+            raise ValueError(f"type = {bar_type} not recognised. Please check")
 
         # make the value string using the format specifier
         value_string = label_format.format(value)
