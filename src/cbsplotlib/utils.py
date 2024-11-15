@@ -589,7 +589,7 @@ def format_thousands_label(value: float, _: object) -> str:
     Returns
     -------
     str
-        The formatted value with spaces as thousand separators.
+        The formatted value with spaces as a thousand separator.
 
     Examples
     --------
