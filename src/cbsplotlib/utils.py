@@ -575,26 +575,30 @@ def clean_up_artists(axis, artist_list):
             pass
 
 
-def format_thousand_label(
-    label: float, label_index: int
-) -> str:
+def format_thousands_label(value: float, _) -> str:
     """
-    Format a value `x` with a thousand separator. This is a custom function
-    for use with `matplotlib.ticker.FuncFormatter`.
+    Format a value with a thousand separator.
 
     Parameters
     ----------
-    label : float
-        Value to format.
-    label_index : int
-        Current tick position (not used).
+    value : float
+        The value to format.
+    _ : unused
+        An unused parameter, only present to match the signature for a FormatStrFormatter.
 
     Returns
     -------
     str
-        Formatted string.
+        The formatted value.
+
+    Examples
+    --------
+    >>> format_thousands_label(1234, None)
+    '1 234'
+    >>> format_thousands_label(1234567.89, None)
+    '1 234 5679'
     """
-    return "{:0,d}".format(int(label)).replace(",", " ")
+    return "{:0,d}".format(int(value)).replace(",", " ")
 
 
 def swap_legend_boxes(
