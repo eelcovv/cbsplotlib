@@ -2,7 +2,7 @@
 Utility functions
 """
 import logging
-from typing import List
+from typing import List, Tuple, Dict
 
 import matplotlib.patches as m_patches
 import matplotlib.transforms as trn
@@ -575,30 +575,35 @@ def clean_up_artists(axis, artist_list):
             pass
 
 
-def format_thousand_label(label, label_index):
+def format_thousand_label(
+    label: float, label_index: int
+) -> str:
     """
     Format a value `x` with a thousand separator. This is a custom function
     for use with `matplotlib.ticker.FuncFormatter`.
 
-    Args:
-        label (float): Value to format.
-        label_index (int): Current tick position (not used).
+    Parameters
+    ----------
+    label : float
+        Value to format.
+    label_index : int
+        Current tick position (not used).
 
-    Returns:
-        str: Formatted string.
+    Returns
+    -------
+    str
+        Formatted string.
     """
     return "{:0,d}".format(int(label)).replace(",", " ")
 
 
-def swap_legend_boxes(handles: List, labels: List, n_cols: int):
+def swap_legend_boxes(
+    handles: List[m_patches.Patch], labels: List[str], n_cols: int
+) -> Tuple[List[m_patches.Patch], List[str]]:
     """
-    Rearrange legend handles and labels of the legend to match the order of the first column of the legend.
+    Rearrange legend handles and labels to match the order of the first row.
 
-    In matplotlib the legend handles and labels are filled according to the first column, then the second, etc.
-
-    In highcharts they first fill the first row, then the second, etc.
-
-    In this function we convert the matplotlib handles and labels into the following highcharts:
+    In matplotlib, legend handles and labels are filled column-wise, while in highcharts, they are filled row-wise.
 
     Parameters
     ----------
@@ -611,40 +616,33 @@ def swap_legend_boxes(handles: List, labels: List, n_cols: int):
 
     Returns
     -------
-    new_handles : list of matplotlib.patches.Patch
+    reordered_handles : list of matplotlib.patches.Patch
         The rearranged list of legend handles.
-    new_labels : list of str
+    reordered_labels : list of str
         The rearranged list of legend labels.
     """
-    new_handles = [hh for hh in handles]
-    new_labels = [ll for ll in labels]
+    reordered_handles = handles[:]
+    reordered_labels = labels[:]
 
-    n_rows_per_col = {}
+    rows_per_col: Dict[int, int] = {}
 
-    # Determine the number of rows per column
-    # We loop over the labels and count the number of rows per column
-    # This is stored in the dictionary n_rows_per_col
-    for counter, label in enumerate(labels):
-        col = counter % n_cols
-        n_rows_per_col[col] = n_rows_per_col.get(col, 0) + 1
+    # Calculate number of rows per column
+    for idx, _ in enumerate(labels):
+        col = idx % n_cols
+        rows_per_col[col] = rows_per_col.get(col, 0) + 1
 
-    # index refers to the new position
-    index = 0
-    row = 0
-    for counter, (handle, label) in enumerate(zip(handles, labels)):
+    current_index = 0
+    current_row = 0
+    for idx, (handle, label) in enumerate(zip(handles, labels)):
+        reordered_handles[current_index] = handle
+        reordered_labels[current_index] = label
 
-        # copy handle and label to new order
-        new_handles[index] = handle
-        new_labels[index] = label
-
-        # update col, the numbers of rows in that column, and the next index to write to
-        col = counter % n_cols
-        n_rows = n_rows_per_col[col]
-        index += n_rows
+        col = idx % n_cols
+        num_rows = rows_per_col[col]
+        current_index += num_rows
 
         if col == n_cols - 1:
-            # we have reached the last column, go to the next row and start again
-            row += 1
-            index = row
+            current_row += 1
+            current_index = current_row
 
-    return new_handles, new_labels
+    return reordered_handles, reordered_labels
