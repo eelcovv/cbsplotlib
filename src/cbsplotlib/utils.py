@@ -575,7 +575,7 @@ def clean_up_artists(axis, artist_list):
             pass
 
 
-def format_thousands_label(value: float, _) -> str:
+def format_thousands_label(value: float, _: object) -> str:
     """
     Format a value with a thousand separator.
 
@@ -583,20 +583,20 @@ def format_thousands_label(value: float, _) -> str:
     ----------
     value : float
         The value to format.
-    _ : unused
+    _ : object
         An unused parameter, only present to match the signature for a FormatStrFormatter.
 
     Returns
     -------
     str
-        The formatted value.
+        The formatted value with spaces as thousand separators.
 
     Examples
     --------
     >>> format_thousands_label(1234, None)
     '1 234'
     >>> format_thousands_label(1234567.89, None)
-    '1 234 5679'
+    '1 234 568'
     """
     return "{:0,d}".format(int(value)).replace(",", " ")
 
