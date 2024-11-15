@@ -1,6 +1,6 @@
 import logging
-
 from typing import List
+
 import matplotlib.patches as mpatches
 import matplotlib.transforms as trn
 import numpy as np
