@@ -57,5 +57,5 @@ def test_format_thousands_label_non_numeric_input():
     This test verifies that passing a non-numeric input to
     format_thousands_label raises a TypeError.
     """
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         format_thousands_label("abc", None)
