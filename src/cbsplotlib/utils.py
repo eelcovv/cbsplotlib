@@ -596,7 +596,7 @@ def format_thousands_label(value: float, _: object) -> str:
     >>> format_thousands_label(1234, None)
     '1 234'
     >>> format_thousands_label(1234567.89, None)
-    '1 234 568'
+    '1 234 567`
     """
     return "{:0,d}".format(int(value)).replace(",", " ")
 
