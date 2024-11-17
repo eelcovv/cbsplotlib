@@ -628,6 +628,9 @@ def swap_legend_boxes(
     reordered_handles = handles[:]
     reordered_labels = labels[:]
 
+    if len(reordered_labels) != len(reordered_handles):
+        raise ValueError("Number of handles and labels must be equal.")
+
     rows_per_col: Dict[int, int] = {}
 
     # Calculate number of rows per column
