@@ -2,38 +2,43 @@
 Changelog
 =========
 
+Version 0.5.1
+=============
+- Added two new utility functions: wap_legend_positions and format_thousands_label
+- Added a few more unit tests
+
 Version 0.5.0
 =============
-- Eerste releaseversie via pypi
+- First release version via pypi
 
 Version 0.4.3
 =============
-- Categorieën nu altijd als str geschreven
-- Nieuw voorbeeld met lijnplot 
+- Categories now always written as str
+- New example with line plot
 - Installer update for pyscaffold 4
-- Bugfix na update
+- Bug fix after update
 
 Version 0.4
 ===========
 
-- Html viewer toegevoegd
+- Added HTML viewer
 
 Version 0.3.1
 =============
 
-- Diverse nieuwe highcharts standaard templates toegevoegd
-- Kleuren automatisch geladen bij maken CBSSettings
+- Added several new highcharts standard templates
+- Colors automatically loaded when creating CBSSettings
 
 
 Version 0.2
 ===========
 
-- Een *highcharts* module toegevoegd omdat pandas dataframes in highcharts project json files om
-  te zetten.
-- De project json files kan nu in highcharts ingelezen worden en als highcharts geëxporteerd.
+- Added a *highcharts* module because pandas converts data frames into highcharts project json files
+  to put.
+- The project json files can now be read into highcharts and exported as highcharts.
 
 
 Version 0.1
 ===========
 
-- Eerste opzet cbsplotlib op basis van cbs_utils.plotting
+- First setup of cbsplotlib based on cbs_utils.plotting
