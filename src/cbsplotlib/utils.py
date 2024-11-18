@@ -11,19 +11,19 @@ from matplotlib.path import Path as mPath
 
 _logger = logging.getLogger(__name__)
 
-RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
+RATIO_OPTIONS = {'golden_ratio', 'equal', 'from_rows'}
 
 
 def add_values_to_bars(
-    axis,
-    bar_type="bar",
-    position="c",
-    label_format="{:.0f}",
-    x_offset=0,
-    y_offset=0,
-    color="k",
-    horizontalalignment="center",
-    verticalalignment="center",
+        axis,
+        bar_type='bar',
+        position='c',
+        label_format='{:.0f}',
+        x_offset=0,
+        y_offset=0,
+        color='k',
+        horizontalalignment='center',
+        verticalalignment='center',
 ):
     """
     Add the values of the bars as number in the center
@@ -68,19 +68,19 @@ def add_values_to_bars(
         ww = b.x1 - b.x0
 
         # determine the position of the text
-        if position == "c":
+        if position == 'c':
             # center
             (px, py) = (cx, cy)
-        elif position == "t":
+        elif position == 't':
             # top
             (px, py) = (cx, cy + hh / 2)
-        elif position == "b":
+        elif position == 'b':
             # bottom
             (px, py) = (cx, cy - hh / 2)
-        elif position == "l":
+        elif position == 'l':
             # left
             (px, py) = (cx - ww / 2, cy)
-        elif position == "r":
+        elif position == 'r':
             # right
             (px, py) = (cx + ww / 2, cy)
         else:
@@ -90,9 +90,9 @@ def add_values_to_bars(
         (px, py) = (px + x_offset, py + y_offset)
 
         # determine the value of the bar
-        if bar_type == "bar":
+        if bar_type == 'bar':
             value = hh
-        elif bar_type == "barh":
+        elif bar_type == 'barh':
             value = ww
         else:
             raise ValueError(f"type = {bar_type} not recognised. Please check")
@@ -111,17 +111,17 @@ def add_values_to_bars(
 
 
 def add_cbs_logo_to_plot(
-    fig,
-    axes=None,
-    margin_x_in_mm=6.0,
-    margin_y_in_mm=6.0,
-    x0=0,
-    y0=0,
-    width=None,
-    height=None,
-    zorder_start=1,
-    fillcolor="cbs:highchartslichtgrijs",
-    edgecolor="cbs:logogrijs",
+        fig,
+        axes=None,
+        margin_x_in_mm=6.0,
+        margin_y_in_mm=6.0,
+        x0=0,
+        y0=0,
+        width=None,
+        height=None,
+        zorder_start=1,
+        fillcolor='cbs:highchartslichtgrijs',
+        edgecolor='cbs:logogrijs',
 ):
     """
     Add the CBS logo to the plot.
@@ -178,7 +178,7 @@ def add_cbs_logo_to_plot(
         x0 = (margin_x_in_mm / 25.4) * fig.dpi
         y0 = (margin_y_in_mm / 25.4) * fig.dpi
 
-    all_points = get_cbs_logo_points()
+    all_points = _get_cbs_logo_points()
 
     if axes is not None:
         trans = axes.transAxes
@@ -210,14 +210,14 @@ def add_cbs_logo_to_plot(
             zorder += 1
 
 
-def get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
+def _get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
     """
     Generate the CBS logo points as a list of numpy arrays.
 
     This function returns the points required to draw the CBS logo,
     consisting of the letters 'C', 'B', and 'S'. Each letter is represented
     by a set of points describing its outline and inner details, using
-    matplotlib's path codes for path drawing.
+    matplotlib path codes for path drawing.
 
     Parameters
     ----------
@@ -381,21 +381,21 @@ def get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
 
 
 def add_axis_label_background(
-    fig,
-    axes,
-    alpha=1,
-    margin=0.05,
-    x0=None,
-    y0=None,
-    loc="east",
-    radius_corner_in_mm=1,
-    logo_margin_x_in_mm=1,
-    logo_margin_y_in_mm=1,
-    add_logo=True,
-    aspect=None,
-    backgroundcolor="cbs:highchartslichtgrijs",
-    logo_fillcolor="cbs:highchartslichtgrijs",
-    logo_edgecolor="cbs:logogrijs",
+        fig,
+        axes,
+        alpha=1,
+        margin=0.05,
+        x0=None,
+        y0=None,
+        loc='east',
+        radius_corner_in_mm=1,
+        logo_margin_x_in_mm=1,
+        logo_margin_y_in_mm=1,
+        add_logo=True,
+        aspect=None,
+        backgroundcolor='cbs:highchartslichtgrijs',
+        logo_fillcolor='cbs:highchartslichtgrijs',
+        logo_edgecolor='cbs:logogrijs',
 ):
     """
     Add a background to the axis labels.
@@ -453,7 +453,7 @@ def add_axis_label_background(
         axes.transAxes.inverted()
     )
 
-    if loc == "east":
+    if loc == 'east':
         if x0 is None:
             x0 = bbox_axi.x0 - margin * bbox_axi.width
         x1 = 0
@@ -461,7 +461,7 @@ def add_axis_label_background(
         y0 = 0
         y1 = 1
 
-    elif loc == "south":
+    elif loc == 'south':
         x0 = 0
         x1 = 1
 
@@ -480,11 +480,11 @@ def add_axis_label_background(
     _logger.debug(f"Adding rectangle with width {width} and height {height}")
 
     # eerste vierkant zorgt voor rechte hoeken aan de rechterkant
-    if loc == "east":
+    if loc == 'east':
         rec_p = (x0 + width / 2, y0)
         rec_w = width / 2
         rec_h = height
-    elif loc == "south":
+    elif loc == 'south':
         rec_p = (x0, y0 + height / 2)
         rec_w = width
         rec_h = height / 2
@@ -523,7 +523,7 @@ def add_axis_label_background(
         transform=fig.transFigure,
         zorder=0,
     )
-    p2.set_boxstyle("round", pad=pad)
+    p2.set_boxstyle('round', pad=pad)
     p2.set_transform(axes.transAxes)
     p2.set_clip_on(False)
 
@@ -598,11 +598,11 @@ def format_thousands_label(value: float, _: object) -> str:
     >>> format_thousands_label(1234567.89, None)
     '1 234 567`
     """
-    return "{:0,d}".format(int(value)).replace(",", " ")
+    return '{:0,d}'.format(int(value)).replace(',', ' ')
 
 
 def swap_legend_boxes(
-    handles: List[m_patches.Patch], labels: List[str], n_cols: int
+        handles: List[m_patches.Patch], labels: List[str], n_cols: int
 ) -> Tuple[List[m_patches.Patch], List[str]]:
     """
     Rearrange legend handles and labels to match the order of the first row.
@@ -629,7 +629,7 @@ def swap_legend_boxes(
     reordered_labels = labels[:]
 
     if len(reordered_labels) != len(reordered_handles):
-        raise ValueError("Number of handles and labels must be equal.")
+        raise ValueError('Number of handles and labels must be equal.')
 
     rows_per_col: Dict[int, int] = {}
 
