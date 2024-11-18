@@ -2,11 +2,11 @@
 Changelog
 =========
 
-Version 0.5.2
+Version 0.5.3
 =============
 - Added two new utility functions: wap_legend_positions and format_thousands_label
 - Added a few more unit tests
-- Added import aliases
+- Added import aliases and setup.py
 
 Version 0.5.0
 =============
