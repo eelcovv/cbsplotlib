@@ -93,6 +93,24 @@ def test_update_color_palette_reverse_flag(default_color_cycle):
 
 
 def test_update_color_palette_offset_parameter(default_color_cycle):
+    """
+    Test `update_color_palette` with offset parameter.
+
+    This test sets a color palette with three colors, offsets the color palette by 1,
+    and then checks whether the colors are offset.
+
+    """
+    original_colors = ['red', 'green', 'blue']
+    expected_colors = ['green', 'blue', 'red']
+
+    plt.rcParams['axes.prop_cycle'] = mpl.cycler(color=original_colors)
+
+    update_color_palette(offset=1)
+
+    assert plt.rcParams['axes.prop_cycle'].by_key()['color'] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams['axes.prop_cycle'] = default_color_cycle
     original_colors = ['red', 'green', 'blue']
     expected_colors = ['green', 'blue', 'red']
 
@@ -107,6 +125,30 @@ def test_update_color_palette_offset_parameter(default_color_cycle):
 
 
 def test_update_color_palette_combined_flags(default_color_cycle):
+    """
+    Test that the color palette can be reversed and offset simultaneously.
+
+    Parameters
+    ----------
+    default_color_cycle: cycler
+        The default color cycle fixture.
+
+    Notes
+    -----
+    This test sets a color palette with three colors, reverses the color palette,
+    and then checks whether the colors are reversed.
+    """
+    original_colors = ['red', 'green', 'blue']
+    expected_colors = ['green', 'red', 'blue']
+
+    plt.rcParams['axes.prop_cycle'] = mpl.cycler(color=original_colors)
+
+    update_color_palette(reverse=True, offset=1)
+
+    assert plt.rcParams['axes.prop_cycle'].by_key()['color'] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams['axes.prop_cycle'] = default_color_cycle
     original_colors = ['red', 'green', 'blue']
     expected_colors = ['green', 'red', 'blue']
 
