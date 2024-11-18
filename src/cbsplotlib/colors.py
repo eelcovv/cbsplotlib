@@ -120,6 +120,10 @@ def get_color_palette(style="koel", reverse=False, offset=0):
     ----------
     style: {"koel", "warm"}, optional
         Color palette to pick. Default = "koel"
+    reverse: bool, optional
+        Inverteer de color set. Default = False
+    offset: int, optional
+        Offset de color set. Default = 0
 
     Returns
     -------
@@ -128,11 +132,15 @@ def get_color_palette(style="koel", reverse=False, offset=0):
 
     Notes
     -----
-    In order to set the cbs color palette default::
+    To set the cbs color palette default::
 
         import matplotlib as mpl
         from cbs_utils.plotting import get_color_palette
         mpl.rcParams.update({'axes.prop_cycle': get_color_palette("warm")}
+
+    Args:
+        offset:
+        reverse:
     """
 
     set_cbs_colors()
@@ -168,7 +176,7 @@ def update_color_palette(reverse=False, offset=0):
     if reverse:
         cbs_palette = cbs_palette[-1::-1]
     if offset > 0:
-        offset = offset % len(cbs_palette)
+        offset %= len(cbs_palette)
         cbs_palette = cbs_palette[offset:] + cbs_palette[:offset]
     cbs_color_cycle = mpl.cycler(color=cbs_palette)
     param = {"axes.prop_cycle": cbs_color_cycle}
@@ -176,5 +184,13 @@ def update_color_palette(reverse=False, offset=0):
 
 
 def report_colors():
+    """
+    Logs the names and RGB values of all CBS colors.
+
+    This function iterates over the CBS_COLORS dictionary, logging each color
+    name and its corresponding RGB value in a formatted string.
+    """
+    for name, value in CBS_COLORS.items():
+        _logger.info("{:20s}: {}".format(name, value))
     for name, value in CBS_COLORS.items():
         _logger.info("{:20s}: {}".format(name, value))

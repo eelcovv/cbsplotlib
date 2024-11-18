@@ -1,13 +1,13 @@
+import pytest
 from cbsplotlib.colors import CBS_COLORS_HEX
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
-__author__ = "Eelco van Vliet"
-__copyright__ = "Eelco van Vliet"
-__license__ = "MIT"
+from cbsplotlib.colors import update_color_palette
 
 
 def test_hex():
-    """API Tests"""
-
+    """Test that the CBS colors are correctly converted to hex values"""
     assert CBS_COLORS_HEX["corporateblauw"] == "#271D6C"
     assert CBS_COLORS_HEX["corporateblauw"] == "#271D6C"
     assert CBS_COLORS_HEX["corporatelichtblauw"] == "#00A1CD"
@@ -32,3 +32,90 @@ def test_hex():
     assert CBS_COLORS_HEX["grijs"] == "#666666"
     assert CBS_COLORS_HEX["logogrijs"] == "#929292"
     assert CBS_COLORS_HEX["codekleur"] == "#585858"
+
+
+@pytest.fixture
+def default_color_cycle():
+    """
+    Fixture to store the default color cycle at the start of a test and restore it at the end.
+
+    Returns
+    -------
+    cycler
+        The default color cycle.
+    """
+    return plt.rcParams["axes.prop_cycle"]
+
+
+def test_update_color_palette_reverses_colors(default_color_cycle):
+    """
+    Test that the color palette can be reversed.
+
+    Parameters
+    ----------
+    default_color_cycle: cycler
+        The default color cycle fixture.
+
+    Notes
+    -----
+    This test sets a color palette with three colors, reverses the color palette,
+    and then checks whether the colors are reversed.
+    """
+    original_colors = ["red", "green", "blue"]
+    expected_colors = ["blue", "green", "red"]
+
+    plt.rcParams["axes.prop_cycle"] = LinearSegmentedColormap.from_list(
+        "test", original_colors
+    )
+
+    update_color_palette(reverse=True)
+
+    assert plt.rcParams["axes.prop_cycle"].by_key()["color"] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams["axes.prop_cycle"] = default_color_cycle
+    original_colors = ["red", "green", "blue"]
+    expected_colors = ["blue", "green", "red"]
+
+    plt.rcParams["axes.prop_cycle"] = LinearSegmentedColormap.from_list(
+        "test", original_colors
+    )
+
+    update_color_palette(reverse=True)
+
+    assert plt.rcParams["axes.prop_cycle"].by_key()["color"] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams["axes.prop_cycle"] = default_color_cycle
+
+
+def test_update_color_palette_applies_offset(default_color_cycle):
+    original_colors = ["red", "green", "blue"]
+    expected_colors = ["green", "blue", "red"]
+
+    plt.rcParams["axes.prop_cycle"] = LinearSegmentedColormap.from_list(
+        "test", original_colors
+    )
+
+    update_color_palette(offset=1)
+
+    assert plt.rcParams["axes.prop_cycle"].by_key()["color"] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams["axes.prop_cycle"] = default_color_cycle
+
+
+def test_update_color_palette_reverses_and_applies_offset(default_color_cycle):
+    original_colors = ["red", "green", "blue"]
+    expected_colors = ["blue", "red", "green"]
+
+    plt.rcParams["axes.prop_cycle"] = LinearSegmentedColormap.from_list(
+        "test", original_colors
+    )
+
+    update_color_palette(reverse=True, offset=1)
+
+    assert plt.rcParams["axes.prop_cycle"].by_key()["color"] == expected_colors
+
+    # Restore default color cycle
+    plt.rcParams["axes.prop_cycle"] = default_color_cycle
