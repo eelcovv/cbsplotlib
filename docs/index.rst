@@ -30,6 +30,7 @@ Contents
    :maxdepth: 2
 
    Overview <readme>
+   Contributing <contributing>
    License <license>
    Authors <authors>
    Changelog <changelog>

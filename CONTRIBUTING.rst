@@ -75,7 +75,7 @@ and use Python's built-in web server for a preview in your web browser
 Code Contributions
 ==================
 
-A library based on matplotlib_ is always a bit tricky to contribute to, because it is diffult to test
+A library based on *matplotlib* is always a bit tricky to contribute to, because it is difficult to test
 
 Submit an issue
 ---------------
