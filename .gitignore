@@ -62,3 +62,4 @@ MANIFEST
 /install_exe.ps1
 # ignore for master, not for js_queries branch
 /src/cbsplotlib/js_queries/
+/examples/highcharts/
