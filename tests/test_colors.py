@@ -2,6 +2,7 @@ import pytest
 from cbsplotlib.colors import CBS_COLORS_HEX
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from matplotlib.axes import Axes
 
 from cbsplotlib.colors import update_color_palette
 

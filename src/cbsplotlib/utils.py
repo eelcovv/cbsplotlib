@@ -11,6 +11,9 @@ import matplotlib.transforms as trn
 import numpy as np
 from matplotlib.path import Path as mPath
 
+from matplotlib.axes import Axes
+from matplotlib.artist import Artist
+
 _logger = logging.getLogger(__name__)
 
 RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
@@ -547,41 +550,38 @@ def add_axis_label_background(
         )
 
 
-def clean_up_artists(axis: matplotlib.axes.Axes, artist_list: list) -> None:
+def remove_artists(axis: Axes, artists: list[Artist]) -> None:
     """
-    Clean up artists from the axis by removing collections and text.
+    Remove artists from an axis.
 
     Parameters
     ----------
-    axis : matplotlib.axes.Axes
+    axis : Axes
         The axis from which to remove artists.
-    artist_list : list
+    artists : list[Artist]
         A list of artists to be removed.
 
     Returns
     -------
     None
     """
-    for artist in artist_list:
+    for artist in artists:
+        # Try to remove the artist from the axis
         try:
-            # First attempt: try to remove collections (e.g., contours)
-            while artist.collections:
-                for col in artist.collections:
-                    artist.collections.remove(col)
-                    try:
-                        axis.collections.remove(col)
-                    except ValueError:
-                        pass
-
-                artist.collections = []
-                axis.collections = []
+            artist.remove()
         except AttributeError:
             pass
 
-        # Second attempt: try to remove the text
+        # Try to remove the artist from the axis collections
         try:
-            artist.remove()
-        except (AttributeError, ValueError):
+            while artist.collections:
+                for collection in artist.collections:
+                    artist.collections.remove(collection)
+                    try:
+                        axis.collections.remove(collection)
+                    except ValueError:
+                        pass
+        except AttributeError:
             pass
 
 
@@ -594,21 +594,15 @@ def format_thousands_label(value: float, _: object) -> str:
     value : float
         The value to format.
     _ : object
-        An unused parameter, only present to match the signature for a FormatStrFormatter.
+        Unused parameter, only present to match the signature for a FormatStrFormatter.
 
     Returns
     -------
     str
-        The formatted value with spaces as a thousand separator.
-
-    Examples
-    --------
-    >>> format_thousands_label(1234, None)
-    '1 234'
-    >>> format_thousands_label(1234567.89, None)
-    '1 234 567`
+        Formatted value with spaces as a thousand separator.
     """
-    return "{:0,d}".format(int(value)).replace(",", " ")
+    int_value = int(value)
+    return "{:,}".format(int_value).replace(",", " ")
 
 
 def swap_legend_boxes(
