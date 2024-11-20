@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 0.5.5
+Version 0.5.6
 =============
 - Added two new utility functions: wap_legend_positions and format_thousands_label
 - Added a few more unit tests
