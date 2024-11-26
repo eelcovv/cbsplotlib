@@ -7,78 +7,78 @@ from typing import Union
 
 import pandas as pd
 
-HC_DEFAULTS_DIRECTORY = "cbs_hc_defaults"
+HC_DEFAULTS_DIRECTORY = 'cbs_hc_defaults'
 
 _logger = logging.getLogger(__name__)
 
 PLOT_TYPES = {
-    "line",
-    "area",
-    "column",
-    "bar",
-    "pie",
-    "polar",
-    "choropleth",
-    "bubbleChart",
+    'line',
+    'area',
+    'column',
+    'bar',
+    'pie',
+    'polar',
+    'choropleth',
+    'bubbleChart',
 }
 PLOT_TEMPLATES = {
-    "area_percentage_grouped",
-    "area_stacked_grouped",
-    "bar",
-    "bar_percentage",
-    "bar_stacked",
-    "bar_stacked_percentage",
-    "bar_with_negative_stack",
-    "bubblechart_tourist",
-    "choropleth_youthcare",
-    "column_grouped",
-    "column_grouped_stacked",
-    "column",
-    "column_percentage",
-    "column_stacked_percentage",
-    "line_column_combination_grouped",
-    "line",
-    "pie_donut",
-    "polar_spider_line",
-    "spline_grouped",
+    'area_percentage_grouped',
+    'area_stacked_grouped',
+    'bar',
+    'bar_percentage',
+    'bar_stacked',
+    'bar_stacked_percentage',
+    'bar_with_negative_stack',
+    'bubblechart_tourist',
+    'choropleth_youthcare',
+    'column_grouped',
+    'column_grouped_stacked',
+    'column',
+    'column_percentage',
+    'column_stacked_percentage',
+    'line_column_combination_grouped',
+    'line',
+    'pie_donut',
+    'polar_spider_line',
+    'spline_grouped',
 }
 
 PALETTES = {
-    "Warm": [
-        "#e94c0a",
-        "#ffcc00",
-        "#af0e80",
-        "#f39200",
-        "#53a31d",
-        "#afcb05",
-        "#0058b8",
-        "#00a1cd",
-        "#b23d02",
-        "#e1b600",
-        "#82045e",
-        "#ce7c00",
-        "#488225",
-        "#899d0c",
-        "#163a72",
-        "#0581a2",
+    'Warm': [
+        '#e94c0a',
+        '#ffcc00',
+        '#af0e80',
+        '#f39200',
+        '#53a31d',
+        '#afcb05',
+        '#0058b8',
+        '#00a1cd',
+        '#b23d02',
+        '#e1b600',
+        '#82045e',
+        '#ce7c00',
+        '#488225',
+        '#899d0c',
+        '#163a72',
+        '#0581a2',
     ],
-    "Cold": [
-        "#00a1cd",
-        "#0058b8",
-        "#afcb05",
-        "#53a31d",
-        "#f39200",
-        "#af0e80",
-        "#ffcc00",
-        "#e94c0a",
-        "#0581a2",
-        "#163a72",
-        "#899d0c",
-        "#488225",
-        "#ce7c00",
-        "#82045e",
-        "#e1b600",
-        "#b23d02",
+    'Cold': [
+        '#00a1cd',
+        '#0058b8',
+        '#afcb05',
+        '#53a31d',
+        '#f39200',
+        '#af0e80',
+        '#ffcc00',
+        '#e94c0a',
+        '#0581a2',
+        '#163a72',
+        '#899d0c',
+        '#488225',
+        '#ce7c00',
+        '#82045e',
+        '#e1b600',
+        '#b23d02',
     ],
 }
 
@@ -116,25 +116,25 @@ def write_to_json_file(
     if output_file_name is None:
         if input_file_name is None:
             if chart_type is None:
-                chart_label = ""
+                chart_label = ''
             else:
                 chart_label = chart_type
             default_file_name = Path(
-                "_".join(["highchart", chart_label, "plot"]) + ".json"
+                '_'.join(['highchart', chart_label, 'plot']) + '.json'
             )
         else:
             file_stem = Path(input_file_name).stem
-            default_file_name = Path(file_stem).with_suffix(".json")
+            default_file_name = Path(file_stem).with_suffix('.json')
 
         outfile = output_directory / default_file_name
     else:
         if output_directory is None:
-            outfile = Path(output_file_name).with_suffix(".json")
+            outfile = Path(output_file_name).with_suffix('.json')
         else:
-            outfile = output_directory / Path(output_file_name).with_suffix(".json")
+            outfile = output_directory / Path(output_file_name).with_suffix('.json')
     _logger.info(f"Writing to {outfile}")
     chart_container = json.dumps(output, indent=json_indent, ensure_ascii=False)
-    with codecs.open(outfile.as_posix(), "w", encoding="utf-8") as stream:
+    with codecs.open(outfile.as_posix(), 'w', encoding='utf-8') as stream:
         stream.write(chart_container)
 
     return outfile
@@ -151,8 +151,8 @@ class CBSHighChart:
         defaults_file_name: str = None,
         defaults_out_file: str = None,
         chart_type: str = None,
-        csv_separator: str = ";",
-        decimal: str = ",",
+        csv_separator: str = ';',
+        decimal: str = ',',
         index_col: int = 0,
         x_format: str = None,
         y_format: str = None,
@@ -213,12 +213,12 @@ class CBSHighChart:
 
         if chart_type is None:
             # defaults chart type is a bar plot
-            self.chart_type = "bar"
+            self.chart_type = 'bar'
         else:
             self.chart_type = chart_type
 
         if output_directory is None:
-            self.output_directory = Path(".")
+            self.output_directory = Path('.')
         else:
             self.output_directory = Path(output_directory)
 
@@ -227,7 +227,7 @@ class CBSHighChart:
         self.modification_file_name = defaults_out_file
 
         # initieer de output dictionary
-        self.output = {"template": {}, "options": {}, "selectedTemplate": {}}
+        self.output = {'template': {}, 'options': {}, 'selectedTemplate': {}}
 
         # hier worden alle defaults in de self.defaults attribute geladen
         self.defaults = self.read_the_defaults(
@@ -243,7 +243,7 @@ class CBSHighChart:
             _logger.info(
                 """
                 We hebben de defaults template geschreven om het *default_out_file* als argument gegeven
-                was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee 
+                was. Als je het plaatje met deze template wil maken, geef dan *defaults_out_file* mee
                 met het *defaults_file_name* argument. Script stop nu hier.
                     """
             )
@@ -262,7 +262,7 @@ class CBSHighChart:
             _logger.debug(f"Using dataframe")
             self.data_df = data
 
-        if self.chart_type == "bar_with_negative_stack":
+        if self.chart_type == 'bar_with_negative_stack':
             self.negative_stack = True
         else:
             self.negative_stack = False
@@ -289,26 +289,25 @@ class CBSHighChart:
             _logger.info(f"Successfully wrote to {out_file}")
         else:
             _logger.info(
-                "The data was read successfully. To create the highcharts, call the "
-                "*make_highcharts()* method or pass the start=True argument"
+                'The data was read successfully. To create the highcharts, call the '
+                '*make_highcharts()* method or pass the start=True argument'
             )
 
     def make_highchart(self):
-
         # now add all the items of the highcarts
         self.add_chart()
         self.add_plot_options()
         self.check_and_modify_data()
 
-        self.add_title(text_key="title")
-        self.add_title(text_key="subtitle")
+        self.add_title(text_key='title')
+        self.add_title(text_key='subtitle')
 
         self.add_axis(
-            axis_key="xAxis",
+            axis_key='xAxis',
             categories=self.categories,
             labels_format=self.x_labels_format,
         )
-        self.add_axis(axis_key="yAxis", labels_format=self.y_labels_format)
+        self.add_axis(axis_key='yAxis', labels_format=self.y_labels_format)
         self.add_legend()
         self.add_tooltip()
         self.add_credits()
@@ -318,13 +317,13 @@ class CBSHighChart:
         self.add_csv_data()
         self.add_series()
         self.add_axis(
-            key="options",
-            axis_key="xAxis",
+            key='options',
+            axis_key='xAxis',
             categories=self.categories,
             labels_format=self.x_labels_format,
         )
         self.add_axis(
-            key="options", axis_key="yAxis", labels_format=self.y_labels_format
+            key='options', axis_key='yAxis', labels_format=self.y_labels_format
         )
 
         self.add_selected_templated()
@@ -349,7 +348,7 @@ class CBSHighChart:
                 self.data_df.index = self.data_df.index.astype(str)
             except ValueError:
                 _logger.debug(
-                    "Kan niet naar string converteren. Hopelijk is dit het al"
+                    'Kan niet naar string converteren. Hopelijk is dit het al'
                 )
 
     def impose_value(self, value, key_1, key_2=None, key_3=None, output=None):
@@ -378,39 +377,38 @@ class CBSHighChart:
             except KeyError:
                 _logger.warning(f"Failed imposing value '{value}' to [{key_1}]")
         else:
-            raise ValueError("at least one key should be given")
+            raise ValueError('at least one key should be given')
 
         return output
 
     def impose_axis_prop(
         self,
         output,
-        section="template",
-        axis_key="xAxis",
+        section='template',
+        axis_key='xAxis',
         label=None,
         tick_interval=None,
         lim=None,
         keep_tick_interval_format=False,
     ):
-
         new_axis = list()
         for axis in self.output[section][axis_key]:
             if label is not None:
-                if axis_key == "xAxis":
+                if axis_key == 'xAxis':
                     _logger.debug(
                         f"Imposing {label} to [{section}][{axis_key}][title][text]"
                     )
-                    axis = self.impose_value(label, "title", "text", output=axis)
+                    axis = self.impose_value(label, 'title', 'text', output=axis)
                 else:
                     _logger.debug(
                         f"Imposing {label} to [{section}][{axis_key}][cbsTitle]"
                     )
-                    axis = self.impose_value(label, "cbsTitle", output=axis)
+                    axis = self.impose_value(label, 'cbsTitle', output=axis)
             if tick_interval is not None:
                 _logger.debug(
                     f"Imposing {tick_interval} to [{section}][{axis_key}][tickInterval]"
                 )
-                if axis_key == "xAxis" or keep_tick_interval_format:
+                if axis_key == 'xAxis' or keep_tick_interval_format:
                     tick_interval_on_axis = tick_interval
                 else:
                     tick_interval_on_axis = str(tick_interval)
@@ -419,15 +417,15 @@ class CBSHighChart:
                 # volgens mijn is xAxis een int, yAxis een float. Introduceer anders vlag 'keep_tick_interval_format
                 # als je het als gebruiker zelf wil bepalen
                 axis = self.impose_value(
-                    tick_interval_on_axis, "tickInterval", output=axis
+                    tick_interval_on_axis, 'tickInterval', output=axis
                 )
             if lim is not None:
                 if lim[0] is not None:
                     _logger.debug(f"Imposing {lim[0]} to [{section}][{axis_key}][min]")
-                    axis = self.impose_value(str(lim[0]), "min", output=axis)
+                    axis = self.impose_value(str(lim[0]), 'min', output=axis)
                 if lim[1] is not None:
                     _logger.debug(f"Imposing {lim[1]} to [{section}][{axis_key}][max]")
-                    axis = self.impose_value(str(lim[1]), "max", output=axis)
+                    axis = self.impose_value(str(lim[1]), 'max', output=axis)
             new_axis.append(axis)
         output[section][axis_key] = new_axis
 
@@ -438,11 +436,11 @@ class CBSHighChart:
         # plot settings
         if self.title is not None:
             _logger.debug(f"Imposing {self.title} to [options][title][text]")
-            self.output = self.impose_value(self.title, "options", "title", "text")
+            self.output = self.impose_value(self.title, 'options', 'title', 'text')
         if self.subtitle is not None:
             _logger.debug(f"Imposing {self.subtitle} to [options][title][text]")
             self.output = self.impose_value(
-                self.subtitle, "options", "subtitle", "text"
+                self.subtitle, 'options', 'subtitle', 'text'
             )
 
         if (
@@ -450,12 +448,12 @@ class CBSHighChart:
             or self.x_tick_interval is not None
             or self.x_lim is not None
         ):
-            for section in ("template", "options"):
+            for section in ('template', 'options'):
                 _logger.debug(f"Imposing xlabel/xtick/xlim to [{section}][xAxis][text]")
                 self.output = self.impose_axis_prop(
                     output=self.output,
                     section=section,
-                    axis_key="xAxis",
+                    axis_key='xAxis',
                     label=self.xlabel,
                     tick_interval=self.x_tick_interval,
                     lim=self.x_lim,
@@ -467,12 +465,12 @@ class CBSHighChart:
             or self.y_tick_interval is not None
             or self.y_lim is not None
         ):
-            for section in ("template", "options"):
+            for section in ('template', 'options'):
                 _logger.debug(f"Imposing ylabel/ytick/ylim to [{section}][yAxis][text]")
                 self.output = self.impose_axis_prop(
                     output=self.output,
                     section=section,
-                    axis_key="yAxis",
+                    axis_key='yAxis',
                     label=self.ylabel,
                     tick_interval=self.y_tick_interval,
                     lim=self.y_lim,
@@ -484,45 +482,45 @@ class CBSHighChart:
                 f"Imposing {self.chart_description} to [options][chart][description]"
             )
             self.output = self.impose_value(
-                self.chart_description, "options", "chart", "description"
+                self.chart_description, 'options', 'chart', 'description'
             )
         if self.chart_height is not None:
             _logger.debug(f"Imposing {self.chart_height} to [options][chart][height]")
             self.output = self.impose_value(
-                self.chart_height, "options", "chart", "height"
+                self.chart_height, 'options', 'chart', 'height'
             )
         if self.color_selection is not None:
             pass
         if self.sources_text is not None:
             _logger.debug(f"Imposing {self.sources_text} to [options][sources][text]")
             self.output = self.impose_value(
-                self.sources_text, "options", "sources", "text"
+                self.sources_text, 'options', 'sources', 'text'
             )
         if self.sources_prefix is not None:
             _logger.debug(
                 f"Imposing {self.sources_prefix} to [options][sources][prefix]"
             )
             self.output = self.impose_value(
-                self.sources_prefix, "options", "sources", "prefix"
+                self.sources_prefix, 'options', 'sources', 'prefix'
             )
         if self.footnote_text is not None:
             _logger.debug(f"Imposing {self.footnote_text} to [options][footNote][text]")
             self.output = self.impose_value(
-                self.footnote_text, "options", "footNote", "text"
+                self.footnote_text, 'options', 'footNote', 'text'
             )
         if self.tooltip_prefix is not None:
             _logger.debug(
                 f"Imposing {self.tooltip_prefix} to [options][tooltip][valuePrefix]"
             )
             self.output = self.impose_value(
-                self.tooltip_prefix, "options", "tooltip", "valuePrefix"
+                self.tooltip_prefix, 'options', 'tooltip', 'valuePrefix'
             )
         if self.tooltip_suffix is not None:
             _logger.debug(
                 f"Imposing {self.tooltip_suffix} to [options][tooltip][valueSuffix]"
             )
             self.output = self.impose_value(
-                self.tooltip_suffix, "options", "tooltip", "valueSuffix"
+                self.tooltip_suffix, 'options', 'tooltip', 'valueSuffix'
             )
 
         if self.enable_legend is not None:
@@ -530,7 +528,7 @@ class CBSHighChart:
                 f"Imposing {self.enable_legend} to [options][legend][enabled]"
             )
             self.output = self.impose_value(
-                self.enable_legend, "options", "legend", "enabled"
+                self.enable_legend, 'options', 'legend', 'enabled'
             )
 
         if self.has_grouped_categories is not None:
@@ -540,9 +538,9 @@ class CBSHighChart:
             )
             self.output = self.impose_value(
                 self.has_grouped_categories,
-                "options",
-                "settings",
-                "hasGroupedCategories",
+                'options',
+                'settings',
+                'hasGroupedCategories',
             )
 
         if self.color_selection is not None:
@@ -554,26 +552,26 @@ class CBSHighChart:
                 )
 
             self.output = self.impose_value(
-                self.color_selection, "options", "colorSelection"
+                self.color_selection, 'options', 'colorSelection'
             )
-            self.output = self.impose_value(colors, "options", "colors")
+            self.output = self.impose_value(colors, 'options', 'colors')
 
         if self.series_description is not None:
             self.series_description.index = self.series_description.index.map(str)
             new_entries = list()
-            for entry in self.output["options"]["series"]:
-                name = entry["name"]
+            for entry in self.output['options']['series']:
+                name = entry['name']
                 description = self.series_description.loc[name].values[0]
-                entry["description"] = description
+                entry['description'] = description
                 new_entries.append(entry)
-            self.output["options"]["series"] = new_entries
+            self.output['options']['series'] = new_entries
 
     @staticmethod
-    def get_data(input_file_name, index_col=0, csv_separator=";", decimal=","):
+    def get_data(input_file_name, index_col=0, csv_separator=';', decimal=','):
         if input_file_name is None:
             raise TypeError(
-                "Both input data argument *data_df* and input filename "
-                "*input_file_name* are None. Please provide at least one."
+                'Both input data argument *data_df* and input filename '
+                '*input_file_name* are None. Please provide at least one.'
             )
         else:
             _logger.debug(f"Reading {input_file_name}")
@@ -584,7 +582,7 @@ class CBSHighChart:
 
     def get_categories(self):
         if self.data_df.index.nlevels == 1:
-            categories = ["0" if _ == 0 else _ for _ in self.data_df.index.to_list()]
+            categories = ['0' if _ == 0 else _ for _ in self.data_df.index.to_list()]
             if self.has_grouped_categories is None:
                 self.has_grouped_categories = False
         elif self.data_df.index.nlevels == 2:
@@ -594,15 +592,15 @@ class CBSHighChart:
 
             for first_level_key, df in self.data_df.groupby(level=0, sort=False):
                 categories_strings = [
-                    "0" if _ == 0 else _ for _ in df.index.get_level_values(1).to_list()
+                    '0' if _ == 0 else _ for _ in df.index.get_level_values(1).to_list()
                 ]
                 group_categories = {
-                    "name": str(first_level_key),
-                    "categories": categories_strings,
+                    'name': str(first_level_key),
+                    'categories': categories_strings,
                 }
                 categories.append(group_categories)
         else:
-            raise TypeError("Multilevel with more than 2 levels not implemented")
+            raise TypeError('Multilevel with more than 2 levels not implemented')
 
         return categories
 
@@ -637,7 +635,7 @@ class CBSHighChart:
 
         if defaults_file_name is None:
             # Als de default filename None is, dan is default directory sowieso gezet.
-            defaults_file_name = defaults_directory / Path(chart_type + ".json")
+            defaults_file_name = defaults_directory / Path(chart_type + '.json')
         else:
             # Default file naam was door de gebruiker meegegeven. Als ook de directory meegegeven
             # was dan combineren
@@ -654,7 +652,7 @@ class CBSHighChart:
 
         _logger.debug(f"Reading template {defaults_file_name}")
         try:
-            with open(defaults_file_name, "r") as stream:
+            with open(defaults_file_name, 'r') as stream:
                 defaults = json.load(stream)
         except FileNotFoundError as err:
             try:
@@ -662,95 +660,85 @@ class CBSHighChart:
                     f"{err}\n"
                     f"Failed reading {defaults_file_name}. Try again with .json suffix"
                 )
-                defaults_file_name = defaults_file_name.with_suffix(".json")
-                with open(defaults_file_name, "r") as stream:
+                defaults_file_name = defaults_file_name.with_suffix('.json')
+                with open(defaults_file_name, 'r') as stream:
                     defaults = json.load(stream)
             except FileNotFoundError as err:
                 _logger.warning(err)
-                template_list = "\n".join(PLOT_TEMPLATES)
+                template_list = '\n'.join(PLOT_TEMPLATES)
                 _logger.warning(
                     f"Je hebt  chart_type={chart_type} geselecteerd maar kan de template "
                     f"{defaults_file_name}\n niet vinden. De volgende templates zijn"
                     f"tot nu geïmplementeerd:\n{template_list}"
                 )
                 _logger.warning(
-                    "Geef een goede template via de chart_type optie of kies een "
-                    "custom template via input_file_name. Stop hier"
+                    'Geef een goede template via de chart_type optie of kies een '
+                    'custom template via input_file_name. Stop hier'
                 )
                 sys.exit(-1)
 
         return defaults
 
-    def add_plot_lines(self, key="template"):
+    def add_plot_lines(self, key='template'):
+        self.output[key]['plotLines'] = self.defaults[key]['plotLines']
 
-        self.output[key]["plotLines"] = self.defaults[key]["plotLines"]
+    def add_chart(self, key='template'):
+        self.output[key]['chart'] = self.defaults[key]['chart']
 
-    def add_chart(self, key="template"):
+    def add_plot_options(self, key='template'):
+        self.output[key]['plotOptions'] = self.defaults[key]['plotOptions']
 
-        self.output[key]["chart"] = self.defaults[key]["chart"]
-
-    def add_plot_options(self, key="template"):
-        self.output[key]["plotOptions"] = self.defaults[key]["plotOptions"]
-
-    def add_title(self, key="template", text_key="title"):
-
+    def add_title(self, key='template', text_key='title'):
         self.output[key][text_key] = self.defaults[key][text_key]
 
-    def add_tooltip(self, key="template"):
+    def add_tooltip(self, key='template'):
+        self.output[key]['tooltip'] = self.defaults[key]['tooltip']
 
-        self.output[key]["tooltip"] = self.defaults[key]["tooltip"]
+    def add_credits(self, key='template'):
+        self.output[key]['credits'] = self.defaults[key]['credits']
 
-    def add_credits(self, key="template"):
+    def add_bar_type(self, key='template'):
+        if self.chart_type == 'bar_with_negative_stack':
+            self.output[key]['barType'] = {'negative': True}
 
-        self.output[key]["credits"] = self.defaults[key]["credits"]
-
-    def add_bar_type(self, key="template"):
-
-        if self.chart_type == "bar_with_negative_stack":
-            self.output[key]["barType"] = {"negative": True}
-
-    def add_legend(self, key="template"):
-
-        self.output[key]["legend"] = self.defaults[key]["legend"]
+    def add_legend(self, key='template'):
+        self.output[key]['legend'] = self.defaults[key]['legend']
 
     def add_axis(
-        self, key="template", axis_key="xAxis", categories=None, labels_format=None
+        self, key='template', axis_key='xAxis', categories=None, labels_format=None
     ):
-
         self.output[key][axis_key] = self.defaults[key][axis_key]
         if labels_format is not None:
             for ax in self.output[key][axis_key]:
                 try:
-                    labels = ax["labels"]
+                    labels = ax['labels']
                 except KeyError:
-                    ax["labels"] = dict()
-                    labels = ax["labels"]
+                    ax['labels'] = dict()
+                    labels = ax['labels']
 
-                labels["format"] = labels_format
+                labels['format'] = labels_format
 
         if categories is not None:
             for ax in self.output[key][axis_key]:
-                ax["categories"] = []
+                ax['categories'] = []
                 for category in categories:
                     if isinstance(category, dict):
-                        ax["categories"].append(category)
+                        ax['categories'].append(category)
                     else:
-                        ax["categories"].append(str(category))
+                        ax['categories'].append(str(category))
 
     def add_options(self):
-        self.output["options"] = self.defaults["options"]
+        self.output['options'] = self.defaults['options']
 
-    def add_csv_data(self, key="options", settings_keys="settings"):
-
+    def add_csv_data(self, key='options', settings_keys='settings'):
         csv = self.data_df.to_csv(
-            sep=self.csv_separator, decimal=self.decimal, float_format="%g"
+            sep=self.csv_separator, decimal=self.decimal, float_format='%g'
         )
-        self.output[key][settings_keys]["csvData"] = csv.rstrip()
+        self.output[key][settings_keys]['csvData'] = csv.rstrip()
 
-    def add_series(self, key="options", series_key="series"):
-
+    def add_series(self, key='options', series_key='series'):
         if self.y_format is None:
-            self.y_format = "{:g}"
+            self.y_format = '{:g}'
 
         try:
             # als data_df een Series is maken we er een dataframe van.
@@ -763,10 +751,10 @@ class CBSHighChart:
         for col_name in data_df.columns:
             # Let op dat de name van een serie altijd een string moet zijn.
             item = {
-                "name": str(col_name),
-                "isSerie": True,
-                "borderColor": "#FFFFFF",
-                "data": list(),
+                'name': str(col_name),
+                'isSerie': True,
+                'borderColor': '#FFFFFF',
+                'data': list(),
             }
             for index, row in data_df[[col_name]].iterrows():
                 value = row.values[0]
@@ -778,9 +766,9 @@ class CBSHighChart:
                     pass
 
                 if pd.isnull(value):
-                    y_string = "."
+                    y_string = '.'
                     entry = {
-                        "yString": y_string,
+                        'yString': y_string,
                     }
                 else:
                     if self.y_format is None:
@@ -788,16 +776,16 @@ class CBSHighChart:
                     else:
                         y_string = self.y_format.format(value)
                     entry = {
-                        "y": value,
-                        "yString": y_string,
+                        'y': value,
+                        'yString': y_string,
                     }
                 if isinstance(index, str):
-                    entry["name"] = index
-                item["data"].append(entry)
+                    entry['name'] = index
+                item['data'].append(entry)
 
             series.append(item)
 
         self.output[key][series_key] = series
 
-    def add_selected_templated(self, key="selectedTemplate"):
+    def add_selected_templated(self, key='selectedTemplate'):
         self.output[key] = self.defaults[key]

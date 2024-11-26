@@ -11,7 +11,7 @@ from cbsplotlib.colors import get_color_palette, set_cbs_colors
 
 _logger = logging.getLogger(__name__)
 
-RATIO_OPTIONS = {"golden_ratio", "equal", "from_rows"}
+RATIO_OPTIONS = {'golden_ratio', 'equal', 'from_rows'}
 
 PT_PER_INCHE = 72.27
 INCHES_PER_PT = 1 / PT_PER_INCHE
@@ -57,16 +57,15 @@ class CBSPlotSettings(object):
         text_width_in_pt: float = 392.64813,
         text_height_in_pt: float = 693,
         text_margin_bot_in_inch: float = 1.0,  # margin in inch
-        ratio_option="golden_ratio",
+        ratio_option='golden_ratio',
         plot_parameters: dict = None,
-        color_palette: str = "koel",
+        color_palette: str = 'koel',
         font_size: float = 8,
         set_gray_x_tics: bool = False,
         set_gray_y_tics: bool = False,
         reverse: bool = False,
         offset: int = 0,
     ):
-
         self.number_of_figures_rows = number_of_figures_rows
         self.number_of_figures_cols = number_of_figures_cols
         self.text_width_in_pt = text_width_in_pt
@@ -93,11 +92,11 @@ class CBSPlotSettings(object):
 
         if fig_height_in_inch is not None:
             self.fig_height = fig_height_in_inch
-        elif ratio_option == "golden_ratio":
+        elif ratio_option == 'golden_ratio':
             self.fig_height = self.fig_width * GOLDEN_MEAN
-        elif ratio_option == "equal":
+        elif ratio_option == 'equal':
             self.fig_height = self.fig_width
-        elif ratio_option == "from_rows":
+        elif ratio_option == 'from_rows':
             self.fig_height = (text_height - text_margin_bot) / number_of_figures_rows
         else:
             raise ValueError(
@@ -113,27 +112,27 @@ class CBSPlotSettings(object):
             self.params = plot_parameters
         else:
             self.params = {
-                "axes.labelsize": font_size,
-                "font.size": font_size,
-                "legend.fontsize": font_size,
-                "xtick.labelsize": font_size,
-                "ytick.labelsize": font_size,
-                "figure.figsize": self.fig_size,
-                "grid.color": "cbs:highchartslichtgrijs",
-                "grid.linewidth": 1.0,
-                "hatch.color": "cbs:highchartslichtgrijs",
-                "axes.prop_cycle": prop_cycle,
-                "axes.edgecolor": "cbs:grijs",
-                "axes.linewidth": 1.5,
+                'axes.labelsize': font_size,
+                'font.size': font_size,
+                'legend.fontsize': font_size,
+                'xtick.labelsize': font_size,
+                'ytick.labelsize': font_size,
+                'figure.figsize': self.fig_size,
+                'grid.color': 'cbs:highchartslichtgrijs',
+                'grid.linewidth': 1.0,
+                'hatch.color': 'cbs:highchartslichtgrijs',
+                'axes.prop_cycle': prop_cycle,
+                'axes.edgecolor': 'cbs:grijs',
+                'axes.linewidth': 1.5,
             }
 
         set_cbs_colors()
         mpl.rcParams.update(self.params)
 
         if set_gray_x_tics:
-            self.set_tick_color(axis="x")
+            self.set_tick_color(axis='x')
         if set_gray_y_tics:
-            self.set_tick_color(axis="y")
+            self.set_tick_color(axis='y')
 
     @staticmethod
     def set_tick_color(axis: str = None):
@@ -151,23 +150,23 @@ class CBSPlotSettings(object):
           zodat dit niet goed mogelijk is.
 
         """
-        if axis is None or axis not in ("x", "y"):
+        if axis is None or axis not in ('x', 'y'):
             msg = "Specificeer de axis waarvan je de ticks wilt kleuren met axis='x' of axis='y'"
             raise ValueError(msg)
 
         try:
-            mpl.rcParams.update({f"{axis}tick.labelcolor": "black"})
+            mpl.rcParams.update({f"{axis}tick.labelcolor": 'black'})
         except KeyError:
             _logger.warning(
-                "In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur"
-                "apart instellen omdat xtick.labelcolor nog niet bestaat. Doe"
-                "in je script dan gewoon "
+                'In matplotlib <3.4 kan je nog niet de tick kleur en tick label kleur'
+                'apart instellen omdat xtick.labelcolor nog niet bestaat. Doe'
+                'in je script dan gewoon '
                 "ax.tick_params(colors='cbs:highchartslichtgrijs', which='both')"
             )
         else:
             # We konden de label kleur op black zetten. Verander dan nu de tick kleur
             mpl.rcParams.update(
                 {
-                    f"{axis}tick.color": "cbs:grijs",
+                    f"{axis}tick.color": 'cbs:grijs',
                 }
             )

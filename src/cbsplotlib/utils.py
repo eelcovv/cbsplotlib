@@ -1,6 +1,7 @@
 """
 Utility functions
 """
+
 import logging
 from typing import List, Tuple, Dict
 
@@ -15,15 +16,15 @@ RATIO_OPTIONS = {'golden_ratio', 'equal', 'from_rows'}
 
 
 def add_values_to_bars(
-        axis,
-        bar_type='bar',
-        position='c',
-        label_format='{:.0f}',
-        x_offset=0,
-        y_offset=0,
-        color='k',
-        horizontalalignment='center',
-        verticalalignment='center',
+    axis,
+    bar_type='bar',
+    position='c',
+    label_format='{:.0f}',
+    x_offset=0,
+    y_offset=0,
+    color='k',
+    horizontalalignment='center',
+    verticalalignment='center',
 ):
     """
     Add the values of the bars as number in the center
@@ -111,17 +112,17 @@ def add_values_to_bars(
 
 
 def add_cbs_logo_to_plot(
-        fig,
-        axes=None,
-        margin_x_in_mm=6.0,
-        margin_y_in_mm=6.0,
-        x0=0,
-        y0=0,
-        width=None,
-        height=None,
-        zorder_start=1,
-        fillcolor='cbs:highchartslichtgrijs',
-        edgecolor='cbs:logogrijs',
+    fig,
+    axes=None,
+    margin_x_in_mm=6.0,
+    margin_y_in_mm=6.0,
+    x0=0,
+    y0=0,
+    width=None,
+    height=None,
+    zorder_start=1,
+    fillcolor='cbs:highchartslichtgrijs',
+    edgecolor='cbs:logogrijs',
 ):
     """
     Add the CBS logo to the plot.
@@ -187,7 +188,6 @@ def add_cbs_logo_to_plot(
 
     zorder = zorder_start
     for points_in_out in all_points:
-
         for ii, points in enumerate(points_in_out):
             points[:, :2] *= fig.dpi / 25.4
             points[:, 0] += x0
@@ -381,21 +381,21 @@ def _get_cbs_logo_points(logo_width_in_mm=3.234, rrcor=0.171):
 
 
 def add_axis_label_background(
-        fig,
-        axes,
-        alpha=1,
-        margin=0.05,
-        x0=None,
-        y0=None,
-        loc='east',
-        radius_corner_in_mm=1,
-        logo_margin_x_in_mm=1,
-        logo_margin_y_in_mm=1,
-        add_logo=True,
-        aspect=None,
-        backgroundcolor='cbs:highchartslichtgrijs',
-        logo_fillcolor='cbs:highchartslichtgrijs',
-        logo_edgecolor='cbs:logogrijs',
+    fig,
+    axes,
+    alpha=1,
+    margin=0.05,
+    x0=None,
+    y0=None,
+    loc='east',
+    radius_corner_in_mm=1,
+    logo_margin_x_in_mm=1,
+    logo_margin_y_in_mm=1,
+    add_logo=True,
+    aspect=None,
+    backgroundcolor='cbs:highchartslichtgrijs',
+    logo_fillcolor='cbs:highchartslichtgrijs',
+    logo_edgecolor='cbs:logogrijs',
 ):
     """
     Add a background to the axis labels.
@@ -602,7 +602,7 @@ def format_thousands_label(value: float, _: object) -> str:
 
 
 def swap_legend_boxes(
-        handles: List[m_patches.Patch], labels: List[str], n_cols: int
+    handles: List[m_patches.Patch], labels: List[str], n_cols: int
 ) -> Tuple[List[m_patches.Patch], List[str]]:
     """
     Rearrange legend handles and labels to match the order of the first row.
