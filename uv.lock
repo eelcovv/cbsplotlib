@@ -53,7 +53,7 @@ wheels = [
 
 [[package]]
 name = "cbsplotlib"
-version = "0.5.4.dev1+g7eef609.d20241126"
+version = "0.5.4.dev1+g1736163"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib", marker = "sys_platform == 'linux'" },
@@ -91,7 +91,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'testing'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'testing'" },
-    { name = "ruff", marker = "extra == 'dev'" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" },
     { name = "seaborn" },
     { name = "setuptools", marker = "extra == 'dev'" },
     { name = "setuptools", marker = "extra == 'testing'" },
