@@ -5,12 +5,7 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
-[tool.uv]
-environments = [
-    "sys_platform == 'linux'",
-]
 cache-keys = [{ git = { commit = true, tags = true } }]
-
 
 [project]
 name = "cbsplotlib"
@@ -20,7 +15,7 @@ readme = "README.rst"
 license = "MIT"
 requires-python = ">=3.8"
 authors = [
-    { name = "Eelco van Vliet", email = "EVLT@cbs.nl" },
+    { name = "Eelco van Vliet", email = "eelcovv@gmail.nl" },
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -40,15 +35,12 @@ dev = [
     "pytest",
     "pytest-cov",
     "ruff>=0.8.0",
-    "setuptools",
-    "tox",
     "twine",
     "wheel",
 ]
 testing = [
     "pytest",
     "pytest-cov",
-    "setuptools",
 ]
 
 [project.scripts]

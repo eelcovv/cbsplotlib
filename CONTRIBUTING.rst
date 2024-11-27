@@ -71,6 +71,13 @@ and use Python's built-in web server for a preview in your web browser
 
     python3 -m http.server --directory 'docs/_build/html'
 
+In case you use uv as a package manager, install tox with tox-uv as::
+
+        uv tool install tox --with tox-uv # use uv to install
+        tox --version # validate you are using the installed tox
+        tox r -e py312 # will use uv
+        tox --runner virtualenv r -e py312 # will use virtualenv+pip
+
 
 Code Contributions
 ==================
