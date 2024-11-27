@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Version 0.5.9
+Version 0.6.0
 =============
 - Introduced pyproject.toml file generated with uv
+- added ruff as formatter
 
 Version 0.5.6
 =============
