@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Version 0.5.7
+=============
+- Introduced pyproject.toml file generated with uv
+
 Version 0.5.3
 =============
 - Added two new utility functions: wap_legend_positions and format_thousands_label
