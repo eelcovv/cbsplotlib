@@ -13,7 +13,7 @@ __pycache__/*
 .*.swp
 */.ipynb_checkpoints/*
 .DS_Store
-__pychache__
+__pycache__
 
 # Project files
 .ropeproject
@@ -62,3 +62,4 @@ MANIFEST
 /install_exe.ps1
 # ignore for master, not for js_queries branch
 /src/cbsplotlib/js_queries/
+/examples/highcharts/

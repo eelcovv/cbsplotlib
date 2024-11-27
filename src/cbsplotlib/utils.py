@@ -5,10 +5,14 @@ Utility functions
 import logging
 from typing import List, Tuple, Dict
 
+import matplotlib
 import matplotlib.patches as m_patches
 import matplotlib.transforms as trn
 import numpy as np
 from matplotlib.path import Path as mPath
+
+from matplotlib.axes import Axes
+from matplotlib.artist import Artist
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +39,7 @@ def add_values_to_bars(
 
     Parameters
     ----------
-    axis: `mpl.pyplot.axes.Axes` object
+    axis: `matplotlib.pyplot.axes.Axes` object
         Axis containing the bar plot
     bar_type: {"bar", "barh"}
         Direction of the bars. Default = "bar", meaning vertical bars. Alternatively, you need to
@@ -545,33 +549,38 @@ def add_axis_label_background(
         )
 
 
-def clean_up_artists(axis, artist_list):
+def remove_artists(axis: Axes, artists: list[Artist]) -> None:
     """
-    try to remove the artists stored in the artist list belonging to the 'axis'.
-    :param axis: clean artists belonging to these axis
-    :param artist_list: list of artists to remove
-    :return: nothing
-    """
-    for artist in artist_list:
-        try:
-            # fist attempt: try to remove a collection of contours for instance
-            while artist.collections:
-                for col in artist.collections:
-                    artist.collections.remove(col)
-                    try:
-                        axis.collections.remove(col)
-                    except ValueError:
-                        pass
+    Remove artists from an axis.
 
-                artist.collections = []
-                axis.collections = []
+    Parameters
+    ----------
+    axis : Axes
+        The axis from which to remove artists.
+    artists : list[Artist]
+        A list of artists to be removed.
+
+    Returns
+    -------
+    None
+    """
+    for artist in artists:
+        # Try to remove the artist from the axis
+        try:
+            artist.remove()
         except AttributeError:
             pass
 
-        # second attempt, try to remove the text
+        # Try to remove the artist from the axis collections
         try:
-            artist.remove()
-        except (AttributeError, ValueError):
+            while artist.collections:
+                for collection in artist.collections:
+                    artist.collections.remove(collection)
+                    try:
+                        axis.collections.remove(collection)
+                    except ValueError:
+                        pass
+        except AttributeError:
             pass
 
 
@@ -584,26 +593,22 @@ def format_thousands_label(value: float, _: object) -> str:
     value : float
         The value to format.
     _ : object
-        An unused parameter, only present to match the signature for a FormatStrFormatter.
+        Unused parameter, only present to match the signature for a FormatStrFormatter.
 
     Returns
     -------
     str
-        The formatted value with spaces as a thousand separator.
-
-    Examples
-    --------
-    >>> format_thousands_label(1234, None)
-    '1 234'
-    >>> format_thousands_label(1234567.89, None)
-    '1 234 567`
+        Formatted value with spaces as a thousand separator.
     """
-    return '{:0,d}'.format(int(value)).replace(',', ' ')
+    int_value = int(value)
+    return '{:,}'.format(int_value).replace(',', ' ')
 
 
 def swap_legend_boxes(
-    handles: List[m_patches.Patch], labels: List[str], n_cols: int
-) -> Tuple[List[m_patches.Patch], List[str]]:
+    handles: List[matplotlib.artist.Artist],  # List of legend handles
+    labels: List[str],  # List of legend labels
+    n_cols: int  # Number of columns in the legend
+) -> Tuple[List[matplotlib.artist.Artist], List[str]]:
     """
     Rearrange legend handles and labels to match the order of the first row.
 
@@ -611,22 +616,22 @@ def swap_legend_boxes(
 
     Parameters
     ----------
-    handles : list of matplotlib.patches.Patch
+    handles : List[matplotlib.artist.Artist]
         The list of legend handles.
-    labels : list of str
+    labels : List[str]
         The list of legend labels.
     n_cols : int
         The number of columns in the legend.
 
     Returns
     -------
-    reordered_handles : list of matplotlib.patches.Patch
+    reordered_handles : List[matplotlib.artist.Artist]
         The rearranged list of legend handles.
-    reordered_labels : list of str
+    reordered_labels : List[str]
         The rearranged list of legend labels.
     """
-    reordered_handles = handles[:]
-    reordered_labels = labels[:]
+    reordered_handles: List[matplotlib.artist.Artist] = handles.copy()
+    reordered_labels: List[str] = labels.copy()
 
     if len(reordered_labels) != len(reordered_handles):
         raise ValueError('Number of handles and labels must be equal.')
