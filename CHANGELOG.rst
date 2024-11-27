@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 0.5.8
+Version 0.5.9
 =============
 - Introduced pyproject.toml file generated with uv
 
