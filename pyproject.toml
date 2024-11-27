@@ -49,5 +49,3 @@ highcharts_html_viewer = "cbsplotlib.htmlviewer:run"
 [project.urls]
 Documentation = "https://pyscaffold.org/"
 Homepage = "https://github.com/pyscaffold/pyscaffold/"
-
-version-file = "cbsplotlib/_version.py"

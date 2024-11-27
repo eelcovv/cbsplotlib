@@ -56,7 +56,7 @@ wheels = [
 
 [[package]]
 name = "cbsplotlib"
-version = "0.5.7.dev5+gd3f32e8.d20241127"
+version = "0.5.9.dev0+g7aa36fd.d20241127"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
